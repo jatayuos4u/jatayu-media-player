@@ -7,11 +7,18 @@
 #include <QSGRendererInterface>
 #include <QDebug>
 #include <exception>
+#include <clocale>
 int main(int argc, char *argv[]) {
   QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
   QGuiApplication app(argc, argv);
   QGuiApplication::setApplicationName("Jatayu Media Player");
   QGuiApplication::setOrganizationName("Jatayu");
+  // libmpv requires the C numeric locale for number parsing.
+  // Keep the system language and other locale categories unchanged.
+  if (!std::setlocale(LC_NUMERIC, "C")) {
+    qCritical() << "Unable to configure numeric locale for libmpv";
+    return 1;
+  }
   try {
     PlaybackController player;
     qmlRegisterType<MpvVideoItem>("Jatayu.Backend", 1, 0, "MpvVideoItem");
