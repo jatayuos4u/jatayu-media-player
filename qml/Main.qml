@@ -57,7 +57,11 @@ ApplicationWindow {
                 Item { Layout.fillWidth: true }
                 Button {
                     text: "↑ Up"
-                    onClicked: mediaBrowser.navigate(mediaBrowser.currentPath === "/" ? "/" : mediaBrowser.currentPath.replace(/\\/[^\\/]+\\/?$/, "") || "/")
+                    onClicked: {
+                        const path = mediaBrowser.currentPath
+                        const parentPath = path.substring(0, path.lastIndexOf("/")) || "/"
+                        mediaBrowser.navigate(parentPath)
+                    }
                 }
             }
             TextField {
