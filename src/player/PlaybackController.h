@@ -24,6 +24,7 @@ public:
   Q_INVOKABLE void openFile(const QString &path);
   Q_INVOKABLE QString locationPath(const QString &name) const;
   Q_INVOKABLE QVariantList browseFolder(const QString &path, const QString &filter) const;
+  Q_INVOKABLE QVariantList recentMedia() const;
   Q_INVOKABLE QVariantList searchMedia(const QString &query) const;
   Q_INVOKABLE void togglePause();
   Q_INVOKABLE void stop();
@@ -41,6 +42,7 @@ signals:
   void titleChanged();
   void errorChanged();
   void engineEvent();
+  void recentMediaChanged();
 private:
   static void wakeup(void *ctx);
   void setError(QString message);
