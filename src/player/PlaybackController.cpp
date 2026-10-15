@@ -5,6 +5,7 @@
 #include <QStandardPaths>
 #include <QSet>
 #include <QVariantMap>
+#include <QSettings>
 #include <QFile>
 #include <QMetaObject>
 #include <QUrl>
@@ -43,6 +44,13 @@ void PlaybackController::openFile(const QString &path) {
   if (!info.isFile() || !info.isReadable()) { setError("File is unavailable or not readable"); return; }
   setError({});
   title_ = info.fileName(); emit titleChanged();
+  QSettings settings;
+  QStringList recent = settings.value("recentMedia").toStringList();
+  recent.removeAll(info.absoluteFilePath());
+  recent.prepend(info.absoluteFilePath());
+  while (recent.size() > 20) recent.removeLast();
+  settings.setValue("recentMedia", recent);
+  emit recentMediaChanged();
   QByteArray bytes = QFile::encodeName(info.absoluteFilePath());
   const char *args[] = {"loadfile", bytes.constData(), "replace", nullptr};
   int result = mpv_command_async(handle_, 0, args);
@@ -97,6 +105,9 @@ QVariantList PlaybackController::searchMedia(const QString &query) const {
   };
   const auto home = QDir::homePath();
   const QStringList folders = {
+    QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
+    QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
+    QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
     QStandardPaths::writableLocation(QStandardPaths::MoviesLocation),
     QStandardPaths::writableLocation(QStandardPaths::MusicLocation),
     QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)
@@ -152,6 +163,20 @@ QVariantList PlaybackController::browseFolder(const QString &path, const QString
     items.append(QVariantMap{{"name",entry.fileName()}, {"path",entry.absoluteFilePath()},
                              {"directory",directory}, {"folder",entry.absolutePath()}});
     if (items.size() >= 500) break;
+  }
+  return items;
+}
+
+QVariantList PlaybackController::recentMedia() const {
+  QVariantList items;
+  const QStringList paths = QSettings().value("recentMedia").toStringList();
+  for (const QString &path : paths) {
+    const QFileInfo info(path);
+    if (!info.isFile() || !info.isReadable()) continue;
+    items.append(QVariantMap{{"name", info.fileName()},
+                             {"path", info.absoluteFilePath()},
+                             {"directory", false},
+                             {"folder", info.absolutePath()}});
   }
   return items;
 }
