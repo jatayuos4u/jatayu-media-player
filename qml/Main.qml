@@ -28,7 +28,21 @@ ApplicationWindow {
         property string selectedPath: ""
         property string selectedName: ""
         property bool selectedFolder: false
+        property bool showingRecent: false
+        property bool searchEverywhere: false
+        Timer { id: searchDelay; interval: 350; onTriggered: mediaBrowser.refresh() }
+        function showRecent() {
+            showingRecent = true
+            searchEverywhere = false
+            currentPath = "Recent files"
+            selectedPath = ""
+            selectedName = ""
+            browserSearch.text = ""
+            entries = player.recentMedia()
+        }
         function navigate(path) {
+            showingRecent = false
+            searchEverywhere = false
             currentPath = path
             selectedPath = ""
             selectedName = ""
@@ -36,7 +50,14 @@ ApplicationWindow {
             refresh()
         }
         function refresh() {
-            entries = player.browseFolder(currentPath, browserSearch.text)
+            if (showingRecent) {
+                let search = browserSearch.text.toLowerCase()
+                entries = player.recentMedia().filter(item => item.name.toLowerCase().includes(search))
+            } else if (searchEverywhere) {
+                entries = browserSearch.text.trim().length < 2 ? [] : player.searchMedia(browserSearch.text)
+            } else {
+                entries = player.browseFolder(currentPath, browserSearch.text)
+            }
         }
         onOpened: {
             if (currentPath.length === 0) currentPath = player.locationPath("Home")
@@ -63,8 +84,8 @@ ApplicationWindow {
                     onClicked: mediaBrowser.navigate(player.locationPath("Desktop"))
                 }
                 Button {
-                    text: "▤ Documents"
-                    onClicked: mediaBrowser.navigate(player.locationPath("Documents"))
+                    text: "◷ Recent"
+                    onClicked: mediaBrowser.showRecent()
                 }
                 Item { Layout.fillWidth: true }
                 Button {
@@ -84,16 +105,36 @@ ApplicationWindow {
                 color: "#E9F1F7"
                 placeholderText: "Folder path"
                 background: Rectangle { color: "#101820"; border.color: "#52697E"; radius: 5 }
-                onAccepted: mediaBrowser.navigate(text)
+                readOnly: mediaBrowser.showingRecent || mediaBrowser.searchEverywhere
+                onAccepted: if (!readOnly) mediaBrowser.navigate(text)
             }
-            TextField {
-                id: browserSearch
+            RowLayout {
                 Layout.fillWidth: true
-                placeholderText: "Filter files and folders in this location..."
-                color: "#E9F1F7"
-                selectByMouse: true
-                background: Rectangle { color: "#101820"; border.color: "#52697E"; radius: 5 }
-                onTextChanged: mediaBrowser.refresh()
+                spacing: 8
+                TextField {
+                    id: browserSearch
+                    Layout.fillWidth: true
+                    placeholderText: mediaBrowser.searchEverywhere ? "Search common media folders by filename…" : "Filter names in this folder…"
+                    color: "#E9F1F7"
+                    selectByMouse: true
+                    background: Rectangle { color: "#101820"; border.color: "#52697E"; radius: 5 }
+                    onTextChanged: searchDelay.restart()
+                }
+                Button {
+                    text: mediaBrowser.searchEverywhere ? "Browse folders" : "Search all"
+                    onClicked: {
+                        if (mediaBrowser.searchEverywhere) {
+                            mediaBrowser.navigate(player.locationPath("Home"))
+                        } else {
+                            mediaBrowser.showingRecent = false
+                            mediaBrowser.searchEverywhere = true
+                            mediaBrowser.currentPath = "Common media folders"
+                            mediaBrowser.entries = []
+                            searchDelay.restart()
+                            browserSearch.forceActiveFocus()
+                        }
+                    }
+                }
             }
             RowLayout {
                 Layout.fillWidth: true
@@ -139,13 +180,16 @@ ApplicationWindow {
                                 font.pixelSize: 11
                             }
                             Repeater {
-                                model: ["Home", "Desktop", "Documents", "Downloads", "Videos", "Music", "Pictures", "Computer"]
+                                model: ["Recent", "Home", "Desktop", "Documents", "Downloads", "Videos", "Music", "Pictures", "Computer"]
                                 Button {
                                     required property string modelData
                                     width: 145
                                     height: 35
                                     text: modelData
-                                    onClicked: mediaBrowser.navigate(player.locationPath(modelData))
+                                    onClicked: {
+                                        if (modelData === "Recent") mediaBrowser.showRecent()
+                                        else mediaBrowser.navigate(player.locationPath(modelData))
+                                    }
                                 }
                             }
                         }
@@ -243,80 +287,7 @@ ApplicationWindow {
         nameFilters: ["Subtitle files (*.srt *.ass *.ssa)", "All files (*)"]
         onAccepted: player.openSubtitle(selectedFile.toString())
     }
-    Dialog {
-        id: searchDialog
-        title: "Find local media"
-        modal: true
-        anchors.centerIn: Overlay.overlay
-        width: Math.min(window.width - 60, 720)
-        height: Math.min(window.height - 70, 510)
-        standardButtons: Dialog.Close
-        property var results: []
-        ColumnLayout {
-            anchors.fill: parent
-            spacing: 12
-            Label {
-                text: "Search file names in Videos, Music and Downloads (no background indexing)."
-                color: window.textColor
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
-            }
-            RowLayout {
-                Layout.fillWidth: true
-                TextField {
-                    id: searchInput
-                    Layout.fillWidth: true
-                    placeholderText: "Enter at least two characters"
-                    onAccepted: searchDialog.results = player.searchMedia(text)
-                }
-                Button {
-                    text: "Search"
-                    enabled: searchInput.text.trim().length >= 2
-                    onClicked: searchDialog.results = player.searchMedia(searchInput.text)
-                }
-            }
-            Label {
-                text: searchDialog.results.length + " matches (first 100 max)"
-                color: window.muted
-            }
-            ScrollView {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                ListView {
-                    id: searchResults
-                    model: searchDialog.results
-                    clip: true
-                    spacing: 4
-                    delegate: ItemDelegate {
-                        required property var modelData
-                        width: searchResults.width
-                        height: 58
-                        onClicked: {
-                            player.openFile(modelData.path)
-                            searchDialog.close()
-                        }
-                        contentItem: Column {
-                            spacing: 3
-                            Label {
-                                width: parent.width
-                                text: modelData.name
-                                color: window.textColor
-                                elide: Text.ElideMiddle
-                            }
-                            Label {
-                                width: parent.width
-                                text: modelData.folder
-                                color: window.muted
-                                font.pixelSize: 11
-                                elide: Text.ElideMiddle
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    Shortcut { sequence: "Ctrl+F"; onActivated: searchDialog.open() }
+    Shortcut { sequence: "Ctrl+F"; onActivated: { mediaBrowser.open(); browserSearch.forceActiveFocus() } }
     Shortcut { sequence: "Space"; onActivated: player.togglePause() }
     Shortcut { sequence: "Left"; onActivated: player.seekRelative(-5) }
     Shortcut { sequence: "Right"; onActivated: player.seekRelative(5) }
@@ -349,7 +320,7 @@ ApplicationWindow {
                 }
                 Item { Layout.fillWidth: true }
                 Button { text: "Browse media"; onClicked: mediaBrowser.open() }
-                Button { text: "Find"; onClicked: searchDialog.open() }
+                Button { text: "Recent"; onClicked: { mediaBrowser.open(); mediaBrowser.showRecent() } }
                 Button { text: "Subtitles"; onClicked: subtitleDialog.open() }
             }
         }
