@@ -113,36 +113,41 @@ ApplicationWindow {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                Layout.minimumHeight: 0
                 spacing: 10
                 Rectangle {
                     Layout.preferredWidth: 165
                     Layout.fillHeight: true
+                    Layout.minimumHeight: 0
                     color: "#13212F"
                     radius: 7
-                    ColumnLayout {
+                    ScrollView {
                         anchors.fill: parent
-                        anchors.margins: 9
-                        spacing: 6
-                        Label {
-                            text: "PLACES"
-                            color: "#8496A8"
-                            font.bold: true
-                            font.pixelSize: 11
-                        }
-                        Repeater {
-                            model: ["Home", "Desktop", "Documents", "Downloads", "Videos", "Music", "Pictures", "Computer"]
-                            Button {
-                                required property string modelData
-                                Layout.fillWidth: true
-                                text: modelData
-                                onClicked: mediaBrowser.navigate(player.locationPath(modelData))
+                        anchors.margins: 7
+                        clip: true
+                        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                        Column {
+                            width: 145
+                            spacing: 5
+                            Label {
+                                width: parent.width
+                                height: 26
+                                text: "PLACES"
+                                verticalAlignment: Text.AlignVCenter
+                                color: "#8496A8"
+                                font.bold: true
+                                font.pixelSize: 11
                             }
-                        }
-                        Item { Layout.fillHeight: true }
-                        Label {
-                            text: "Local files only"
-                            color: "#8496A8"
-                            font.pixelSize: 11
+                            Repeater {
+                                model: ["Home", "Desktop", "Documents", "Downloads", "Videos", "Music", "Pictures", "Computer"]
+                                Button {
+                                    required property string modelData
+                                    width: 145
+                                    height: 35
+                                    text: modelData
+                                    onClicked: mediaBrowser.navigate(player.locationPath(modelData))
+                                }
+                            }
                         }
                     }
                 }
