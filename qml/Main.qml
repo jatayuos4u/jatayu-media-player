@@ -327,19 +327,29 @@ ApplicationWindow {
         anchors.fill: parent
         spacing: 0
         Rectangle {
-            Layout.fillWidth: true; Layout.preferredHeight: 62
-            color: "#1B2836"
+            Layout.fillWidth: true
+            Layout.preferredHeight: 72
+            color: "#172532"
             RowLayout {
-                anchors.fill: parent; anchors.leftMargin: 24; anchors.rightMargin: 24
-                Label { text: "▶"; color: window.accent; font.pixelSize: 26 }
+                anchors.fill: parent
+                anchors.leftMargin: 22
+                anchors.rightMargin: 22
+                spacing: 12
+                Rectangle {
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 40
+                    radius: 11
+                    color: "#163F63"
+                    Label { anchors.centerIn: parent; text: "▶"; color: "#53B7FF"; font.pixelSize: 24 }
+                }
                 ColumnLayout {
-                    spacing: 0
-                    Label { text: "Jatayu Media Player"; color: window.textColor; font.bold: true; font.pixelSize: 18 }
-                    Label { text: "Every Beat. Every Frame."; color: window.muted; font.pixelSize: 11 }
+                    spacing: 2
+                    Label { text: "Jatayu Media Player"; color: "#E9F1F7"; font.bold: true; font.pixelSize: 19 }
+                    Label { text: player.title === "No media selected" ? "Every Beat. Every Frame." : player.title; color: "#97ADBF"; font.pixelSize: 11; elide: Text.ElideMiddle; Layout.maximumWidth: 350 }
                 }
                 Item { Layout.fillWidth: true }
-                Button { text: "Find media"; onClicked: searchDialog.open() }
-                Button { text: "Open media"; onClicked: mediaBrowser.open() }
+                Button { text: "Browse media"; onClicked: mediaBrowser.open() }
+                Button { text: "Find"; onClicked: searchDialog.open() }
                 Button { text: "Subtitles"; onClicked: subtitleDialog.open() }
             }
         }
@@ -347,12 +357,46 @@ ApplicationWindow {
             Layout.fillWidth: true; Layout.fillHeight: true
             color: "#070B0F"
             MpvVideoItem { id: video; anchors.fill: parent; controller: player }
-            Label {
+            Column {
                 anchors.centerIn: parent
                 visible: player.title === "No media selected"
-                text: "Open a video or audio file to begin\nCtrl+O to open a file"
-                color: "#8496A8"; horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 18
+                spacing: 15
+                width: Math.min(parent.width - 44, 430)
+                Rectangle {
+                    width: 78
+                    height: 78
+                    radius: 24
+                    color: "#19354A"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Label { anchors.centerIn: parent; text: "▶"; color: "#59B8FF"; font.pixelSize: 38 }
+                }
+                Label {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Your screen. Your sound."
+                    color: "#F1F6FA"
+                    font.pixelSize: 23
+                    font.bold: true
+                }
+                Label {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "Enjoy local music and videos without ads, accounts or tracking."
+                    color: "#9BB0C1"
+                    font.pixelSize: 14
+                }
+                Button {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Open a video or song"
+                    onClicked: mediaBrowser.open()
+                }
+                Label {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Ctrl+O to browse    ·    Ctrl+F to find"
+                    color: "#738B9E"
+                    font.pixelSize: 11
+                }
             }
         }
         Rectangle {
@@ -361,7 +405,7 @@ ApplicationWindow {
             Label { anchors.centerIn: parent; text: player.error; color: "white" }
         }
         Rectangle {
-            Layout.fillWidth: true; Layout.preferredHeight: 102
+            Layout.fillWidth: true; Layout.preferredHeight: 100
             color: "#1B2836"
             ColumnLayout {
                 anchors.fill: parent; anchors.margins: 12; spacing: 4
@@ -374,10 +418,10 @@ ApplicationWindow {
                 }
                 RowLayout {
                     spacing: 14
-                    Button { text: "−5s"; onClicked: player.seekRelative(-5) }
-                    Button { text: player.paused ? "▶ Play" : "Ⅱ Pause"; onClicked: player.togglePause() }
+                    Button { text: "↶ 10"; onClicked: player.seekRelative(-10) }
+                    Button { text: player.paused ? "▶ Play" : "Ⅱ Pause"; highlighted: true; onClicked: player.togglePause() }
                     Button { text: "Stop"; onClicked: player.stop() }
-                    Button { text: "+5s"; onClicked: player.seekRelative(5) }
+                    Button { text: "10 ↷"; onClicked: player.seekRelative(10) }
                     Label {
                         text: formatTime(player.position) + " / " + formatTime(player.duration)
                         color: window.textColor
