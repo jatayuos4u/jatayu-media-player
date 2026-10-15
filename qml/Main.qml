@@ -19,14 +19,19 @@ ApplicationWindow {
         title: "Open media"
         modal: true
         anchors.centerIn: Overlay.overlay
-        width: Math.min(window.width - 36, 850)
-        height: Math.min(window.height - 36, 560)
+        width: Math.min(window.width - 24, 960)
+        height: Math.min(window.height - 24, 590)
         padding: 16
         standardButtons: Dialog.Close
         property string currentPath: player.locationPath("Videos")
         property var entries: []
+        property string selectedPath: ""
+        property string selectedName: ""
+        property bool selectedFolder: false
         function navigate(path) {
             currentPath = path
+            selectedPath = ""
+            selectedName = ""
             browserSearch.text = ""
             refresh()
         }
@@ -38,7 +43,7 @@ ApplicationWindow {
         header: Rectangle {
             implicitHeight: 52
             color: "#233446"
-            Label { anchors.centerIn: parent; text: "Browse your media"; color: "#E9F1F7"; font.bold: true; font.pixelSize: 17 }
+            Label { anchors.centerIn: parent; text: "Jatayu Media Browser"; color: "#E9F1F7"; font.bold: true; font.pixelSize: 17 }
         }
         ColumnLayout {
             anchors.fill: parent
@@ -83,54 +88,139 @@ ApplicationWindow {
                 background: Rectangle { color: "#101820"; border.color: "#52697E"; radius: 5 }
                 onTextChanged: mediaBrowser.refresh()
             }
-            Label {
+            RowLayout {
                 Layout.fillWidth: true
-                text: mediaBrowser.entries.length + " items · Folders first · Supported audio and video files"
-                color: "#B7C8D8"
-                font.pixelSize: 12
+                spacing: 8
+                Label {
+                    text: mediaBrowser.entries.length + " items"
+                    color: "#B7C8D8"
+                    font.pixelSize: 12
+                }
+                Item { Layout.fillWidth: true }
+                Label {
+                    text: "Click to select · Double-click to open"
+                    color: "#B7C8D8"
+                    font.pixelSize: 12
+                }
             }
-            Rectangle {
+            RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: "#101820"
-                radius: 7
-                ListView {
-                    id: browserList
-                    anchors.fill: parent
-                    anchors.margins: 6
-                    clip: true
-                    spacing: 3
-                    model: mediaBrowser.entries
-                    delegate: ItemDelegate {
-                        required property var modelData
-                        width: browserList.width
-                        height: 44
-                        onClicked: {
-                            if (modelData.directory) mediaBrowser.navigate(modelData.path)
-                            else {
-                                player.openFile(modelData.path)
-                                mediaBrowser.close()
+                spacing: 10
+                Rectangle {
+                    Layout.preferredWidth: 142
+                    Layout.fillHeight: true
+                    color: "#13212F"
+                    radius: 7
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: 9
+                        spacing: 6
+                        Label {
+                            text: "PLACES"
+                            color: "#8496A8"
+                            font.bold: true
+                            font.pixelSize: 11
+                        }
+                        Repeater {
+                            model: ["Home", "Videos", "Music", "Downloads"]
+                            Button {
+                                required property string modelData
+                                Layout.fillWidth: true
+                                text: modelData
+                                onClicked: mediaBrowser.navigate(player.locationPath(modelData))
                             }
                         }
-                        background: Rectangle { radius: 4; color: parent.hovered ? "#2A4760" : "#172431" }
-                        contentItem: RowLayout {
-                            spacing: 10
-                            Label { text: modelData.directory ? "📁" : "▶"; color: "#59B8FF"; font.pixelSize: 17 }
-                            Label {
-                                text: modelData.name
-                                color: "#E9F1F7"
-                                Layout.fillWidth: true
-                                elide: Text.ElideMiddle
-                            }
-                            Label { text: modelData.directory ? "Open folder ›" : "Play"; color: "#8496A8" }
+                        Item { Layout.fillHeight: true }
+                        Label {
+                            text: "Local files only"
+                            color: "#8496A8"
+                            font.pixelSize: 11
                         }
                     }
                 }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: "#101820"
+                    radius: 7
+                    ListView {
+                        id: browserList
+                        anchors.fill: parent
+                        anchors.margins: 6
+                        clip: true
+                        spacing: 3
+                        model: mediaBrowser.entries
+                        delegate: ItemDelegate {
+                            required property var modelData
+                            width: browserList.width
+                            height: 46
+                            highlighted: mediaBrowser.selectedPath === modelData.path
+                            onClicked: {
+                                mediaBrowser.selectedPath = modelData.path
+                                mediaBrowser.selectedName = modelData.name
+                                mediaBrowser.selectedFolder = modelData.directory
+                            }
+                            onDoubleClicked: {
+                                if (modelData.directory) mediaBrowser.navigate(modelData.path)
+                                else {
+                                    player.openFile(modelData.path)
+                                    mediaBrowser.close()
+                                }
+                            }
+                            background: Rectangle {
+                                radius: 5
+                                color: parent.highlighted ? "#26547A" :
+                                       parent.hovered ? "#243D53" : "#172431"
+                            }
+                            contentItem: RowLayout {
+                                spacing: 10
+                                Label {
+                                    text: modelData.directory ? "▸" : "▶"
+                                    color: "#59B8FF"
+                                    font.pixelSize: 18
+                                }
+                                Label {
+                                    text: modelData.name
+                                    color: "#E9F1F7"
+                                    Layout.fillWidth: true
+                                    elide: Text.ElideMiddle
+                                }
+                                Label {
+                                    text: modelData.directory ? "Folder" : "Media"
+                                    color: "#B7C8D8"
+                                    font.pixelSize: 11
+                                }
+                            }
+                        }
+                    }
+                    Label {
+                        anchors.centerIn: parent
+                        visible: mediaBrowser.entries.length === 0
+                        text: "No supported files in this folder"
+                        color: "#B7C8D8"
+                    }
+                }
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
                 Label {
-                    anchors.centerIn: parent
-                    visible: mediaBrowser.entries.length === 0
-                    text: "No matching media files or folders"
-                    color: "#B7C8D8"
+                    Layout.fillWidth: true
+                    text: mediaBrowser.selectedName.length ? mediaBrowser.selectedName : "Select a media file or folder"
+                    color: "#E9F1F7"
+                    elide: Text.ElideMiddle
+                }
+                Button {
+                    text: mediaBrowser.selectedFolder ? "Open folder" : "Play selected"
+                    enabled: mediaBrowser.selectedPath.length > 0
+                    onClicked: {
+                        if (mediaBrowser.selectedFolder) mediaBrowser.navigate(mediaBrowser.selectedPath)
+                        else {
+                            player.openFile(mediaBrowser.selectedPath)
+                            mediaBrowser.close()
+                        }
+                    }
                 }
             }
         }

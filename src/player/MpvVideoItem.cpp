@@ -39,7 +39,8 @@ public:
     if (!context_) return;
     QOpenGLFramebufferObject *fbo = framebufferObject();
     mpv_opengl_fbo mpvFbo = {static_cast<int>(fbo->handle()), fbo->width(), fbo->height(), 0};
-    int flip = 1;
+    // Qt Quick's framebuffer texture orientation requires no libmpv Y flip.
+    int flip = 0;
     mpv_render_param params[] = {{MPV_RENDER_PARAM_OPENGL_FBO, &mpvFbo},
                                  {MPV_RENDER_PARAM_FLIP_Y, &flip}, {MPV_RENDER_PARAM_INVALID, nullptr}};
     mpv_render_context_render(context_, params);
