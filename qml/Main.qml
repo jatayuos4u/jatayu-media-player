@@ -14,17 +14,122 @@ ApplicationWindow {
     property color accent: "#1689E8"
     property color textColor: "#E9F1F7"
     property color muted: "#8496A8"
-    FileDialog {
-        id: fileDialog
-        title: "Open audio or video"
-        currentFolder: "file://" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
-        nameFilters: [
-            "Media files (*.mp4 *.mkv *.avi *.mov *.webm *.mpeg *.mpg *.m4v *.flv *.ts *.mp3 *.aac *.flac *.wav *.ogg *.opus *.m4a *.wma *.alac)",
-            "Video files (*.mp4 *.mkv *.avi *.mov *.webm *.mpeg *.mpg *.m4v *.flv *.ts)",
-            "Audio files (*.mp3 *.aac *.flac *.wav *.ogg *.opus *.m4a *.wma *.alac)",
-            "All files (*)"
-        ]
-        onAccepted: player.openFile(selectedFile.toString())
+    Dialog {
+        id: mediaBrowser
+        title: "Open media"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 36, 850)
+        height: Math.min(window.height - 36, 560)
+        padding: 16
+        standardButtons: Dialog.Close
+        property string currentPath: player.locationPath("Videos")
+        property var entries: []
+        function navigate(path) {
+            currentPath = path
+            browserSearch.text = ""
+            refresh()
+        }
+        function refresh() {
+            entries = player.browseFolder(currentPath, browserSearch.text)
+        }
+        onOpened: refresh()
+        background: Rectangle { color: "#1B2836"; radius: 12; border.color: "#35475A" }
+        header: Rectangle {
+            implicitHeight: 52
+            color: "#233446"
+            Label { anchors.centerIn: parent; text: "Browse your media"; color: "#E9F1F7"; font.bold: true; font.pixelSize: 17 }
+        }
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 8
+                Repeater {
+                    model: ["Home", "Videos", "Music", "Downloads"]
+                    Button {
+                        required property string modelData
+                        text: modelData
+                        onClicked: mediaBrowser.navigate(player.locationPath(modelData))
+                    }
+                }
+                Item { Layout.fillWidth: true }
+                Button {
+                    text: "↑ Up"
+                    onClicked: mediaBrowser.navigate(mediaBrowser.currentPath === "/" ? "/" : mediaBrowser.currentPath.replace(/\\/[^\\/]+\\/?$/, "") || "/")
+                }
+            }
+            TextField {
+                id: browserPath
+                Layout.fillWidth: true
+                text: mediaBrowser.currentPath
+                selectByMouse: true
+                color: "#E9F1F7"
+                placeholderText: "Folder path"
+                background: Rectangle { color: "#101820"; border.color: "#52697E"; radius: 5 }
+                onAccepted: mediaBrowser.navigate(text)
+            }
+            TextField {
+                id: browserSearch
+                Layout.fillWidth: true
+                placeholderText: "Filter files and folders in this location..."
+                color: "#E9F1F7"
+                selectByMouse: true
+                background: Rectangle { color: "#101820"; border.color: "#52697E"; radius: 5 }
+                onTextChanged: mediaBrowser.refresh()
+            }
+            Label {
+                Layout.fillWidth: true
+                text: mediaBrowser.entries.length + " items · Folders first · Supported audio and video files"
+                color: "#B7C8D8"
+                font.pixelSize: 12
+            }
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: "#101820"
+                radius: 7
+                ListView {
+                    id: browserList
+                    anchors.fill: parent
+                    anchors.margins: 6
+                    clip: true
+                    spacing: 3
+                    model: mediaBrowser.entries
+                    delegate: ItemDelegate {
+                        required property var modelData
+                        width: browserList.width
+                        height: 44
+                        onClicked: {
+                            if (modelData.directory) mediaBrowser.navigate(modelData.path)
+                            else {
+                                player.openFile(modelData.path)
+                                mediaBrowser.close()
+                            }
+                        }
+                        background: Rectangle { radius: 4; color: parent.hovered ? "#2A4760" : "#172431" }
+                        contentItem: RowLayout {
+                            spacing: 10
+                            Label { text: modelData.directory ? "📁" : "▶"; color: "#59B8FF"; font.pixelSize: 17 }
+                            Label {
+                                text: modelData.name
+                                color: "#E9F1F7"
+                                Layout.fillWidth: true
+                                elide: Text.ElideMiddle
+                            }
+                            Label { text: modelData.directory ? "Open folder ›" : "Play"; color: "#8496A8" }
+                        }
+                    }
+                }
+                Label {
+                    anchors.centerIn: parent
+                    visible: mediaBrowser.entries.length === 0
+                    text: "No matching media files or folders"
+                    color: "#B7C8D8"
+                }
+            }
+        }
     }
     FileDialog {
         id: subtitleDialog
@@ -109,7 +214,7 @@ ApplicationWindow {
     Shortcut { sequence: "Space"; onActivated: player.togglePause() }
     Shortcut { sequence: "Left"; onActivated: player.seekRelative(-5) }
     Shortcut { sequence: "Right"; onActivated: player.seekRelative(5) }
-    Shortcut { sequence: "Ctrl+O"; onActivated: fileDialog.open() }
+    Shortcut { sequence: "Ctrl+O"; onActivated: mediaBrowser.open() }
     Shortcut { sequence: "F"; onActivated: window.visibility = window.visibility === Window.FullScreen ? Window.Windowed : Window.FullScreen }
     Shortcut { sequence: "Escape"; onActivated: if (window.visibility === Window.FullScreen) window.visibility = Window.Windowed }
     ColumnLayout {
@@ -128,7 +233,7 @@ ApplicationWindow {
                 }
                 Item { Layout.fillWidth: true }
                 Button { text: "Find media"; onClicked: searchDialog.open() }
-                Button { text: "Open media"; onClicked: fileDialog.open() }
+                Button { text: "Open media"; onClicked: mediaBrowser.open() }
                 Button { text: "Subtitles"; onClicked: subtitleDialog.open() }
             }
         }

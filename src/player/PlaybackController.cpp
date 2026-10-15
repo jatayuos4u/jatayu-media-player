@@ -123,3 +123,31 @@ QVariantList PlaybackController::searchMedia(const QString &query) const {
   }
   return results;
 }
+
+QString PlaybackController::locationPath(const QString &name) const {
+  if (name == "Videos") return QStandardPaths::writableLocation(QStandardPaths::MoviesLocation);
+  if (name == "Music") return QStandardPaths::writableLocation(QStandardPaths::MusicLocation);
+  if (name == "Downloads") return QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+  return QDir::homePath();
+}
+
+QVariantList PlaybackController::browseFolder(const QString &path, const QString &filter) const {
+  QVariantList items;
+  QDir dir(path);
+  if (!dir.exists() || !QFileInfo(dir.absolutePath()).isReadable()) return items;
+  static const QSet<QString> supported = {
+    "mp4","mkv","avi","mov","webm","mpeg","mpg","m4v","flv","ts",
+    "mp3","aac","flac","wav","ogg","opus","m4a","wma","alac"
+  };
+  const QFileInfoList entries = dir.entryInfoList(QDir::Dirs | QDir::Files |
+    QDir::NoDotAndDotDot | QDir::Readable, QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
+  for (const QFileInfo &entry : entries) {
+    const bool directory = entry.isDir();
+    if (!directory && !supported.contains(entry.suffix().toLower())) continue;
+    if (!filter.isEmpty() && !entry.fileName().contains(filter, Qt::CaseInsensitive)) continue;
+    items.append(QVariantMap{{"name",entry.fileName()}, {"path",entry.absoluteFilePath()},
+                             {"directory",directory}, {"folder",entry.absolutePath()}});
+    if (items.size() >= 500) break;
+  }
+  return items;
+}

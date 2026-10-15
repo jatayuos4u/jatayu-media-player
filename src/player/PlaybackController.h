@@ -22,6 +22,8 @@ public:
   QString title() const { return title_; }
   QString error() const { return error_; }
   Q_INVOKABLE void openFile(const QString &path);
+  Q_INVOKABLE QString locationPath(const QString &name) const;
+  Q_INVOKABLE QVariantList browseFolder(const QString &path, const QString &filter) const;
   Q_INVOKABLE QVariantList searchMedia(const QString &query) const;
   Q_INVOKABLE void togglePause();
   Q_INVOKABLE void stop();
