@@ -23,7 +23,7 @@ ApplicationWindow {
         height: Math.min(window.height - 24, 590)
         padding: 16
         standardButtons: Dialog.Close
-        property string currentPath: player.locationPath("Videos")
+        property string currentPath: player.locationPath("Home")
         property var entries: []
         property string selectedPath: ""
         property string selectedName: ""
@@ -38,7 +38,10 @@ ApplicationWindow {
         function refresh() {
             entries = player.browseFolder(currentPath, browserSearch.text)
         }
-        onOpened: refresh()
+        onOpened: {
+            if (currentPath.length === 0) currentPath = player.locationPath("Home")
+            refresh()
+        }
         background: Rectangle { color: "#1B2836"; radius: 12; border.color: "#35475A" }
         header: Rectangle {
             implicitHeight: 52
@@ -51,13 +54,17 @@ ApplicationWindow {
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 8
-                Repeater {
-                    model: ["Home", "Videos", "Music", "Downloads"]
-                    Button {
-                        required property string modelData
-                        text: modelData
-                        onClicked: mediaBrowser.navigate(player.locationPath(modelData))
-                    }
+                Button {
+                    text: "⌂ Home"
+                    onClicked: mediaBrowser.navigate(player.locationPath("Home"))
+                }
+                Button {
+                    text: "▣ Desktop"
+                    onClicked: mediaBrowser.navigate(player.locationPath("Desktop"))
+                }
+                Button {
+                    text: "▤ Documents"
+                    onClicked: mediaBrowser.navigate(player.locationPath("Documents"))
                 }
                 Item { Layout.fillWidth: true }
                 Button {
@@ -98,7 +105,7 @@ ApplicationWindow {
                 }
                 Item { Layout.fillWidth: true }
                 Label {
-                    text: "Click to select · Double-click to open"
+                    text: "Double-click folders to browse · Double-click media to play"
                     color: "#B7C8D8"
                     font.pixelSize: 12
                 }
@@ -108,7 +115,7 @@ ApplicationWindow {
                 Layout.fillHeight: true
                 spacing: 10
                 Rectangle {
-                    Layout.preferredWidth: 142
+                    Layout.preferredWidth: 165
                     Layout.fillHeight: true
                     color: "#13212F"
                     radius: 7
@@ -123,7 +130,7 @@ ApplicationWindow {
                             font.pixelSize: 11
                         }
                         Repeater {
-                            model: ["Home", "Videos", "Music", "Downloads"]
+                            model: ["Home", "Desktop", "Documents", "Downloads", "Videos", "Music", "Pictures", "Computer"]
                             Button {
                                 required property string modelData
                                 Layout.fillWidth: true

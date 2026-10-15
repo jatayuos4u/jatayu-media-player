@@ -125,6 +125,10 @@ QVariantList PlaybackController::searchMedia(const QString &query) const {
 }
 
 QString PlaybackController::locationPath(const QString &name) const {
+  if (name == "Desktop") return QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+  if (name == "Documents") return QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+  if (name == "Pictures") return QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+  if (name == "Computer") return "/";
   if (name == "Videos") return QStandardPaths::writableLocation(QStandardPaths::MoviesLocation);
   if (name == "Music") return QStandardPaths::writableLocation(QStandardPaths::MusicLocation);
   if (name == "Downloads") return QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
