@@ -1,6 +1,7 @@
 #pragma once
 #include <QObject>
 #include <QString>
+#include <QVariantList>
 #include <mpv/client.h>
 class PlaybackController : public QObject {
   Q_OBJECT
@@ -21,6 +22,7 @@ public:
   QString title() const { return title_; }
   QString error() const { return error_; }
   Q_INVOKABLE void openFile(const QString &path);
+  Q_INVOKABLE QVariantList searchMedia(const QString &query) const;
   Q_INVOKABLE void togglePause();
   Q_INVOKABLE void stop();
   Q_INVOKABLE void seek(double seconds);

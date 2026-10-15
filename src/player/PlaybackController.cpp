@@ -1,5 +1,10 @@
 #include "PlaybackController.h"
 #include <QFileInfo>
+#include <QDir>
+#include <QDirIterator>
+#include <QStandardPaths>
+#include <QSet>
+#include <QVariantMap>
 #include <QFile>
 #include <QMetaObject>
 #include <QUrl>
@@ -79,4 +84,42 @@ void PlaybackController::processEvents() {
       if (end && end->reason == MPV_END_FILE_REASON_ERROR) setError(QString::fromUtf8(mpv_error_string(end->error)));
     } else if (event->event_id == MPV_EVENT_FILE_LOADED) { setError({}); }
   }
+}
+
+QVariantList PlaybackController::searchMedia(const QString &query) const {
+  QVariantList results;
+  const QString needle = query.trimmed();
+  if (needle.size() < 2) return results;
+  // Intentionally user-local and bounded: never index the entire disk.
+  const auto extensions = QSet<QString>{
+    "mp4","mkv","avi","mov","webm","mpeg","mpg","m4v","flv","ts",
+    "mp3","aac","flac","wav","ogg","opus","m4a","wma","alac"
+  };
+  const auto home = QDir::homePath();
+  const QStringList folders = {
+    QStandardPaths::writableLocation(QStandardPaths::MoviesLocation),
+    QStandardPaths::writableLocation(QStandardPaths::MusicLocation),
+    QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)
+  };
+  QSet<QString> visited;
+  int inspected = 0;
+  for (const QString &folder : folders) {
+    const QString canonical = QFileInfo(folder).canonicalFilePath();
+    if (canonical.isEmpty() || !canonical.startsWith(home + QDir::separator()) || visited.contains(canonical))
+      continue;
+    visited.insert(canonical);
+    QDirIterator iterator(canonical, QDir::Files | QDir::NoDotAndDotDot,
+                          QDirIterator::Subdirectories);
+    while (iterator.hasNext() && inspected < 12000 && results.size() < 100) {
+      iterator.next();
+      ++inspected;
+      const QFileInfo info = iterator.fileInfo();
+      if (!extensions.contains(info.suffix().toLower())) continue;
+      if (!info.fileName().contains(needle, Qt::CaseInsensitive)) continue;
+      results.append(QVariantMap{{"name", info.fileName()}, {"path", info.absoluteFilePath()},
+                                  {"folder", info.absolutePath()}});
+    }
+    if (inspected >= 12000 || results.size() >= 100) break;
+  }
+  return results;
 }
