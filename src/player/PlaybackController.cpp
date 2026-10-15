@@ -1,0 +1,82 @@
+#include "PlaybackController.h"
+#include <QFileInfo>
+#include <QFile>
+#include <QMetaObject>
+#include <QUrl>
+#include <algorithm>
+#include <stdexcept>
+PlaybackController::PlaybackController(QObject *parent) : QObject(parent) {
+  handle_ = mpv_create();
+  if (!handle_) throw std::runtime_error("Cannot initialise libmpv");
+  mpv_set_option_string(handle_, "vo", "libmpv");
+  mpv_set_option_string(handle_, "hwdec", "auto-safe");
+  mpv_set_option_string(handle_, "idle", "yes");
+  if (mpv_initialize(handle_) < 0) {
+    mpv_terminate_destroy(handle_); handle_ = nullptr;
+    throw std::runtime_error("Cannot start libmpv");
+  }
+  mpv_observe_property(handle_, 1, "pause", MPV_FORMAT_FLAG);
+  mpv_observe_property(handle_, 2, "time-pos", MPV_FORMAT_DOUBLE);
+  mpv_observe_property(handle_, 3, "duration", MPV_FORMAT_DOUBLE);
+  mpv_observe_property(handle_, 4, "volume", MPV_FORMAT_DOUBLE);
+  mpv_set_wakeup_callback(handle_, &PlaybackController::wakeup, this);
+  connect(this, &PlaybackController::engineEvent, this, &PlaybackController::processEvents, Qt::QueuedConnection);
+  setVolume(70);
+}
+PlaybackController::~PlaybackController() {
+  if (handle_) { mpv_set_wakeup_callback(handle_, nullptr, nullptr); mpv_terminate_destroy(handle_); }
+}
+void PlaybackController::wakeup(void *ctx) {
+  auto *self = static_cast<PlaybackController *>(ctx);
+  QMetaObject::invokeMethod(self, "processEvents", Qt::QueuedConnection);
+}
+void PlaybackController::setError(QString message) { if (error_ != message) { error_ = message; emit errorChanged(); } }
+void PlaybackController::openFile(const QString &path) {
+  QUrl url(path);
+  QString localPath = url.isLocalFile() ? url.toLocalFile() : path;
+  QFileInfo info(localPath);
+  if (!info.isFile() || !info.isReadable()) { setError("File is unavailable or not readable"); return; }
+  setError({});
+  title_ = info.fileName(); emit titleChanged();
+  QByteArray bytes = QFile::encodeName(info.absoluteFilePath());
+  const char *args[] = {"loadfile", bytes.constData(), "replace", nullptr};
+  int result = mpv_command_async(handle_, 0, args);
+  if (result < 0) setError(QString::fromUtf8(mpv_error_string(result)));
+}
+void PlaybackController::togglePause() { setPaused(!paused_); }
+void PlaybackController::setPaused(bool paused) { int value = paused ? 1 : 0; mpv_set_property_async(handle_, 0, "pause", MPV_FORMAT_FLAG, &value); }
+void PlaybackController::stop() { const char *args[] = {"stop", nullptr}; mpv_command_async(handle_, 0, args); }
+void PlaybackController::seek(double seconds) {
+  if (duration_ <= 0) return;
+  QByteArray t = QByteArray::number(std::clamp(seconds, 0.0, duration_), 'f', 3);
+  const char *args[] = {"seek", t.constData(), "absolute+exact", nullptr}; mpv_command_async(handle_, 0, args);
+}
+void PlaybackController::seekRelative(double seconds) { seek(position_ + seconds); }
+void PlaybackController::setVolume(double value) { double v = std::clamp(value, 0.0, 100.0); mpv_set_property_async(handle_, 0, "volume", MPV_FORMAT_DOUBLE, &v); }
+void PlaybackController::openSubtitle(const QString &path) {
+  QUrl url(path); QString local = url.isLocalFile() ? url.toLocalFile() : path;
+  if (!QFileInfo(local).isFile()) { setError("Subtitle file not found"); return; }
+  QByteArray bytes = QFile::encodeName(local);
+  const char *args[] = {"sub-add", bytes.constData(), "select", nullptr};
+  mpv_command_async(handle_, 0, args);
+}
+void PlaybackController::processEvents() {
+  if (!handle_) return;
+  while (true) {
+    mpv_event *event = mpv_wait_event(handle_, 0);
+    if (event->event_id == MPV_EVENT_NONE) break;
+    if (event->event_id == MPV_EVENT_PROPERTY_CHANGE) {
+      auto *prop = static_cast<mpv_event_property *>(event->data);
+      if (!prop->data) continue;
+      switch (event->reply_userdata) {
+        case 1: { bool x = *static_cast<int *>(prop->data); if (paused_ != x) { paused_ = x; emit pausedChanged(); } break; }
+        case 2: { double x = *static_cast<double *>(prop->data); if (position_ != x) { position_ = x; emit positionChanged(); } break; }
+        case 3: { double x = *static_cast<double *>(prop->data); if (duration_ != x) { duration_ = x; emit durationChanged(); } break; }
+        case 4: { double x = *static_cast<double *>(prop->data); if (volume_ != x) { volume_ = x; emit volumeChanged(); } break; }
+      }
+    } else if (event->event_id == MPV_EVENT_END_FILE) {
+      auto *end = static_cast<mpv_event_end_file *>(event->data);
+      if (end && end->reason == MPV_END_FILE_REASON_ERROR) setError(QString::fromUtf8(mpv_error_string(end->error)));
+    } else if (event->event_id == MPV_EVENT_FILE_LOADED) { setError({}); }
+  }
+}
