@@ -220,3 +220,19 @@ QVariantList PlaybackController::browseSubtitles(const QString &path) const {
   }
   return items;
 }
+
+void PlaybackController::setSubtitleDelay(double seconds) {
+  QByteArray value = QByteArray::number(std::clamp(seconds, -30.0, 30.0), 'f', 2);
+  const int status = mpv_set_property_string(handle_, "sub-delay", value.constData());
+  if (status < 0) setError(QString::fromUtf8(mpv_error_string(status)));
+}
+void PlaybackController::setSubtitleSize(int size) {
+  QByteArray value = QByteArray::number(std::clamp(size, 20, 90));
+  const int status = mpv_set_property_string(handle_, "sub-font-size", value.constData());
+  if (status < 0) setError(QString::fromUtf8(mpv_error_string(status)));
+}
+void PlaybackController::cycleSubtitleTrack() {
+  const char *args[] = {"cycle", "sid", nullptr};
+  const int status = mpv_command_async(handle_, 0, args);
+  if (status < 0) setError(QString::fromUtf8(mpv_error_string(status)));
+}
