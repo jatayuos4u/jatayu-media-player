@@ -6,6 +6,7 @@
 #include <QQuickWindow>
 #include <QSGRendererInterface>
 #include <QDebug>
+#include <QIcon>
 #include <exception>
 #include <clocale>
 int main(int argc, char *argv[]) {
@@ -13,6 +14,7 @@ int main(int argc, char *argv[]) {
   QGuiApplication app(argc, argv);
   QGuiApplication::setApplicationName("Jatayu Media Player");
   QGuiApplication::setOrganizationName("Jatayu");
+  app.setWindowIcon(QIcon(":/icons/jatayu-media-player.svg"));
   // libmpv requires the C numeric locale for number parsing.
   // Keep the system language and other locale categories unchanged.
   if (!std::setlocale(LC_NUMERIC, "C")) {
