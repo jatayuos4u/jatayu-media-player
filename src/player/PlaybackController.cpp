@@ -185,18 +185,15 @@ QVariantList PlaybackController::recentMedia() const {
 
 void PlaybackController::setQualityProfile(const QString &requested) {
   if (!handle_) return;
-  const QString profile = (requested == "Performance" || requested == "Balanced" ||
-                           requested == "High Quality") ? requested : "Balanced";
-  const char *scale = profile == "Performance" ? "bilinear" :
-                      profile == "High Quality" ? "ewa_lanczossharp" : "spline36";
-  const char *downscale = profile == "Performance" ? "bilinear" :
-                          profile == "High Quality" ? "ewa_lanczossharp" : "spline36";
-  // MPV's GPU renderer also uses these for libmpv embedding.
-  const int a = mpv_set_property_string(handle_, "scale", scale);
-  const int b = mpv_set_property_string(handle_, "dscale", downscale);
-  if (a < 0 || b < 0) {
-    setError(QStringLiteral("Video quality profile could not be applied: ") +
-             QString::fromUtf8(mpv_error_string(a < 0 ? a : b)));
+  // High Quality is temporarily disabled: changing to EWA LanczosSharp while
+  // rendering caused an abort on an older Intel GPU. Do not restore that saved
+  // profile on startup or set it while video is playing.
+  const QString profile = requested == "Performance" ? "Performance" : "Balanced";
+  const char *filter = profile == "Performance" ? "bilinear" : "spline36";
+  const int result = mpv_set_property_string(handle_, "scale", filter);
+  if (result < 0) {
+    setError(QStringLiteral("Cannot apply video scaling: ") +
+             QString::fromUtf8(mpv_error_string(result)));
     return;
   }
   QSettings().setValue("videoQualityProfile", profile);

@@ -346,11 +346,11 @@ ApplicationWindow {
                 ComboBox {
                     id: videoQualityPicker
                     Layout.preferredWidth: 144
-                    model: ["Performance", "Balanced", "High Quality"]
+                    model: ["Performance", "Balanced"]
                     currentIndex: Math.max(0, model.indexOf(player.qualityProfile))
                     onActivated: player.setQualityProfile(currentText)
                     ToolTip.visible: hovered
-                    ToolTip.text: "Choose picture scaling quality. High Quality may be slower on older GPUs."
+                    ToolTip.text: "High Quality is temporarily disabled pending graphics stability testing."
                 }
                 Button { text: "Subtitles"; onClicked: subtitleDialog.open() }
             }
