@@ -34,6 +34,9 @@ PlaybackController::PlaybackController(QObject *parent) : QObject(parent) {
   mpv_observe_property(handle_, 3, "duration", MPV_FORMAT_DOUBLE);
   mpv_observe_property(handle_, 4, "volume", MPV_FORMAT_DOUBLE);
   mpv_observe_property(handle_, 5, "metadata", MPV_FORMAT_NODE);
+  mpv_observe_property(handle_, 6, "speed", MPV_FORMAT_DOUBLE);
+  mpv_observe_property(handle_, 7, "track-list", MPV_FORMAT_NODE);
+  mpv_observe_property(handle_, 8, "aid", MPV_FORMAT_NODE);
   mpv_set_wakeup_callback(handle_, &PlaybackController::wakeup, this);
   connect(this, &PlaybackController::engineEvent, this, &PlaybackController::processEvents, Qt::QueuedConnection);
   setVolume(70);
@@ -82,6 +85,22 @@ void PlaybackController::seek(double seconds) {
 }
 void PlaybackController::seekRelative(double seconds) { seek(position_ + seconds); }
 void PlaybackController::setVolume(double value) { double v = std::clamp(value, 0.0, 100.0); mpv_set_property_async(handle_, 0, "volume", MPV_FORMAT_DOUBLE, &v); }
+void PlaybackController::setPlaybackSpeed(double speed) {
+  const double v = std::clamp(speed, 0.5, 2.0);
+  const int status = mpv_set_property(handle_, "speed", MPV_FORMAT_DOUBLE, &v);
+  if (status < 0) setError(QString::fromUtf8(mpv_error_string(status)));
+}
+void PlaybackController::selectAudioTrack(int id) {
+  if (id < 0) {
+    const int status = mpv_set_property_string(handle_, "aid", "no");
+    if (status < 0) setError(QString::fromUtf8(mpv_error_string(status)));
+    return;
+  }
+  const QByteArray value = QByteArray::number(id);
+  const int status = mpv_set_property_string(handle_, "aid", value.constData());
+  if (status < 0) setError(QString::fromUtf8(mpv_error_string(status)));
+}
+
 void PlaybackController::openSubtitle(const QString &path) {
   QUrl url(path); QString local = url.isLocalFile() ? url.toLocalFile() : path;
   if (!QFileInfo(local).isFile()) { setError("Subtitle file not found"); return; }
@@ -102,6 +121,47 @@ void PlaybackController::processEvents() {
         case 2: { double x = *static_cast<double *>(prop->data); if (position_ != x) { position_ = x; emit positionChanged(); } break; }
         case 3: { double x = *static_cast<double *>(prop->data); if (duration_ != x) { duration_ = x; emit durationChanged(); } break; }
         case 4: { double x = *static_cast<double *>(prop->data); if (volume_ != x) { volume_ = x; emit volumeChanged(); } break; }
+        case 6: {
+          const double v = *static_cast<double *>(prop->data);
+          if (playbackSpeed_ != v) { playbackSpeed_ = v; emit playbackSpeedChanged(); }
+          break;
+        }
+        case 7: {
+          const auto *node = static_cast<const mpv_node *>(prop->data);
+          if (node->format != MPV_FORMAT_NODE_ARRAY || !node->u.list) break;
+          QVariantList tracks;
+          for (int i = 0; i < node->u.list->num; ++i) {
+            const mpv_node &entry = node->u.list->values[i];
+            if (entry.format != MPV_FORMAT_NODE_MAP || !entry.u.list) continue;
+            int id = -1;
+            QString type, lang, title;
+            for (int j = 0; j < entry.u.list->num; ++j) {
+              const auto &value = entry.u.list->values[j];
+              const QString key = QString::fromUtf8(entry.u.list->keys[j]);
+              if (key == "id" && value.format == MPV_FORMAT_INT64) id = int(value.u.int64);
+              if (value.format == MPV_FORMAT_STRING) {
+                if (key == "type") type = QString::fromUtf8(value.u.string);
+                else if (key == "lang") lang = QString::fromUtf8(value.u.string);
+                else if (key == "title") title = QString::fromUtf8(value.u.string);
+              }
+            }
+            if (type != "audio" || id < 0) continue;
+            const QString label = QStringLiteral("Track %1").arg(id) +
+                (lang.isEmpty() ? QString() : " · " + lang) +
+                (title.isEmpty() ? QString() : " · " + title);
+            tracks.append(QVariantMap{{"id", id}, {"label", label}});
+          }
+          audioTracks_ = tracks;
+          emit audioTracksChanged();
+          break;
+        }
+        case 8: {
+          const auto *node = static_cast<const mpv_node *>(prop->data);
+          int id = -1;
+          if (node->format == MPV_FORMAT_INT64) id = int(node->u.int64);
+          if (selectedAudioTrack_ != id) { selectedAudioTrack_ = id; emit audioTracksChanged(); }
+          break;
+        }
         case 5: {
           const auto *node = static_cast<const mpv_node *>(prop->data);
           if (node->format != MPV_FORMAT_NODE_MAP || !node->u.list) break;
