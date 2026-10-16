@@ -30,6 +30,7 @@ EOF
 reprepro -b "$REPO" includedeb stable "$DEB"
 [[ -s "$REPO/dists/stable/InRelease" ]] || { echo "Signed InRelease missing" >&2; exit 1; }
 gpg --batch --armor --export "$KEY" > "$REPO/jatayu-media-player-archive-key.asc"
-gpg --batch --verify "$REPO/dists/stable/InRelease"\ngpg --show-keys --with-fingerprint "$REPO/jatayu-media-player-archive-key.asc"
+gpg --batch --verify "$REPO/dists/stable/InRelease"
+gpg --show-keys --with-fingerprint "$REPO/jatayu-media-player-archive-key.asc"
 echo "Prepared signed APT repository in $REPO (LOCAL ONLY)."
 echo "Do not upload until fingerprint, repository layout and installation are verified."
