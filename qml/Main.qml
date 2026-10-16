@@ -1418,13 +1418,13 @@ ApplicationWindow {
                     onMoved: player.seek(value)
                 }
                 RowLayout {
-                    spacing: 14
-                    Button { text: "↶ 10"; onClicked: player.seekRelative(-10) }
+                    spacing: window.width < 1200 ? 5 : 12
+                    Button { text: "↶10"; onClicked: player.seekRelative(-10) }
                     Button { text: player.paused ? "▶ Play" : "Ⅱ Pause"; highlighted: true; onClicked: player.togglePause() }
                     Button { text: "Stop"; onClicked: player.stop() }
-                    Button { text: "Previous"; enabled: queueIndex > 0; onClicked: skipQueue(-1) }
-                    Button { text: "Next"; enabled: queueIndex >= 0 && queueIndex < mediaQueue.length - 1; onClicked: skipQueue(1) }
-                    Button { text: "10 ↷"; onClicked: player.seekRelative(10) }
+                    Button { text: window.width < 1200 ? "◀" : "Previous"; enabled: queueIndex > 0; onClicked: skipQueue(-1) }
+                    Button { text: window.width < 1200 ? "▶" : "Next"; enabled: queueIndex >= 0 && queueIndex < mediaQueue.length - 1; onClicked: skipQueue(1) }
+                    Button { text: "10↷"; onClicked: player.seekRelative(10) }
                     Label {
                         text: formatTime(player.position) + " / " + formatTime(player.duration)
                         color: window.textColor
@@ -1436,9 +1436,15 @@ ApplicationWindow {
                         ToolTip.visible: hovered
                         ToolTip.text: "Playback speed and audio tracks"
                     }
-                    Label { text: "Volume"; color: window.muted }
-                    Slider { Layout.preferredWidth: 120; from: 0; to: 100; value: player.volume; onMoved: player.setVolume(value) }
-                    Button { text: "⛶ Fullscreen"; onClicked: window.toggleCinema() }
+                    Label { text: "Volume"; visible: window.width >= 1200; color: window.muted }
+                    Slider { Layout.preferredWidth: window.width < 1200 ? 75 : 120; from: 0; to: 100; value: player.volume; onMoved: player.setVolume(value) }
+                    Button {
+                        text: window.width < 1200 ? "⛶" : "⛶ Fullscreen"
+                        Layout.minimumWidth: 40
+                        onClicked: window.toggleCinema()
+                        ToolTip.visible: hovered
+                        ToolTip.text: "Toggle fullscreen (F)"
+                    }
                 }
             }
         }
