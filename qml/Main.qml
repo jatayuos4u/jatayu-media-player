@@ -401,7 +401,7 @@ ApplicationWindow {
                 Button { text: "Home"; onClicked: subtitleDialog.navigate(player.locationPath("Home")) }
                 Button { text: "Downloads"; onClicked: subtitleDialog.navigate(player.locationPath("Downloads")) }
                 Button { text: "Videos"; onClicked: subtitleDialog.navigate(player.locationPath("Videos")) }
-                Button { text: "Up"; enabled: subtitleDialog.folder !== "/"; onClicked: subtitleDialog.navigate(subtitleDialog.folder.replace(/\\/[^\\/]+\\/?$/, "") || "/") }
+                Button { text: "Up"; enabled: subtitleDialog.folder !== "/"; onClicked: subtitleDialog.navigate(subtitleDialog.folder.substring(0, subtitleDialog.folder.lastIndexOf("/")) || "/") }
             }
             Label {
                 Layout.fillWidth: true
