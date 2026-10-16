@@ -34,7 +34,7 @@ public:
   QString qualityProfile() const { return qualityProfile_; }
   Q_INVOKABLE void setQualityProfile(const QString &profile);
   Q_INVOKABLE void openFile(const QString &path);
-  Q_INVOKABLE void saveMusicTags(const QString &title, const QString &artist, const QString &album, const QString &coverPath = QString());
+  Q_INVOKABLE void saveMusicTags(const QString &title, const QString &artist, const QString &album, const QString &coverPath = QString(), const QString &outputName = QString());
   Q_INVOKABLE QString locationPath(const QString &name) const;
   Q_INVOKABLE QVariantList browseFolder(const QString &path, const QString &filter) const;
   Q_INVOKABLE QVariantList recentMedia() const;
@@ -50,6 +50,7 @@ public:
   Q_INVOKABLE void cycleSubtitleTrack();
   Q_INVOKABLE QVariantList browseSubtitles(const QString &path) const;
   Q_INVOKABLE QVariantList browseCoverImages(const QString &path) const;
+  Q_INVOKABLE QVariantList scanMusicLibrary(const QString &folder, const QString &filter) const;
   Q_INVOKABLE void seekRelative(double seconds);
   Q_INVOKABLE void processEvents();
 signals:
