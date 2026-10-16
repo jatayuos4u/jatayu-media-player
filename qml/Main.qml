@@ -14,6 +14,33 @@ ApplicationWindow {
     property color accent: "#1689E8"
     property color textColor: "#E9F1F7"
     property color muted: "#8496A8"
+    property var mediaQueue: []
+    property int queueIndex: -1
+    function playQueueIndex(index) {
+        if (index < 0 || index >= mediaQueue.length) return
+        queueIndex = index
+        player.openFile(mediaQueue[index].path)
+    }
+    function enqueue(path, name, playNow) {
+        if (!path) return
+        let items = mediaQueue.slice()
+        let index = items.findIndex(entry => entry.path === path)
+        if (index < 0) {
+            items.push({path: path, name: name || path.split("/").pop()})
+            index = items.length - 1
+            mediaQueue = items
+        }
+        if (playNow || queueIndex < 0) playQueueIndex(index)
+    }
+    function skipQueue(delta) { playQueueIndex(queueIndex + delta) }
+    function removeQueueIndex(index) {
+        if (index < 0 || index >= mediaQueue.length) return
+        let items = mediaQueue.slice()
+        items.splice(index, 1)
+        mediaQueue = items
+        if (index < queueIndex) queueIndex--
+        else if (index === queueIndex) queueIndex = -1
+    }
     readonly property bool cinemaMode: visibility === Window.FullScreen
     property bool showCinemaControls: true
     function toggleCinema() { if (cinemaMode) showNormal(); else showFullScreen() }
@@ -240,7 +267,7 @@ ApplicationWindow {
                             onDoubleClicked: {
                                 if (modelData.directory) mediaBrowser.navigate(modelData.path)
                                 else {
-                                    player.openFile(modelData.path)
+                                    window.enqueue(modelData.path, modelData.name, true)
                                     mediaBrowser.close()
                                 }
                             }
@@ -288,16 +315,59 @@ ApplicationWindow {
                     elide: Text.ElideMiddle
                 }
                 Button {
+                    text: "Add to queue"
+                    enabled: mediaBrowser.selectedPath.length > 0 && !mediaBrowser.selectedFolder
+                    onClicked: {
+                        window.enqueue(mediaBrowser.selectedPath, mediaBrowser.selectedName, false)
+                        mediaBrowser.close()
+                    }
+                }
+                Button {
                     text: mediaBrowser.selectedFolder ? "Open folder" : "Play selected"
                     enabled: mediaBrowser.selectedPath.length > 0
                     onClicked: {
                         if (mediaBrowser.selectedFolder) mediaBrowser.navigate(mediaBrowser.selectedPath)
                         else {
-                            player.openFile(mediaBrowser.selectedPath)
+                            window.enqueue(mediaBrowser.selectedPath, mediaBrowser.selectedName, true)
                             mediaBrowser.close()
                         }
                     }
                 }
+            }
+        }
+    }
+    Dialog {
+        id: queueDialog
+        title: "Up next"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 600)
+        height: Math.min(window.height - 24, 540)
+        standardButtons: Dialog.Close
+        ColumnLayout {
+            anchors.fill: parent
+            Label { text: mediaQueue.length + " items in queue"; color: window.textColor }
+            ListView {
+                id: queueList
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                model: mediaQueue
+                delegate: ItemDelegate {
+                    required property var modelData
+                    required property int index
+                    width: queueList.width
+                    contentItem: RowLayout {
+                        Label { text: (index === queueIndex ? "▶ " : "") + modelData.name; color: window.textColor; Layout.fillWidth: true; elide: Text.ElideMiddle }
+                        Button { text: "Play"; onClicked: window.playQueueIndex(index) }
+                        Button { text: "Remove"; onClicked: window.removeQueueIndex(index) }
+                    }
+                }
+            }
+            RowLayout {
+                Button { text: "Add media"; onClicked: { queueDialog.close(); mediaBrowser.open() } }
+                Item { Layout.fillWidth: true }
+                Button { text: "Clear queue"; enabled: mediaQueue.length > 0; onClicked: { mediaQueue = []; queueIndex = -1 } }
             }
         }
     }
@@ -341,6 +411,7 @@ ApplicationWindow {
                 }
                 Item { Layout.fillWidth: true }
                 Button { text: "Browse media"; onClicked: mediaBrowser.open() }
+                Button { text: "Queue (" + mediaQueue.length + ")"; onClicked: queueDialog.open() }
                 Button { text: "Recent"; onClicked: { mediaBrowser.open(); mediaBrowser.showRecent() } }
                 Label { text: "Quality"; color: "#9BB0C1" }
                 ComboBox {
@@ -434,6 +505,8 @@ ApplicationWindow {
                     Button { text: "↶ 10"; onClicked: player.seekRelative(-10) }
                     Button { text: player.paused ? "▶ Play" : "Ⅱ Pause"; highlighted: true; onClicked: player.togglePause() }
                     Button { text: "Stop"; onClicked: player.stop() }
+                    Button { text: "Previous"; enabled: queueIndex > 0; onClicked: skipQueue(-1) }
+                    Button { text: "Next"; enabled: queueIndex >= 0 && queueIndex < mediaQueue.length - 1; onClicked: skipQueue(1) }
                     Button { text: "10 ↷"; onClicked: player.seekRelative(10) }
                     Label {
                         text: formatTime(player.position) + " / " + formatTime(player.duration)
