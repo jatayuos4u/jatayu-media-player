@@ -375,11 +375,94 @@ ApplicationWindow {
             }
         }
     }
-    FileDialog {
+    Dialog {
         id: subtitleDialog
         title: "Open subtitles"
-        nameFilters: ["Subtitle files (*.srt *.ass *.ssa)", "All files (*)"]
-        onAccepted: player.openSubtitle(selectedFile.toString())
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 720)
+        height: Math.min(window.height - 24, 540)
+        padding: 16
+        standardButtons: Dialog.Close
+        property string folder: player.locationPath("Downloads")
+        property var entries: []
+        property string selectedFile: ""
+        function navigate(path) {
+            folder = path
+            selectedFile = ""
+            entries = player.browseSubtitles(folder)
+        }
+        onOpened: navigate(folder)
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 12
+            RowLayout {
+                Layout.fillWidth: true
+                Button { text: "Home"; onClicked: subtitleDialog.navigate(player.locationPath("Home")) }
+                Button { text: "Downloads"; onClicked: subtitleDialog.navigate(player.locationPath("Downloads")) }
+                Button { text: "Videos"; onClicked: subtitleDialog.navigate(player.locationPath("Videos")) }
+                Button { text: "Up"; enabled: subtitleDialog.folder !== "/"; onClicked: subtitleDialog.navigate(subtitleDialog.folder.replace(/\\/[^\\/]+\\/?$/, "") || "/") }
+            }
+            Label {
+                Layout.fillWidth: true
+                text: subtitleDialog.folder
+                color: "#C1D5E4"
+                elide: Text.ElideMiddle
+            }
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: "#172532"
+                radius: 7
+                ListView {
+                    id: subtitleFiles
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    model: subtitleDialog.entries
+                    clip: true
+                    delegate: ItemDelegate {
+                        required property var modelData
+                        width: subtitleFiles.width
+                        highlighted: subtitleDialog.selectedFile === modelData.path
+                        text: (modelData.directory ? "📁 " : "◧ ") + modelData.name
+                        onClicked: {
+                            if (modelData.directory) subtitleDialog.navigate(modelData.path)
+                            else subtitleDialog.selectedFile = modelData.path
+                        }
+                        onDoubleClicked: {
+                            if (modelData.directory) subtitleDialog.navigate(modelData.path)
+                            else {
+                                player.openSubtitle(modelData.path)
+                                subtitleDialog.close()
+                            }
+                        }
+                    }
+                }
+                Label {
+                    anchors.centerIn: parent
+                    visible: subtitleFiles.count === 0
+                    text: "No subtitle files in this folder"
+                    color: "#A5BACB"
+                }
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Label {
+                    Layout.fillWidth: true
+                    text: subtitleDialog.selectedFile.length ? subtitleDialog.selectedFile.split("/").pop() : "Choose a subtitle file (.srt, .ass, .ssa, .vtt)"
+                    color: "#D9E7F3"
+                    elide: Text.ElideMiddle
+                }
+                Button {
+                    text: "Load subtitles"
+                    enabled: subtitleDialog.selectedFile.length > 0
+                    onClicked: {
+                        player.openSubtitle(subtitleDialog.selectedFile)
+                        subtitleDialog.close()
+                    }
+                }
+            }
+        }
     }
     Shortcut { sequence: "Ctrl+F"; onActivated: { mediaBrowser.open(); browserSearch.forceActiveFocus() } }
     Shortcut { sequence: "Space"; onActivated: player.togglePause() }
