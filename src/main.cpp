@@ -4,6 +4,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickWindow>
+#include <QTimer>
 #include <QSGRendererInterface>
 #include <QDebug>
 #include <QIcon>
@@ -28,7 +29,14 @@ int main(int argc, char *argv[]) {
     engine.rootContext()->setContextProperty("player", &player);
     engine.loadFromModule("JatayuMediaPlayer", "Main");
     if (engine.rootObjects().isEmpty()) return 2;
-    if (argc > 1) player.openFile(QString::fromLocal8Bit(argv[1]));
+    if (argc > 1) {
+      const QString startupPath = QString::fromLocal8Bit(argv[1]);
+      // Defer media loading until Qt Quick has had time to initialize its
+      // OpenGL framebuffer renderer. The browser already follows this order.
+      QTimer::singleShot(300, &app, [&player, startupPath] {
+        player.openFile(startupPath);
+      });
+    }
     return app.exec();
   } catch (const std::exception &e) {
     qCritical() << "Unable to start player:" << e.what();
