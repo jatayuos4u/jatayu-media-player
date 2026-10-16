@@ -2,38 +2,57 @@
 
 **Every Beat. Every Frame.**
 
-Early development proof of concept for an independent Linux media player, built using C++20, Qt 6/QML and libmpv. Not yet a stable release, not preinstalled in JatayuOS.
+A privacy-focused, independent media player for Linux, built with C++20, Qt 6/QML and libmpv. This project is a standalone app and is **not** preinstalled in JatayuOS.
 
-## Current prototype
+> **Status:** v0.3.0 development / beta candidate testing. Not a stable release or a published beta.
 
-- Playback of locally selected media through libmpv
-- Qt Quick video render surface using the OpenGL-based libmpv render API
-- Play/pause, stop, relative seeking, timeline, volume, fullscreen
-- External subtitle loading, keyboard shortcuts, opening a file via Ctrl+O
-- Dark interface; no advertisement, analytics or telemetry dependencies
+## Features in the development build
 
-**Not yet implemented:** playlists, media library, MPRIS, persistence, comprehensive settings, light theme, localization, portable packages, and the full tested codec/support matrix. Real playback has not yet been verified on hardware.
+- Local audio and video playback, seeking, fullscreen, playback speed, volume and audio-track selection
+- External subtitle loading and subtitle controls
+- Media Browser with keyboard navigation, scrolling, file multi-selection and queue
+- Music Library with Songs, Folders, Artists, Albums and local metadata scanning
+- Saved named playlists, automatic queue progression, recent-file history
+- Music information and cover-art editing (saves edited media to a new file)
+- Resume playback, Media Information, Help/About and Preferences
+- No built-in ads, telemetry or account requirement
 
-## Build locally (Debian 13 / Ubuntu derivatives)
+Support for particular codecs and hardware acceleration varies with system libmpv/FFmpeg and drivers. Additional distributions and hardware remain to be tested.
+
+## Build from source (Debian 13)
 
 ```bash
 ./scripts/setup-linux.sh
 ./scripts/build-local.sh
-./build/jatayu-media-player ~/Videos/sample.mp4
+./scripts/run-tests.sh
+./build/jatayu-media-player /path/to/video.mp4
 ```
 
-Read [docs/BUILD.md](docs/BUILD.md) for environment requirements and diagnostics. The source archive is not a precompiled player. There are no GitHub Actions workflows or artifact uploads.
+For experimental local Debian package generation:
+
+```bash
+bash scripts/build-deb-beta.sh
+```
+
+The resulting package is in `dist/`. It has **not** been certified for general distribution. See [beta packaging and performance guide](docs/BETA-PACKAGING-AND-PERFORMANCE.md), [manual regression checklist](docs/BETA-REGRESSION-CHECKLIST.md) and [draft release notes](docs/BETA-RELEASE-NOTES-DRAFT.md).
 
 ## Keyboard controls
 
 | Key | Action |
 |---|---|
-| Ctrl+O | Open media |
-| Space | Play / pause |
-| Left / Right | Seek back / forward 5 seconds |
-| F | Fullscreen toggle |
-| Escape | Exit fullscreen |
+| Ctrl+O | Browse media |
+| Space | Play/Pause |
+| Left / Right | Seek 5 seconds |
+| Ctrl+Left / Ctrl+Right | Seek 30 seconds |
+| Up / Down | Volume |
+| F / Escape | Enter / leave fullscreen |
+| Ctrl+L | Music Library |
+| Ctrl+P | Named playlists |
 
-## Privacy and licensing
+Further shortcuts are listed within the application under Help.
 
-Playback of local files does not require an account. The app contains no tracking SDKs or advertising code. libmpv and its dependencies may have their own behaviour; network traffic still needs verification in testing. Source code is provided under GPL-3.0-or-later, with third-party dependencies governed by their respective licenses. Complete redistribution compliance remains a release gate.
+## Privacy and license
+
+Local files are played without an account. The app includes no advertising or telemetry SDK. Playlists, history, position bookmarks and preferences are stored locally; clear-history controls are available in Preferences. Any network-related behavior of third-party runtime components must be audited before release.
+
+Application source is made available under **GPL-3.0-or-later**; dependencies and bundled resources may have different licenses. Publication is blocked pending a complete third-party license/provenance review. See [release compliance checklist](docs/RELEASE-COMPLIANCE-AUDIT.md).
