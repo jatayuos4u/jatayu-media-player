@@ -1431,7 +1431,7 @@ ApplicationWindow {
                     }
                     Item { Layout.fillWidth: true }
                     Button {
-                        text: player.playbackSpeed.toFixed(2).replace(/0$/, "").replace(/\\.$/, "") + "×"
+                        text: Number(player.playbackSpeed.toFixed(2)).toString() + "×"
                         onClicked: playbackOptions.open()
                         ToolTip.visible: hovered
                         ToolTip.text: "Playback speed and audio tracks"
