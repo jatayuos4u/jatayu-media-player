@@ -667,8 +667,19 @@ ApplicationWindow {
                             color: "#173D5B"
                             border.color: "#2B96CD"
                             border.width: 1
+                            clip: true
+                            Image {
+                                id: embeddedCover
+                                anchors.fill: parent
+                                source: player.artworkUrl
+                                fillMode: Image.PreserveAspectCrop
+                                asynchronous: true
+                                cache: false
+                                visible: status === Image.Ready && player.artworkUrl.length > 0
+                            }
                             Label {
                                 anchors.centerIn: parent
+                                visible: !embeddedCover.visible
                                 text: "♫"
                                 color: "#66E5FA"
                                 font.pixelSize: 91
