@@ -22,6 +22,7 @@ ApplicationWindow {
     property bool restoredSettings: false
     property var namedPlaylists: ({})
     property var pendingPlaylistEntry: null
+    property var pendingPlaylistEntries: []
     property string activePlaylist: ""
     function saveNamedPlaylist(name, entries) {
         const key = name.trim()
@@ -420,6 +421,25 @@ ApplicationWindow {
         }
         property string folder: libraryPreferences.savedFolder.length > 0 ? libraryPreferences.savedFolder : player.locationPath("Music")
         property var songs: []
+        property var checkedSongs: ({})
+        readonly property int selectedCount: Object.keys(checkedSongs).length
+        function setSongChecked(path, checked) {
+            const updated = Object.assign({}, checkedSongs)
+            if (checked) updated[path] = true
+            else delete updated[path]
+            checkedSongs = updated
+        }
+        function setAllVisible(checked) {
+            const updated = Object.assign({}, checkedSongs)
+            for (const song of visibleSongs) {
+                if (checked) updated[song.path] = true
+                else delete updated[song.path]
+            }
+            checkedSongs = updated
+        }
+        function selectedEntries() {
+            return songs.filter(song => checkedSongs[song.path]).map(song => ({path:song.path, name:song.name}))
+        }
         property string selectedArtist: ""
         property string selectedAlbum: ""
         Connections {
@@ -447,6 +467,7 @@ ApplicationWindow {
         }
         function refresh() {
             songs = player.scanMusicLibrary(folder, librarySearch.text)
+            checkedSongs = ({})
             selectedArtist = ""
             selectedAlbum = ""
             player.inspectMusicTags(songs)
@@ -541,6 +562,43 @@ ApplicationWindow {
                     }
                 }
             }
+            RowLayout {
+                Layout.fillWidth: true
+                Button {
+                    text: "Select all shown"
+                    enabled: libraryDialog.visibleSongs.length > 0
+                    onClicked: libraryDialog.setAllVisible(true)
+                }
+                Button {
+                    text: "Clear selection"
+                    enabled: libraryDialog.selectedCount > 0
+                    onClicked: libraryDialog.checkedSongs = ({})
+                }
+                Label {
+                    text: libraryDialog.selectedCount + " selected"
+                    color: "#B7C8D8"
+                }
+                Item { Layout.fillWidth: true }
+                Button {
+                    text: "Add selected to queue"
+                    enabled: libraryDialog.selectedCount > 0
+                    onClicked: {
+                        for (const entry of libraryDialog.selectedEntries())
+                            window.enqueue(entry.path, entry.name, false)
+                        libraryDialog.checkedSongs = ({})
+                    }
+                }
+                Button {
+                    text: "Add selected to playlist"
+                    enabled: libraryDialog.selectedCount > 0
+                    onClicked: {
+                        window.pendingPlaylistEntries = libraryDialog.selectedEntries()
+                        window.pendingPlaylistEntry = null
+                        libraryDialog.close()
+                        namedPlaylistsDialog.open()
+                    }
+                }
+            }
             ListView {
                 id: songsList
                 Layout.fillWidth: true
@@ -551,6 +609,12 @@ ApplicationWindow {
                     required property var modelData
                     width: songsList.width
                     contentItem: RowLayout {
+                        CheckBox {
+                            checked: !!libraryDialog.checkedSongs[modelData.path]
+                            onToggled: libraryDialog.setSongChecked(modelData.path, checked)
+                            ToolTip.visible: hovered
+                            ToolTip.text: "Select this track for bulk actions"
+                        }
                         Label { Layout.fillWidth: true; text: (modelData.displayTitle || modelData.name) + (modelData.artist ? "  ·  " + modelData.artist : ""); color: "#E9F1F7"; elide: Text.ElideMiddle }
                         Button { text: "Play"; onClicked: { window.enqueue(modelData.path, modelData.name, true); libraryDialog.close() } }
                         Button { text: "Add to queue"; onClicked: window.enqueue(modelData.path, modelData.name, false) }
@@ -558,6 +622,7 @@ ApplicationWindow {
                             text: "Playlist +"
                             onClicked: {
                                 window.pendingPlaylistEntry = {path: modelData.path, name: modelData.name}
+                                window.pendingPlaylistEntries = []
                                 libraryDialog.close()
                                 namedPlaylistsDialog.open()
                             }
@@ -575,7 +640,10 @@ ApplicationWindow {
         width: Math.min(window.width - 24, 650)
         height: Math.min(window.height - 24, 530)
         standardButtons: Dialog.Close
-        onClosed: window.pendingPlaylistEntry = null
+        onClosed: {
+            window.pendingPlaylistEntry = null
+            window.pendingPlaylistEntries = []
+        }
         ColumnLayout {
             anchors.fill: parent
             spacing: 10
@@ -598,7 +666,7 @@ ApplicationWindow {
                 }
             }
             Label {
-                text: window.pendingPlaylistEntry ? "Select a playlist for " + window.pendingPlaylistEntry.name : "Named playlists are saved locally."
+                text: window.pendingPlaylistEntries.length > 0 ? "Add " + window.pendingPlaylistEntries.length + " selected songs to a playlist" : (window.pendingPlaylistEntry ? "Select a playlist for " + window.pendingPlaylistEntry.name : "Named playlists are saved locally.")
                 color: "#B7C8D8"
                 Layout.fillWidth: true
                 elide: Text.ElideMiddle
@@ -620,14 +688,19 @@ ApplicationWindow {
                             elide: Text.ElideMiddle
                         }
                         Button {
-                            text: window.pendingPlaylistEntry ? "Add" : "Load"
+                            text: window.pendingPlaylistEntry || window.pendingPlaylistEntries.length > 0 ? "Add" : "Load"
                             onClicked: {
-                                if (window.pendingPlaylistEntry) {
+                                if (window.pendingPlaylistEntry || window.pendingPlaylistEntries.length > 0) {
                                     let entries = window.namedPlaylists[modelData].slice()
-                                    if (!entries.some(e => e.path === window.pendingPlaylistEntry.path))
-                                        entries.push(window.pendingPlaylistEntry)
+                                    const additions = window.pendingPlaylistEntries.length > 0 ?
+                                                      window.pendingPlaylistEntries : [window.pendingPlaylistEntry]
+                                    for (const song of additions) {
+                                        if (song && !entries.some(e => e.path === song.path))
+                                            entries.push(song)
+                                    }
                                     window.saveNamedPlaylist(modelData, entries)
                                     window.pendingPlaylistEntry = null
+                                    window.pendingPlaylistEntries = []
                                 } else {
                                     window.loadNamedPlaylist(modelData, false)
                                     namedPlaylistsDialog.close()
