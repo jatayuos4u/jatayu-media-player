@@ -963,6 +963,75 @@ ApplicationWindow {
         }
     }
     Dialog {
+        id: aboutPlayerDialog
+        title: "About Jatayu Media Player"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 510)
+        standardButtons: Dialog.Close
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+            Image {
+                source: "qrc:/icons/jatayu-media-player.svg"
+                Layout.preferredWidth: 76
+                Layout.preferredHeight: 76
+                Layout.alignment: Qt.AlignHCenter
+                fillMode: Image.PreserveAspectFit
+            }
+            Label { text: "Jatayu Media Player"; font.pixelSize: 23; font.bold: true; color: "#E9F1F7"; Layout.alignment: Qt.AlignHCenter }
+            Label { text: "Version 0.3.0 — Development Preview"; color: "#9FC1D7"; Layout.alignment: Qt.AlignHCenter }
+            Label {
+                Layout.fillWidth: true
+                text: "Every Beat. Every Frame.\n\nIndependent, open-source media player for Linux, built using Qt 6 and libmpv. No advertising or built-in telemetry.\n\nApplication source: GPL-3.0-or-later. Third-party components retain their own licenses.\n\nThis development build is not a stable release."
+                color: "#D3E2EF"
+                wrapMode: Text.WordWrap
+            }
+            Button {
+                text: "Source code and license"
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: Qt.openUrlExternally("https://github.com/jatayuos4u/jatayu-media-player")
+            }
+        }
+    }
+    Dialog {
+        id: gettingStartedDialog
+        title: "Getting started"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 530)
+        standardButtons: Dialog.Close
+        Label {
+            width: parent.width
+            color: "#D3E2EF"
+            wrapMode: Text.WordWrap
+            text: "Open songs or videos using Browse media (Ctrl+O).\n\nUse Space to play or pause, Left/Right to seek, and F for fullscreen.\n\nOpen More > Music library to browse songs, build queues and manage named playlists.\n\nUse Playback options for speed and audio tracks. Load local subtitle files with Subtitles.\n\nEdit song tags and album covers with More > Edit music information; edits are saved to a new copy."
+        }
+    }
+    Dialog {
+        id: troubleshootingDialog
+        title: "Troubleshooting"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 530)
+        standardButtons: Dialog.Close
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+            Label {
+                Layout.fillWidth: true
+                color: "#D3E2EF"
+                wrapMode: Text.WordWrap
+                text: "No audio? Check mute, system output, volume and the selected audio track.\n\nVideo stuttering? Choose Quality: Performance under More.\n\nSubtitle missing? Load the correct file and inspect subtitle timing or track selection.\n\nAlbum image missing? Not all audio files contain embedded artwork.\n\nIf a problem persists, start the player from a terminal and include the error output in a GitHub issue."
+            }
+            Button {
+                text: "Report an issue"
+                Layout.alignment: Qt.AlignRight
+                onClicked: Qt.openUrlExternally("https://github.com/jatayuos4u/jatayu-media-player/issues")
+            }
+        }
+    }
+    Dialog {
         id: shortcutsHelp
         title: "Keyboard shortcuts"
         modal: true
