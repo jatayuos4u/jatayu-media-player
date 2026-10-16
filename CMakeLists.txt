@@ -36,6 +36,8 @@ install(FILES assets/jatayu-media-player.desktop DESTINATION share/applications)
 set_source_files_properties(assets/jatayu-media-player.svg PROPERTIES QT_RESOURCE_ALIAS jatayu-media-player.svg)
 qt_add_resources(jatayu-media-player "brand_icons" PREFIX "/icons" FILES assets/jatayu-media-player.svg)
 install(FILES assets/jatayu-media-player.svg DESTINATION share/icons/hicolor/scalable/apps)
+# Preserve the application license alongside the installed package.
+install(FILES LICENSE DESTINATION share/doc/jatayu-media-player RENAME copyright)
 
 # Opt-in local Debian beta packaging. No package or release is produced by default.
 set(CPACK_GENERATOR "DEB")
