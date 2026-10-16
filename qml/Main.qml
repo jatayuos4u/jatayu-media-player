@@ -344,8 +344,15 @@ ApplicationWindow {
                         Keys.onUpPressed: function(event) { mediaBrowser.chooseIndex(currentIndex < 0 ? 0 : Math.max(0, currentIndex - 1)); event.accepted = true }
                         Keys.onReturnPressed: function(event) { mediaBrowser.openSelected(); event.accepted = true }
                         Keys.onEnterPressed: function(event) { mediaBrowser.openSelected(); event.accepted = true }
-                        Keys.onHomePressed: function(event) { mediaBrowser.chooseIndex(0); event.accepted = true }
-                        Keys.onEndPressed: function(event) { mediaBrowser.chooseIndex(count - 1); event.accepted = true }
+                        Keys.onPressed: function(event) {
+                            if (event.key === Qt.Key_Home) {
+                                mediaBrowser.chooseIndex(0)
+                                event.accepted = true
+                            } else if (event.key === Qt.Key_End) {
+                                mediaBrowser.chooseIndex(browserList.count - 1)
+                                event.accepted = true
+                            }
+                        }
                         anchors.fill: parent
                         anchors.leftMargin: 6
                         anchors.topMargin: 6
