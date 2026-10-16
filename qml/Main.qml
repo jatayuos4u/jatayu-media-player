@@ -342,6 +342,16 @@ ApplicationWindow {
                 Item { Layout.fillWidth: true }
                 Button { text: "Browse media"; onClicked: mediaBrowser.open() }
                 Button { text: "Recent"; onClicked: { mediaBrowser.open(); mediaBrowser.showRecent() } }
+                Label { text: "Quality"; color: "#9BB0C1" }
+                ComboBox {
+                    id: videoQualityPicker
+                    Layout.preferredWidth: 144
+                    model: ["Performance", "Balanced", "High Quality"]
+                    currentIndex: Math.max(0, model.indexOf(player.qualityProfile))
+                    onActivated: player.setQualityProfile(currentText)
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Choose picture scaling quality. High Quality may be slower on older GPUs."
+                }
                 Button { text: "Subtitles"; onClicked: subtitleDialog.open() }
             }
         }

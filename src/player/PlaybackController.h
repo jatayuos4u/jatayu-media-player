@@ -11,6 +11,7 @@ class PlaybackController : public QObject {
   Q_PROPERTY(double volume READ volume WRITE setVolume NOTIFY volumeChanged)
   Q_PROPERTY(QString title READ title NOTIFY titleChanged)
   Q_PROPERTY(QString error READ error NOTIFY errorChanged)
+  Q_PROPERTY(QString qualityProfile READ qualityProfile NOTIFY qualityProfileChanged)
 public:
   explicit PlaybackController(QObject *parent = nullptr);
   ~PlaybackController() override;
@@ -21,6 +22,8 @@ public:
   double volume() const { return volume_; }
   QString title() const { return title_; }
   QString error() const { return error_; }
+  QString qualityProfile() const { return qualityProfile_; }
+  Q_INVOKABLE void setQualityProfile(const QString &profile);
   Q_INVOKABLE void openFile(const QString &path);
   Q_INVOKABLE QString locationPath(const QString &name) const;
   Q_INVOKABLE QVariantList browseFolder(const QString &path, const QString &filter) const;
@@ -43,6 +46,7 @@ signals:
   void errorChanged();
   void engineEvent();
   void recentMediaChanged();
+  void qualityProfileChanged();
 private:
   static void wakeup(void *ctx);
   void setError(QString message);
@@ -50,4 +54,5 @@ private:
   bool paused_ = true;
   double position_ = 0, duration_ = 0, volume_ = 70;
   QString title_ = "No media selected", error_;
+  QString qualityProfile_ = "Balanced";
 };
