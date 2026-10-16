@@ -377,6 +377,63 @@ ApplicationWindow {
         }
     }
     Dialog {
+        id: libraryDialog
+        title: "Music library"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 820)
+        height: Math.min(window.height - 24, 570)
+        property string folder: player.locationPath("Music")
+        property var songs: []
+        function refresh() { songs = player.scanMusicLibrary(folder, librarySearch.text) }
+        onOpened: refresh()
+        standardButtons: Dialog.Close
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+            RowLayout {
+                Layout.fillWidth: true
+                Button { text: "Music"; onClicked: { libraryDialog.folder = player.locationPath("Music"); libraryDialog.refresh() } }
+                Button { text: "Downloads"; onClicked: { libraryDialog.folder = player.locationPath("Downloads"); libraryDialog.refresh() } }
+                Button { text: "Home"; onClicked: { libraryDialog.folder = player.locationPath("Home"); libraryDialog.refresh() } }
+                Button {
+                    text: "Up"
+                    enabled: libraryDialog.folder !== "/"
+                    onClicked: {
+                        libraryDialog.folder = libraryDialog.folder.substring(0, libraryDialog.folder.lastIndexOf("/")) || "/"
+                        libraryDialog.refresh()
+                    }
+                }
+                Button { text: "Refresh"; onClicked: libraryDialog.refresh() }
+            }
+            Label { Layout.fillWidth: true; text: libraryDialog.folder; color: "#B7C8D8"; elide: Text.ElideMiddle }
+            TextField {
+                id: librarySearch
+                Layout.fillWidth: true
+                placeholderText: "Search song filenames in selected folder…"
+                onTextChanged: libraryRefreshDelay.restart()
+            }
+            Timer { id: libraryRefreshDelay; interval: 280; onTriggered: libraryDialog.refresh() }
+            Label { text: libraryDialog.songs.length + " songs found"; color: "#9AB6C9" }
+            ListView {
+                id: songsList
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                model: libraryDialog.songs
+                delegate: ItemDelegate {
+                    required property var modelData
+                    width: songsList.width
+                    contentItem: RowLayout {
+                        Label { Layout.fillWidth: true; text: modelData.name; color: "#E9F1F7"; elide: Text.ElideMiddle }
+                        Button { text: "Play"; onClicked: { window.enqueue(modelData.path, modelData.name, true); libraryDialog.close() } }
+                        Button { text: "Add to queue"; onClicked: window.enqueue(modelData.path, modelData.name, false) }
+                    }
+                }
+            }
+        }
+    }
+    Dialog {
         id: queueDialog
         title: "Up next"
         modal: true
@@ -517,6 +574,7 @@ ApplicationWindow {
             titleField.text = player.songTitle
             artistField.text = player.artist
             albumField.text = player.album
+            outputNameField.text = player.title.replace(/\\.[^.]+$/, "") + "-edited"
             feedback = ""
             coverPath = ""
             saving = false
@@ -553,11 +611,13 @@ ApplicationWindow {
                 asynchronous: true
                 visible: source.toString().length > 0 && status === Image.Ready
             }
+            Label { text: "Save As filename (same folder)"; color: "#E9F1F7" }
+            TextField { id: outputNameField; Layout.fillWidth: true; placeholderText: "new-file-name"; selectByMouse: true }
             Button {
                 text: editTags.saving ? "Saving…" : "Save edited copy"
                 enabled: !editTags.saving
                 Layout.alignment: Qt.AlignRight
-                onClicked: { editTags.saving = true; player.saveMusicTags(titleField.text, artistField.text, albumField.text, editTags.coverPath) }
+                onClicked: { editTags.saving = true; player.saveMusicTags(titleField.text, artistField.text, albumField.text, editTags.coverPath, outputNameField.text) }
             }
             Label { text: editTags.feedback; color: "#B7C8D8"; wrapMode: Text.WrapAnywhere; Layout.fillWidth: true }
         }
@@ -758,6 +818,7 @@ ApplicationWindow {
                 Button { text: "More ▾"; onClicked: toolsMenu.popup() }
                 Menu {
                     id: toolsMenu
+                    MenuItem { text: "Music library"; onTriggered: libraryDialog.open() }
                     MenuItem { text: "Recent files"; onTriggered: { mediaBrowser.open(); mediaBrowser.showRecent() } }
                     MenuItem { text: "Edit music information"; enabled: window.audioTrack; onTriggered: editTags.open() }
                     MenuItem { text: "Load subtitles"; onTriggered: subtitleDialog.open() }
