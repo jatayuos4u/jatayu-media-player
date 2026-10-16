@@ -627,19 +627,53 @@ ApplicationWindow {
             color: "#070B0F"
             MpvVideoItem { id: video; anchors.fill: parent; controller: player }
             Rectangle {
+                id: musicStage
                 anchors.fill: parent
                 visible: window.musicMode
                 color: "#101C2B"
+                property bool animating: visible && !player.paused && player.title !== "No media selected"
+                // Decorative animation, not an audio spectrum analyzer.
+                // Only six lightweight bars run; no render-loop timers or shaders.
                 ColumnLayout {
                     anchors.centerIn: parent
-                    width: Math.min(parent.width - 48, 570)
-                    spacing: 16
-                    Rectangle {
+                    width: Math.min(parent.width - 48, 560)
+                    spacing: Math.max(9, Math.min(16, parent.height / 38))
+                    Item {
                         Layout.alignment: Qt.AlignHCenter
-                        width: 160; height: 160; radius: 28
-                        color: "#173D5B"
-                        border.color: "#2778AD"
-                        Label { anchors.centerIn: parent; text: "♫"; color: "#66E5FA"; font.pixelSize: 93 }
+                        Layout.preferredWidth: 190
+                        Layout.preferredHeight: 190
+                        Rectangle {
+                            id: artworkHalo
+                            anchors.centerIn: parent
+                            width: 184; height: 184
+                            radius: 92
+                            color: "#113C5C"
+                            border.color: "#246994"
+                            border.width: 2
+                            opacity: 0.7
+                            scale: 1.0
+                            SequentialAnimation on scale {
+                                running: musicStage.animating
+                                loops: Animation.Infinite
+                                NumberAnimation { to: 1.065; duration: 1800; easing.type: Easing.InOutSine }
+                                NumberAnimation { to: 1.0; duration: 1800; easing.type: Easing.InOutSine }
+                                onStopped: artworkHalo.scale = 1.0
+                            }
+                        }
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: 160; height: 160
+                            radius: 26
+                            color: "#173D5B"
+                            border.color: "#2B96CD"
+                            border.width: 1
+                            Label {
+                                anchors.centerIn: parent
+                                text: "♫"
+                                color: "#66E5FA"
+                                font.pixelSize: 91
+                            }
+                        }
                     }
                     Label {
                         Layout.fillWidth: true
@@ -649,13 +683,46 @@ ApplicationWindow {
                         color: "#F0F8FF"
                         horizontalAlignment: Text.AlignHCenter
                         elide: Text.ElideMiddle
+                        Behavior on opacity { NumberAnimation { duration: 180 } }
                     }
                     Label {
                         Layout.fillWidth: true
                         text: (player.artist.length ? player.artist : "Artist not tagged") + (player.album.length ? "  •  " + player.album : "")
                         font.pixelSize: 13
-                        color: "#9AB6C9"
+                        color: "#A7C4D6"
                         horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideRight
+                    }
+                    Row {
+                        Layout.alignment: Qt.AlignHCenter
+                        height: 31
+                        spacing: 7
+                        Repeater {
+                            model: 7
+                            Rectangle {
+                                required property int index
+                                width: 6
+                                height: musicStage.animating ? 10 + ((index * 11) % 18) : 5
+                                radius: 3
+                                anchors.verticalCenter: parent.verticalCenter
+                                color: index % 2 ? "#33B9EF" : "#5CE5F2"
+                                opacity: musicStage.animating ? 0.95 : 0.45
+                                SequentialAnimation on height {
+                                    running: musicStage.animating
+                                    loops: Animation.Infinite
+                                    NumberAnimation {
+                                        to: 7 + ((index * 7) % 19)
+                                        duration: 500 + index * 95
+                                        easing.type: Easing.InOutSine
+                                    }
+                                    NumberAnimation {
+                                        to: 22 + ((index * 3) % 9)
+                                        duration: 570 + index * 73
+                                        easing.type: Easing.InOutSine
+                                    }
+                                }
+                            }
+                        }
                     }
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
