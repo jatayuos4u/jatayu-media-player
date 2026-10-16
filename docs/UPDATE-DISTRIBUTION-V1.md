@@ -21,6 +21,24 @@ The local build already creates `dist/flatpak-repo/`. The Flatpak repo can be pu
 
 An alternative is Flathub, which has its own submission/review process and cannot be guaranteed ready by 19 October.
 
+
+## Local repository staging commands (not deployment)
+
+Install locally on a disposable development machine:
+```bash
+sudo apt install reprepro gnupg flatpak ostree
+```
+Use separate dedicated signing keys where possible; do **not** commit or paste private keys into GitHub or a chat. After producing and testing final packages, set the fingerprint of a *pre-existing* local signing key:
+```bash
+export APT_SIGNING_FINGERPRINT=YOUR_FULL_SIGNING_KEY_FINGERPRINT
+bash scripts/prepare-apt-repository.sh
+export FLATPAK_SIGNING_KEY=YOUR_FLATPAK_SIGNING_KEY_FINGERPRINT
+bash scripts/prepare-flatpak-repository.sh
+```
+These commands stage repositories under `dist/apt-repo` and `dist/flatpak-repo`. The first generates signed Debian metadata and a public key export. The second signs the Flatpak repository summary and exports the public key. Both are **unverified until run locally** and perform no hosting or account configuration. Review the contents and publish only with explicit approval.
+
+**Important:** Host names mentioned in this document are illustrative and are not live endpoints. The APT repo requires a stable HTTPS static host that serves the full `dists/` and `pool/` tree. The Flatpak repo must expose the entire OSTree repository with suitable MIME types and HTTPS. Do not provide update installation instructions pointing to URLs until remote installation and the update path have been tested.
+
 ## Privacy
 No silent download/overwrite of the running executable and no update telemetry. Use APT and Flatpak's signed distribution mechanisms, letting users manage upgrades using their system tools.
 
