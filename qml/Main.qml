@@ -417,11 +417,91 @@ ApplicationWindow {
             }
         }
     }
-    FileDialog {
+    Dialog {
         id: coverChooser
         title: "Choose album artwork"
-        nameFilters: ["Cover images (*.jpg *.jpeg *.png)"]
-        onAccepted: editTags.coverPath = selectedFile.toString()
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 720)
+        height: Math.min(window.height - 24, 540)
+        padding: 16
+        standardButtons: Dialog.Close
+        property string folder: player.locationPath("Pictures")
+        property var entries: []
+        property string selectedPath: ""
+        function navigate(path) {
+            folder = path
+            selectedPath = ""
+            entries = player.browseCoverImages(path)
+        }
+        onOpened: navigate(folder)
+        background: Rectangle { color: "#1B2836"; radius: 10; border.color: "#35475A" }
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+            RowLayout {
+                Layout.fillWidth: true
+                Button { text: "Pictures"; onClicked: coverChooser.navigate(player.locationPath("Pictures")) }
+                Button { text: "Downloads"; onClicked: coverChooser.navigate(player.locationPath("Downloads")) }
+                Button { text: "Home"; onClicked: coverChooser.navigate(player.locationPath("Home")) }
+                Button {
+                    text: "Up"
+                    enabled: coverChooser.folder !== "/"
+                    onClicked: coverChooser.navigate(coverChooser.folder.substring(0, coverChooser.folder.lastIndexOf("/")) || "/")
+                }
+            }
+            Label { text: coverChooser.folder; color: "#C1D5E4"; Layout.fillWidth: true; elide: Text.ElideMiddle }
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: "#172532"
+                radius: 7
+                ListView {
+                    id: coverFileList
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    clip: true
+                    model: coverChooser.entries
+                    delegate: ItemDelegate {
+                        required property var modelData
+                        width: coverFileList.width
+                        highlighted: coverChooser.selectedPath === modelData.path
+                        text: (modelData.directory ? "📁 " : "▣ ") + modelData.name
+                        onClicked: {
+                            if (modelData.directory) coverChooser.navigate(modelData.path)
+                            else coverChooser.selectedPath = modelData.path
+                        }
+                        onDoubleClicked: {
+                            if (modelData.directory) coverChooser.navigate(modelData.path)
+                            else { editTags.coverPath = "file://" + modelData.path; coverChooser.close() }
+                        }
+                    }
+                }
+                Label {
+                    anchors.centerIn: parent
+                    visible: coverFileList.count === 0
+                    color: "#9BB0C1"
+                    text: "No JPG or PNG images in this folder"
+                }
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Label {
+                    Layout.fillWidth: true
+                    color: "#D8E9F4"
+                    elide: Text.ElideMiddle
+                    text: coverChooser.selectedPath.length ? coverChooser.selectedPath.split("/").pop() : "Choose a JPG or PNG cover"
+                }
+                Button {
+                    text: "Use this cover"
+                    enabled: coverChooser.selectedPath.length > 0
+                    onClicked: {
+                        editTags.coverPath = "file://" + coverChooser.selectedPath
+                        coverChooser.close()
+                    }
+                }
+            }
+        }
     }
     Dialog {
         id: editTags
