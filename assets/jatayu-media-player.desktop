@@ -1,9 +1,14 @@
 [Desktop Entry]
 Type=Application
 Name=Jatayu Media Player
-Comment=Private, modern media playback
+GenericName=Media Player
+Comment=Play local music and videos without ads or tracking
 Exec=jatayu-media-player %f
-Terminal=false
-Categories=AudioVideo;Player;Video;Audio;
-MimeType=video/mp4;video/x-matroska;video/webm;audio/mpeg;audio/flac;audio/ogg;
+TryExec=jatayu-media-player
 Icon=jatayu-media-player
+StartupWMClass=jatayu-media-player
+Terminal=false
+StartupNotify=true
+Categories=AudioVideo;Player;Video;Audio;
+MimeType=video/mp4;video/x-matroska;video/webm;video/quicktime;video/x-msvideo;audio/mpeg;audio/flac;audio/ogg;audio/x-wav;audio/mp4;
+Keywords=audio;video;music;player;media;
