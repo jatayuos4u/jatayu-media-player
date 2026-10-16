@@ -10,6 +10,9 @@ class PlaybackController : public QObject {
   Q_PROPERTY(double position READ position NOTIFY positionChanged)
   Q_PROPERTY(double duration READ duration NOTIFY durationChanged)
   Q_PROPERTY(double volume READ volume WRITE setVolume NOTIFY volumeChanged)
+  Q_PROPERTY(double playbackSpeed READ playbackSpeed NOTIFY playbackSpeedChanged)
+  Q_PROPERTY(QVariantList audioTracks READ audioTracks NOTIFY audioTracksChanged)
+  Q_PROPERTY(int selectedAudioTrack READ selectedAudioTrack NOTIFY audioTracksChanged)
   Q_PROPERTY(QString title READ title NOTIFY titleChanged)
   Q_PROPERTY(QString songTitle READ songTitle NOTIFY metadataChanged)
   Q_PROPERTY(QString artist READ artist NOTIFY metadataChanged)
@@ -25,6 +28,9 @@ public:
   double position() const { return position_; }
   double duration() const { return duration_; }
   double volume() const { return volume_; }
+  double playbackSpeed() const { return playbackSpeed_; }
+  QVariantList audioTracks() const { return audioTracks_; }
+  int selectedAudioTrack() const { return selectedAudioTrack_; }
   QString title() const { return title_; }
   QString songTitle() const { return songTitle_; }
   QString artist() const { return artist_; }
@@ -43,6 +49,8 @@ public:
   Q_INVOKABLE void stop();
   Q_INVOKABLE void seek(double seconds);
   Q_INVOKABLE void setVolume(double value);
+  Q_INVOKABLE void setPlaybackSpeed(double speed);
+  Q_INVOKABLE void selectAudioTrack(int id);
   Q_INVOKABLE void setPaused(bool value);
   Q_INVOKABLE void openSubtitle(const QString &path);
   Q_INVOKABLE void setSubtitleDelay(double seconds);
@@ -59,6 +67,8 @@ signals:
   void positionChanged();
   void durationChanged();
   void volumeChanged();
+  void playbackSpeedChanged();
+  void audioTracksChanged();
   void titleChanged();
   void metadataChanged();
   void libraryTagFound(QString path, QString artist, QString album, QString title);
@@ -75,7 +85,9 @@ private:
   void inspectNextMusicTag();
   mpv_handle *handle_ = nullptr;
   bool paused_ = true;
-  double position_ = 0, duration_ = 0, volume_ = 70;
+  double position_ = 0, duration_ = 0, volume_ = 70, playbackSpeed_ = 1;
+  QVariantList audioTracks_;
+  int selectedAudioTrack_ = -1;
   QString title_ = "No media selected", error_;
   QString qualityProfile_ = "Balanced";
   QString songTitle_, artist_, album_, artworkUrl_, currentFile_;
