@@ -1233,6 +1233,17 @@ ApplicationWindow {
                 }
                 Button { text: "Subtitles"; visible: window.width >= 1450; onClicked: subtitleDialog.open() }
                 Button { text: "Caption tools"; visible: window.width >= 1450; onClicked: captionTools.open() }
+                Button { text: "Help ▾"; onClicked: helpMenu.popup() }
+                Menu {
+                    id: helpMenu
+                    MenuItem { text: "Getting started"; onTriggered: gettingStartedDialog.open() }
+                    MenuItem { text: "Keyboard shortcuts"; onTriggered: shortcutsHelp.open() }
+                    MenuItem { text: "Troubleshooting"; onTriggered: troubleshootingDialog.open() }
+                    MenuSeparator {}
+                    MenuItem { text: "Documentation"; onTriggered: Qt.openUrlExternally("https://github.com/jatayuos4u/jatayu-media-player#readme") }
+                    MenuItem { text: "Report an issue"; onTriggered: Qt.openUrlExternally("https://github.com/jatayuos4u/jatayu-media-player/issues") }
+                    MenuItem { text: "About Jatayu Media Player"; onTriggered: aboutPlayerDialog.open() }
+                }
                 Button { text: "More ▾"; onClicked: toolsMenu.popup() }
                 Menu {
                     id: toolsMenu
