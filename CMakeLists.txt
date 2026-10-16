@@ -14,7 +14,16 @@ qt_add_executable(jatayu-media-player
   src/player/MpvVideoItem.cpp
 )
 set_source_files_properties(qml/Main.qml PROPERTIES QT_RESOURCE_ALIAS Main.qml)
-qt_add_qml_module(jatayu-media-player URI JatayuMediaPlayer VERSION 1.0 QML_FILES qml/Main.qml)
+# Ensure QML resources are discoverable outside the build tree.
+# Without QTP0001 NEW, the resources may live under /JatayuMediaPlayer,
+# while QQmlApplicationEngine::loadFromModule searches /qt/qml imports.
+qt_policy(SET QTP0001 NEW)
+qt_add_qml_module(jatayu-media-player
+  URI JatayuMediaPlayer
+  VERSION 1.0
+  RESOURCE_PREFIX "/qt/qml"
+  QML_FILES qml/Main.qml
+)
 target_link_libraries(jatayu-media-player PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::QuickControls2 PkgConfig::MPV)
 install(TARGETS jatayu-media-player RUNTIME DESTINATION bin)
 install(FILES assets/jatayu-media-player.desktop DESTINATION share/applications)
