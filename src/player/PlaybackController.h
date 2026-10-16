@@ -51,6 +51,7 @@ public:
   Q_INVOKABLE QVariantList browseSubtitles(const QString &path) const;
   Q_INVOKABLE QVariantList browseCoverImages(const QString &path) const;
   Q_INVOKABLE QVariantList scanMusicLibrary(const QString &folder, const QString &filter) const;
+  Q_INVOKABLE void inspectMusicTags(const QVariantList &songs);
   Q_INVOKABLE void seekRelative(double seconds);
   Q_INVOKABLE void processEvents();
 signals:
@@ -60,6 +61,7 @@ signals:
   void volumeChanged();
   void titleChanged();
   void metadataChanged();
+  void libraryTagFound(QString path, QString artist, QString album, QString title);
   void tagSaveFinished(bool success, QString message);
   void errorChanged();
   void engineEvent();
@@ -70,6 +72,7 @@ private:
   static void wakeup(void *ctx);
   void setError(QString message);
   void loadLocalArtwork(const QString &path);
+  void inspectNextMusicTag();
   mpv_handle *handle_ = nullptr;
   bool paused_ = true;
   double position_ = 0, duration_ = 0, volume_ = 70;
@@ -77,4 +80,6 @@ private:
   QString qualityProfile_ = "Balanced";
   QString songTitle_, artist_, album_, artworkUrl_, currentFile_;
   QProcess *artworkProcess_ = nullptr;
+  QProcess *libraryProbe_ = nullptr;
+  QStringList pendingMusicFiles_;
 };
