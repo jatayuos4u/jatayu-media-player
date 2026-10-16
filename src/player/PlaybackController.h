@@ -45,6 +45,9 @@ public:
   Q_INVOKABLE QString locationPath(const QString &name) const;
   Q_INVOKABLE QVariantList browseFolder(const QString &path, const QString &filter) const;
   Q_INVOKABLE QVariantList recentMedia() const;
+  Q_INVOKABLE void clearRecentMedia();
+  Q_INVOKABLE void clearResumePositions();
+  Q_INVOKABLE void resetPlaybackPreferences();
   Q_INVOKABLE QVariantList searchMedia(const QString &query) const;
   Q_INVOKABLE void togglePause();
   Q_INVOKABLE void stop();
