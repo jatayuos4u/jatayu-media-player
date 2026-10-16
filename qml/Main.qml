@@ -961,6 +961,56 @@ ApplicationWindow {
         }
     }
     Dialog {
+        id: playbackOptions
+        title: "Playback options"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 440)
+        standardButtons: Dialog.Close
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 12
+            Label { text: "Playback speed"; color: "#E9F1F7" }
+            RowLayout {
+                Layout.fillWidth: true
+                ComboBox {
+                    id: speedPicker
+                    Layout.fillWidth: true
+                    model: ["0.5×", "0.75×", "1×", "1.25×", "1.5×", "1.75×", "2×"]
+                    currentIndex: {
+                        const values = [0.5,0.75,1,1.25,1.5,1.75,2]
+                        let closest = 0
+                        for (let i = 1; i < values.length; ++i)
+                            if (Math.abs(values[i] - player.playbackSpeed) < Math.abs(values[closest] - player.playbackSpeed)) closest = i
+                        return closest
+                    }
+                    onActivated: player.setPlaybackSpeed([0.5,0.75,1,1.25,1.5,1.75,2][currentIndex])
+                }
+                Button { text: "Reset"; onClicked: player.setPlaybackSpeed(1.0) }
+            }
+            Label { text: "Audio track"; color: "#E9F1F7" }
+            Label {
+                Layout.fillWidth: true
+                text: player.audioTracks.length === 0 ? "No audio tracks available" : player.audioTracks.length + " available audio tracks"
+                color: "#B7C8D8"
+            }
+            Repeater {
+                model: player.audioTracks
+                Button {
+                    required property var modelData
+                    Layout.fillWidth: true
+                    text: (player.selectedAudioTrack === modelData.id ? "✓  " : "") + modelData.label
+                    onClicked: player.selectAudioTrack(modelData.id)
+                }
+            }
+            Button {
+                text: "Disable audio"
+                enabled: player.audioTracks.length > 0
+                onClicked: player.selectAudioTrack(-1)
+            }
+        }
+    }
+    Dialog {
         id: captionTools
         title: "Subtitle controls"
         modal: true
@@ -1162,6 +1212,7 @@ ApplicationWindow {
                     MenuItem { text: "Edit music information"; enabled: window.audioTrack; onTriggered: editTags.open() }
                     MenuItem { text: "Load subtitles"; onTriggered: subtitleDialog.open() }
                     MenuItem { text: "Subtitle settings"; onTriggered: captionTools.open() }
+                    MenuItem { text: "Audio tracks and speed"; onTriggered: playbackOptions.open() }
                     MenuSeparator {}
                     MenuItem { text: "Quality: Performance"; onTriggered: player.setQualityProfile("Performance") }
                     MenuItem { text: "Quality: Balanced"; onTriggered: player.setQualityProfile("Balanced") }
@@ -1379,6 +1430,12 @@ ApplicationWindow {
                         color: window.textColor
                     }
                     Item { Layout.fillWidth: true }
+                    Button {
+                        text: player.playbackSpeed.toFixed(2).replace(/0$/, "").replace(/\\.$/, "") + "×"
+                        onClicked: playbackOptions.open()
+                        ToolTip.visible: hovered
+                        ToolTip.text: "Playback speed and audio tracks"
+                    }
                     Label { text: "Volume"; color: window.muted }
                     Slider { Layout.preferredWidth: 120; from: 0; to: 100; value: player.volume; onMoved: player.setVolume(value) }
                     Button { text: "⛶ Fullscreen"; onClicked: window.toggleCinema() }
