@@ -12,7 +12,8 @@ gpg --batch --with-colons --list-secret-keys "$FLATPAK_SIGNING_KEY" | grep -q "^
   echo "No matching secret GPG key in local keyring" >&2; exit 1;
 }
 flatpak build-update-repo --gpg-sign="$FLATPAK_SIGNING_KEY" "$REPO"
-[[ -s "$REPO/summary" ]] || { echo "Flatpak summary missing" >&2; exit 1; }\n[[ -s "$REPO/summary.sig" ]] || { echo "Flatpak summary signature missing" >&2; exit 1; }
+[[ -s "$REPO/summary" ]] || { echo "Flatpak summary missing" >&2; exit 1; }
+[[ -s "$REPO/summary.sig" ]] || { echo "Flatpak summary signature missing" >&2; exit 1; }
 gpg --batch --armor --export "$FLATPAK_SIGNING_KEY" > "$PWD/dist/flatpak-repository-key.asc"
 echo "Signed Flatpak repository staged at $REPO (LOCAL ONLY)."
 echo "Verify a remote install and a real version-to-version update before publication."
