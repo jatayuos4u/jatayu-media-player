@@ -49,6 +49,7 @@ public:
   Q_INVOKABLE void setSubtitleSize(int size);
   Q_INVOKABLE void cycleSubtitleTrack();
   Q_INVOKABLE QVariantList browseSubtitles(const QString &path) const;
+  Q_INVOKABLE QVariantList browseCoverImages(const QString &path) const;
   Q_INVOKABLE void seekRelative(double seconds);
   Q_INVOKABLE void processEvents();
 signals:
