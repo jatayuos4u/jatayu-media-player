@@ -1442,8 +1442,6 @@ ApplicationWindow {
                     text: player.error
                     color: "white"
                     elide: Text.ElideRight
-                    ToolTip.visible: hovered
-                    ToolTip.text: player.error
                 }
                 Button { text: "Dismiss"; onClicked: errorBannerDismissed = true }
             }
