@@ -15,6 +15,37 @@ ApplicationWindow {
     property color textColor: "#E9F1F7"
     property color muted: "#8496A8"
     property var mediaQueue: []
+    property string repeatMode: "Off"
+    property bool shuffleEnabled: false
+    Settings {
+        id: playlistSettings
+        category: "Playlists"
+        property string storedQueue: "[]"
+        property string storedRepeat: "Off"
+        property bool storedShuffle: false
+    }
+    Component.onCompleted: {
+        try {
+            const loaded = JSON.parse(playlistSettings.storedQueue)
+            if (Array.isArray(loaded))
+                mediaQueue = loaded.filter(item => item && typeof item.path === "string" && typeof item.name === "string").slice(0, 500)
+        } catch (e) { mediaQueue = [] }
+        repeatMode = ["Off", "All", "One"].includes(playlistSettings.storedRepeat) ? playlistSettings.storedRepeat : "Off"
+        shuffleEnabled = playlistSettings.storedShuffle
+    }
+    onMediaQueueChanged: playlistSettings.storedQueue = JSON.stringify(mediaQueue)
+    onRepeatModeChanged: playlistSettings.storedRepeat = repeatMode
+    onShuffleEnabledChanged: playlistSettings.storedShuffle = shuffleEnabled
+    function advanceQueue() {
+        if (queueIndex < 0 || mediaQueue.length === 0) return
+        if (repeatMode === "One") { playQueueIndex(queueIndex); return }
+        if (shuffleEnabled && mediaQueue.length > 1) {
+            let next = Math.floor(Math.random() * (mediaQueue.length - 1))
+            if (next >= queueIndex) next++
+            playQueueIndex(next)
+        } else if (queueIndex < mediaQueue.length - 1) playQueueIndex(queueIndex + 1)
+        else if (repeatMode === "All") playQueueIndex(0)
+    }
     property int queueIndex: -1
     function playQueueIndex(index) {
         if (index < 0 || index >= mediaQueue.length) return
@@ -57,8 +88,7 @@ ApplicationWindow {
     Connections {
         target: player
         function onPlaybackFinished() {
-            if (window.queueIndex >= 0 && window.queueIndex + 1 < window.mediaQueue.length)
-                window.playQueueIndex(window.queueIndex + 1)
+            window.advanceQueue()
         }
         function onPausedChanged() {
             if (player.paused) { window.showCinemaControls = true; hideControls.stop() }
@@ -370,8 +400,43 @@ ApplicationWindow {
             }
             RowLayout {
                 Button { text: "Add media"; onClicked: { queueDialog.close(); mediaBrowser.open() } }
+                ComboBox {
+                    model: ["Off", "All", "One"]
+                    currentIndex: model.indexOf(window.repeatMode)
+                    onActivated: window.repeatMode = currentText
+                }
+                CheckBox { text: "Shuffle"; checked: window.shuffleEnabled; onToggled: window.shuffleEnabled = checked }
                 Item { Layout.fillWidth: true }
                 Button { text: "Clear queue"; enabled: mediaQueue.length > 0; onClicked: { mediaQueue = []; queueIndex = -1 } }
+            }
+        }
+    }
+    Dialog {
+        id: captionTools
+        title: "Subtitle controls"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 400)
+        standardButtons: Dialog.Close
+        property real delay: 0
+        property int textSize: 48
+        ColumnLayout {
+            anchors.fill: parent
+            Button { text: "Switch subtitle track"; Layout.fillWidth: true; onClicked: player.cycleSubtitleTrack() }
+            Label { text: "Subtitle delay: " + captionTools.delay.toFixed(1) + " s"; color: "#E9F1F7" }
+            Slider {
+                Layout.fillWidth: true
+                from: -10; to: 10; stepSize: 0.5
+                value: captionTools.delay
+                onMoved: { captionTools.delay = value; player.setSubtitleDelay(value) }
+            }
+            Button { text: "Reset delay"; onClicked: { captionTools.delay = 0; player.setSubtitleDelay(0) } }
+            Label { text: "Subtitle size: " + captionTools.textSize; color: "#E9F1F7" }
+            Slider {
+                Layout.fillWidth: true
+                from: 20; to: 90; stepSize: 2
+                value: captionTools.textSize
+                onMoved: { captionTools.textSize = Math.round(value); player.setSubtitleSize(captionTools.textSize) }
             }
         }
     }
@@ -511,6 +576,7 @@ ApplicationWindow {
                     ToolTip.text: "High Quality is temporarily disabled pending graphics stability testing."
                 }
                 Button { text: "Subtitles"; onClicked: subtitleDialog.open() }
+                Button { text: "Caption tools"; onClicked: captionTools.open() }
             }
         }
         Rectangle {
