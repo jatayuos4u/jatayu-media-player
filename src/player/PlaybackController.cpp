@@ -52,6 +52,7 @@ void PlaybackController::openFile(const QString &path) {
   QFileInfo info(localPath);
   if (!info.isFile() || !info.isReadable()) { setError("File is unavailable or not readable"); return; }
   setError({});
+  currentFile_ = info.absoluteFilePath();
   title_ = info.fileName(); emit titleChanged();
   songTitle_ = info.completeBaseName(); artist_.clear(); album_.clear(); artworkUrl_.clear(); emit metadataChanged();
   loadLocalArtwork(info.absoluteFilePath());
@@ -308,4 +309,40 @@ void PlaybackController::loadLocalArtwork(const QString &path) {
   QTimer::singleShot(3500, this, [this, process] {
     if (artworkProcess_ == process && process->state() != QProcess::NotRunning) process->kill();
   });
+}
+
+void PlaybackController::saveMusicTags(const QString &title, const QString &artist, const QString &album) {
+  const QFileInfo source(currentFile_);
+  if (!source.isFile() || !source.isReadable() ||
+      !QSet<QString>{"mp3", "flac", "m4a", "ogg", "opus"}.contains(source.suffix().toLower())) {
+    emit tagSaveFinished(false, "Open a supported local audio file first.");
+    return;
+  }
+  const QString ffmpeg = QStandardPaths::findExecutable("ffmpeg");
+  if (ffmpeg.isEmpty()) { emit tagSaveFinished(false, "FFmpeg is required to save tags."); return; }
+  const QString output = source.dir().filePath(source.completeBaseName() + "-edited." + source.suffix());
+  if (QFileInfo::exists(output)) {
+    emit tagSaveFinished(false, "The edited copy already exists. Rename or move it first.");
+    return;
+  }
+  auto *proc = new QProcess(this);
+  QStringList args = {"-nostdin", "-hide_banner", "-loglevel", "error",
+                      "-n", "-i", source.absoluteFilePath(), "-map", "0",
+                      "-c", "copy", "-metadata", "title=" + title.left(300),
+                      "-metadata", "artist=" + artist.left(300),
+                      "-metadata", "album=" + album.left(300), output};
+  proc->setProgram(ffmpeg);
+  proc->setArguments(args);
+  connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+          this, [this, proc, output](int code, QProcess::ExitStatus status) {
+    const QString errorText = QString::fromUtf8(proc->readAllStandardError()).trimmed();
+    proc->deleteLater();
+    if (status == QProcess::NormalExit && code == 0 && QFileInfo(output).isFile()) {
+      emit tagSaveFinished(true, "Saved a new copy: " + output);
+    } else {
+      QFile::remove(output);
+      emit tagSaveFinished(false, errorText.isEmpty() ? "Unable to write music information." : errorText.left(250));
+    }
+  });
+  proc->start();
 }
