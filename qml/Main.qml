@@ -20,12 +20,37 @@ ApplicationWindow {
     readonly property bool musicMode: !forceVideoMode && (audioTrack || forceMusicMode)
     property var mediaQueue: []
     property bool restoredSettings: false
+    property var namedPlaylists: ({})
+    property var pendingPlaylistEntry: null
+    property string activePlaylist: ""
+    function saveNamedPlaylist(name, entries) {
+        const key = name.trim()
+        if (!key || key.length > 80) return
+        const data = Object.assign({}, namedPlaylists)
+        data[key] = entries.slice(0, 500).map(item => ({path: item.path, name: item.name}))
+        namedPlaylists = data
+        playlistSettings.namedCollections = JSON.stringify(data)
+    }
+    function deleteNamedPlaylist(name) {
+        const data = Object.assign({}, namedPlaylists)
+        delete data[name]
+        namedPlaylists = data
+        playlistSettings.namedCollections = JSON.stringify(data)
+    }
+    function loadNamedPlaylist(name, play) {
+        const entries = namedPlaylists[name]
+        if (!entries || !entries.length) return
+        mediaQueue = entries.slice()
+        queueIndex = -1
+        if (play) playQueueIndex(0)
+    }
     property string repeatMode: "Off"
     property bool shuffleEnabled: false
     Settings {
         id: playlistSettings
         category: "Playlists"
         property string storedQueue: "[]"
+        property string namedCollections: "{}"
         property string storedRepeat: "Off"
         property bool storedShuffle: false
     }
@@ -37,6 +62,10 @@ ApplicationWindow {
         } catch (e) { mediaQueue = [] }
         repeatMode = ["Off", "All", "One"].includes(playlistSettings.storedRepeat) ? playlistSettings.storedRepeat : "Off"
         shuffleEnabled = playlistSettings.storedShuffle
+        try {
+            const stored = JSON.parse(playlistSettings.namedCollections)
+            if (stored && typeof stored === "object" && !Array.isArray(stored)) namedPlaylists = stored
+        } catch (e) { namedPlaylists = ({}) }
         restoredSettings = true
     }
     onMediaQueueChanged: if (restoredSettings) playlistSettings.storedQueue = JSON.stringify(mediaQueue)
@@ -531,6 +560,136 @@ ApplicationWindow {
         }
     }
     Dialog {
+        id: namedPlaylistsDialog
+        title: "My playlists"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 650)
+        height: Math.min(window.height - 24, 530)
+        standardButtons: Dialog.Close
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+            RowLayout {
+                Layout.fillWidth: true
+                TextField { id: newPlaylistName; Layout.fillWidth: true; placeholderText: "Playlist name"; maximumLength: 80 }
+                Button {
+                    text: "Create"
+                    enabled: newPlaylistName.text.trim().length > 0
+                    onClicked: {
+                        const name = newPlaylistName.text.trim()
+                        if (!Object.prototype.hasOwnProperty.call(window.namedPlaylists, name)) window.saveNamedPlaylist(name, [])
+                        newPlaylistName.text = ""
+                    }
+                }
+                Button {
+                    text: "Save queue as"
+                    enabled: newPlaylistName.text.trim().length > 0 && window.mediaQueue.length > 0
+                    onClicked: { window.saveNamedPlaylist(newPlaylistName.text, window.mediaQueue); newPlaylistName.text = "" }
+                }
+            }
+            Label {
+                text: window.pendingPlaylistEntry ? "Select a playlist for " + window.pendingPlaylistEntry.name : "Named playlists are saved locally."
+                color: "#B7C8D8"
+                Layout.fillWidth: true
+                elide: Text.ElideMiddle
+            }
+            ListView {
+                id: namedPlaylistList
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                model: Object.keys(window.namedPlaylists).sort()
+                delegate: ItemDelegate {
+                    required property var modelData
+                    width: namedPlaylistList.width
+                    contentItem: RowLayout {
+                        Label {
+                            Layout.fillWidth: true
+                            text: modelData + " (" + window.namedPlaylists[modelData].length + ")"
+                            color: "#E9F1F7"
+                            elide: Text.ElideMiddle
+                        }
+                        Button {
+                            text: window.pendingPlaylistEntry ? "Add" : "Load"
+                            onClicked: {
+                                if (window.pendingPlaylistEntry) {
+                                    let entries = window.namedPlaylists[modelData].slice()
+                                    if (!entries.some(e => e.path === window.pendingPlaylistEntry.path))
+                                        entries.push(window.pendingPlaylistEntry)
+                                    window.saveNamedPlaylist(modelData, entries)
+                                    window.pendingPlaylistEntry = null
+                                } else {
+                                    window.loadNamedPlaylist(modelData, false)
+                                    namedPlaylistsDialog.close()
+                                }
+                            }
+                        }
+                        Button {
+                            text: "Play"
+                            enabled: window.namedPlaylists[modelData].length > 0
+                            onClicked: { window.pendingPlaylistEntry = null; window.loadNamedPlaylist(modelData, true); namedPlaylistsDialog.close() }
+                        }
+                        Button { text: "Edit"; onClicked: { window.activePlaylist = modelData; playlistEditor.open() } }
+                        Button { text: "Delete"; onClicked: window.deleteNamedPlaylist(modelData) }
+                    }
+                }
+            }
+        }
+    }
+    Dialog {
+        id: playlistEditor
+        title: "Edit playlist: " + window.activePlaylist
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 590)
+        height: Math.min(window.height - 24, 480)
+        standardButtons: Dialog.Close
+        ColumnLayout {
+            anchors.fill: parent
+            RowLayout {
+                Layout.fillWidth: true
+                TextField { id: renamePlaylistField; Layout.fillWidth: true; placeholderText: window.activePlaylist }
+                Button {
+                    text: "Rename"
+                    onClicked: {
+                        const oldName = window.activePlaylist
+                        const newName = renamePlaylistField.text.trim()
+                        if (newName && newName !== oldName && !Object.prototype.hasOwnProperty.call(window.namedPlaylists, newName)) {
+                            window.saveNamedPlaylist(newName, window.namedPlaylists[oldName])
+                            window.deleteNamedPlaylist(oldName)
+                            window.activePlaylist = newName
+                            renamePlaylistField.text = ""
+                        }
+                    }
+                }
+            }
+            ListView {
+                id: playlistTracks
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                model: window.namedPlaylists[window.activePlaylist] || []
+                delegate: ItemDelegate {
+                    required property var modelData
+                    required property int index
+                    width: playlistTracks.width
+                    contentItem: RowLayout {
+                        Label { Layout.fillWidth: true; text: modelData.name; color: "#E9F1F7"; elide: Text.ElideMiddle }
+                        Button {
+                            text: "Remove"
+                            onClicked: {
+                                const entries = window.namedPlaylists[window.activePlaylist].slice()
+                                entries.splice(index, 1)
+                                window.saveNamedPlaylist(window.activePlaylist, entries)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Dialog {
         id: queueDialog
         title: "Up next"
         modal: true
@@ -916,6 +1075,7 @@ ApplicationWindow {
                 Menu {
                     id: toolsMenu
                     MenuItem { text: "Music library"; onTriggered: libraryDialog.open() }
+                    MenuItem { text: "My playlists"; onTriggered: namedPlaylistsDialog.open() }
                     MenuItem { text: "Recent files"; onTriggered: { mediaBrowser.open(); mediaBrowser.showRecent() } }
                     MenuItem { text: "Edit music information"; enabled: window.audioTrack; onTriggered: editTags.open() }
                     MenuItem { text: "Load subtitles"; onTriggered: subtitleDialog.open() }
