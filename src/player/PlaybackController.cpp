@@ -25,6 +25,7 @@ PlaybackController::PlaybackController(QObject *parent) : QObject(parent) {
   mpv_observe_property(handle_, 2, "time-pos", MPV_FORMAT_DOUBLE);
   mpv_observe_property(handle_, 3, "duration", MPV_FORMAT_DOUBLE);
   mpv_observe_property(handle_, 4, "volume", MPV_FORMAT_DOUBLE);
+  mpv_observe_property(handle_, 5, "metadata", MPV_FORMAT_NODE);
   mpv_set_wakeup_callback(handle_, &PlaybackController::wakeup, this);
   connect(this, &PlaybackController::engineEvent, this, &PlaybackController::processEvents, Qt::QueuedConnection);
   setVolume(70);
@@ -46,6 +47,7 @@ void PlaybackController::openFile(const QString &path) {
   if (!info.isFile() || !info.isReadable()) { setError("File is unavailable or not readable"); return; }
   setError({});
   title_ = info.fileName(); emit titleChanged();
+  songTitle_ = info.completeBaseName(); artist_.clear(); album_.clear(); emit metadataChanged();
   QSettings settings;
   QStringList recent = settings.value("recentMedia").toStringList();
   recent.removeAll(info.absoluteFilePath());
@@ -88,6 +90,26 @@ void PlaybackController::processEvents() {
         case 2: { double x = *static_cast<double *>(prop->data); if (position_ != x) { position_ = x; emit positionChanged(); } break; }
         case 3: { double x = *static_cast<double *>(prop->data); if (duration_ != x) { duration_ = x; emit durationChanged(); } break; }
         case 4: { double x = *static_cast<double *>(prop->data); if (volume_ != x) { volume_ = x; emit volumeChanged(); } break; }
+        case 5: {
+          const auto *node = static_cast<const mpv_node *>(prop->data);
+          if (node->format != MPV_FORMAT_NODE_MAP || !node->u.list) break;
+          QString newTitle, newArtist, newAlbum;
+          const mpv_node_list *list = node->u.list;
+          for (int i = 0; i < list->num; ++i) {
+            if (!list->keys[i] || list->values[i].format != MPV_FORMAT_STRING) continue;
+            const QString key = QString::fromUtf8(list->keys[i]).toLower();
+            const QString value = QString::fromUtf8(list->values[i].u.string);
+            if (key == "title") newTitle = value;
+            else if (key == "artist") newArtist = value;
+            else if (key == "album_artist" && newArtist.isEmpty()) newArtist = value;
+            else if (key == "album") newAlbum = value;
+          }
+          if (!newTitle.isEmpty()) songTitle_ = newTitle;
+          artist_ = newArtist;
+          album_ = newAlbum;
+          emit metadataChanged();
+          break;
+        }
       }
     } else if (event->event_id == MPV_EVENT_END_FILE) {
       auto *end = static_cast<mpv_event_end_file *>(event->data);
