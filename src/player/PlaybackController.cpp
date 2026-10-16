@@ -61,6 +61,7 @@ void PlaybackController::openFile(const QString &path) {
   if (!info.isFile() || !info.isReadable()) { setError("File is unavailable or not readable"); return; }
   setError({});
   currentFile_ = info.absoluteFilePath();
+  lastSavedPosition_ = -1;
   title_ = info.fileName(); emit titleChanged();
   songTitle_ = info.completeBaseName(); artist_.clear(); album_.clear(); artworkUrl_.clear(); emit metadataChanged();
   loadLocalArtwork(info.absoluteFilePath());
@@ -120,7 +121,18 @@ void PlaybackController::processEvents() {
       if (!prop->data) continue;
       switch (event->reply_userdata) {
         case 1: { bool x = *static_cast<int *>(prop->data); if (paused_ != x) { paused_ = x; emit pausedChanged(); } break; }
-        case 2: { double x = *static_cast<double *>(prop->data); if (position_ != x) { position_ = x; emit positionChanged(); } break; }
+        case 2: {
+          double x = *static_cast<double *>(prop->data);
+          if (position_ != x) { position_ = x; emit positionChanged(); }
+          if (!currentFile_.isEmpty() && duration_ > 60 && x >= 10 &&
+              (lastSavedPosition_ < 0 || std::abs(x - lastSavedPosition_) >= 5)) {
+            const QString key = "resume/" + QString::fromLatin1(QCryptographicHash::hash(
+                 QFile::encodeName(currentFile_), QCryptographicHash::Sha256).toHex());
+            QSettings().setValue(key, x);
+            lastSavedPosition_ = x;
+          }
+          break;
+        }
         case 3: { double x = *static_cast<double *>(prop->data); if (duration_ != x) { duration_ = x; emit durationChanged(); } break; }
         case 4: { double x = *static_cast<double *>(prop->data); if (volume_ != x) { volume_ = x; emit volumeChanged(); } break; }
         case 6: {
@@ -188,8 +200,27 @@ void PlaybackController::processEvents() {
     } else if (event->event_id == MPV_EVENT_END_FILE) {
       auto *end = static_cast<mpv_event_end_file *>(event->data);
       if (end && end->reason == MPV_END_FILE_REASON_ERROR) setError(QString::fromUtf8(mpv_error_string(end->error)));
-      else if (end && end->reason == MPV_END_FILE_REASON_EOF) emit playbackFinished();
-    } else if (event->event_id == MPV_EVENT_FILE_LOADED) { setError({}); }
+      else if (end && end->reason == MPV_END_FILE_REASON_EOF) {
+        if (!currentFile_.isEmpty()) {
+          const QString key = "resume/" + QString::fromLatin1(QCryptographicHash::hash(
+              QFile::encodeName(currentFile_), QCryptographicHash::Sha256).toHex());
+          QSettings().remove(key);
+        }
+        emit playbackFinished();
+      }
+    } else if (event->event_id == MPV_EVENT_FILE_LOADED) {
+      setError({});
+      if (!currentFile_.isEmpty()) {
+        const QString key = "resume/" + QString::fromLatin1(QCryptographicHash::hash(
+            QFile::encodeName(currentFile_), QCryptographicHash::Sha256).toHex());
+        const double saved = QSettings().value(key, 0).toDouble();
+        if (saved >= 10 && (duration_ <= 0 || saved < duration_ - 15)) {
+          const QByteArray t = QByteArray::number(saved, 'f', 2);
+          const char *args[] = {"seek", t.constData(), "absolute", nullptr};
+          mpv_command_async(handle_, 0, args);
+        }
+      }
+    }
   }
 }
 
@@ -542,4 +573,32 @@ void PlaybackController::inspectNextMusicTag() {
   QTimer::singleShot(1200, this, [this, probe] {
     if (libraryProbe_ == probe && probe->state() != QProcess::NotRunning) probe->kill();
   });
+}
+
+QString PlaybackController::mediaInformation() const {
+  if (currentFile_.isEmpty()) return "Open a local media file to view its information.";
+  const QFileInfo file(currentFile_);
+  QStringList lines = {"File: " + file.fileName(),
+                       "Location: " + file.absoluteFilePath(),
+                       "Size: " + QString::number(file.size() / 1048576.0, 'f', 2) + " MiB"};
+  auto read = [this](const char *key) {
+    char *value = mpv_get_property_string(handle_, key);
+    if (!value) return QString();
+    const QString result = QString::fromUtf8(value);
+    mpv_free(value);
+    return result;
+  };
+  for (const auto &field : {
+      std::pair<const char *, const char *>{"Video codec", "video-codec"},
+      {"Width", "width"}, {"Height", "height"},
+      {"Frame rate", "estimated-vf-fps"},
+      {"Audio codec", "audio-codec"},
+      {"Audio channels", "audio-params/channel-count"},
+      {"Sample rate", "audio-params/samplerate"},
+      {"Container", "file-format"}}) {
+    const QString value = read(field.second);
+    if (!value.isEmpty()) lines << QString::fromUtf8(field.first) + ": " + value;
+  }
+  lines << "Duration: " + QString::number(duration_, 'f', 1) + " seconds";
+  return lines.join("\n");
 }
