@@ -14,6 +14,9 @@ ApplicationWindow {
     property color accent: "#1689E8"
     property color textColor: "#E9F1F7"
     property color muted: "#8496A8"
+    property bool forceMusicMode: false
+    readonly property bool audioTrack: /\\.(mp3|flac|wav|ogg|opus|m4a|aac|wma|alac)$/i.test(player.title)
+    readonly property bool musicMode: audioTrack || forceMusicMode
     property var mediaQueue: []
     property bool restoredSettings: false
     property string repeatMode: "Off"
@@ -591,6 +594,7 @@ ApplicationWindow {
                 Item { Layout.fillWidth: true }
                 Button { text: "Browse media"; onClicked: mediaBrowser.open() }
                 Button { text: "Queue (" + mediaQueue.length + ")"; onClicked: queueDialog.open() }
+                Button { text: window.musicMode ? "Video view" : "Music view"; onClicked: window.forceMusicMode = !window.forceMusicMode }
                 Button { text: "Recent"; onClicked: { mediaBrowser.open(); mediaBrowser.showRecent() } }
                 Label { text: "Quality"; color: "#9BB0C1" }
                 ComboBox {
@@ -610,6 +614,52 @@ ApplicationWindow {
             Layout.fillWidth: true; Layout.fillHeight: true
             color: "#070B0F"
             MpvVideoItem { id: video; anchors.fill: parent; controller: player }
+            Rectangle {
+                anchors.fill: parent
+                visible: window.musicMode
+                color: "#101C2B"
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    width: Math.min(parent.width - 48, 570)
+                    spacing: 16
+                    Rectangle {
+                        Layout.alignment: Qt.AlignHCenter
+                        width: 160; height: 160; radius: 28
+                        color: "#173D5B"
+                        border.color: "#2778AD"
+                        Label { anchors.centerIn: parent; text: "♫"; color: "#66E5FA"; font.pixelSize: 93 }
+                    }
+                    Label {
+                        Layout.fillWidth: true
+                        text: player.title === "No media selected" ? "Your music, your way" : player.title
+                        font.pixelSize: 25
+                        font.bold: true
+                        color: "#F0F8FF"
+                        horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideMiddle
+                    }
+                    Label {
+                        Layout.fillWidth: true
+                        text: "Local music • No accounts • No tracking"
+                        font.pixelSize: 13
+                        color: "#9AB6C9"
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                    RowLayout {
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: 14
+                        Button { text: "Previous"; enabled: window.queueIndex > 0; onClicked: window.skipQueue(-1) }
+                        Button { text: player.paused ? "Play" : "Pause"; onClicked: player.togglePause() }
+                        Button {
+                            text: "Next"
+                            enabled: window.queueIndex >= 0 && window.queueIndex < window.mediaQueue.length - 1
+                            onClicked: window.skipQueue(1)
+                        }
+                    }
+                    Button { Layout.alignment: Qt.AlignHCenter; text: "Music queue"; onClicked: queueDialog.open() }
+                }
+            }
+
             MouseArea {
                 anchors.fill: parent
                 visible: window.cinemaMode
@@ -622,7 +672,7 @@ ApplicationWindow {
             }
             Column {
                 anchors.centerIn: parent
-                visible: player.title === "No media selected"
+                visible: player.title === "No media selected" && !window.musicMode
                 spacing: 15
                 width: Math.min(parent.width - 44, 430)
                 Rectangle {
