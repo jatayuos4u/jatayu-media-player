@@ -47,6 +47,7 @@ signals:
   void engineEvent();
   void recentMediaChanged();
   void qualityProfileChanged();
+  void playbackFinished();
 private:
   static void wakeup(void *ctx);
   void setError(QString message);
