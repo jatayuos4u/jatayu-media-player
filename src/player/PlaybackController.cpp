@@ -311,7 +311,7 @@ void PlaybackController::loadLocalArtwork(const QString &path) {
   });
 }
 
-void PlaybackController::saveMusicTags(const QString &title, const QString &artist, const QString &album, const QString &coverPath) {
+void PlaybackController::saveMusicTags(const QString &title, const QString &artist, const QString &album, const QString &coverPath, const QString &outputName) {
   const QFileInfo source(currentFile_);
   if (!source.isFile() || !source.isReadable() ||
       !QSet<QString>{"mp3", "flac", "m4a", "ogg", "opus"}.contains(source.suffix().toLower())) {
@@ -320,7 +320,21 @@ void PlaybackController::saveMusicTags(const QString &title, const QString &arti
   }
   const QString ffmpeg = QStandardPaths::findExecutable("ffmpeg");
   if (ffmpeg.isEmpty()) { emit tagSaveFinished(false, "FFmpeg is required to save tags."); return; }
-  const QString output = source.dir().filePath(source.completeBaseName() + "-edited." + source.suffix());
+  QString baseName = outputName.trimmed();
+  if (baseName.isEmpty()) baseName = source.completeBaseName() + "-edited";
+  // Save As accepts a filename only, never a path or traversal sequence.
+  if (baseName.contains('/') || baseName.contains('\\\\') || baseName == "." ||
+      baseName == ".." || baseName.contains("..") || baseName.size() > 180) {
+    emit tagSaveFinished(false, "Choose a filename without folders or '..'.");
+    return;
+  }
+  const QString suffix = "." + source.suffix();
+  if (baseName.endsWith(suffix, Qt::CaseInsensitive)) baseName.chop(suffix.size());
+  const QString output = source.dir().filePath(baseName + suffix);
+  if (QFileInfo(output).absoluteFilePath() == source.absoluteFilePath()) {
+    emit tagSaveFinished(false, "The original file cannot be overwritten.");
+    return;
+  }
   if (QFileInfo::exists(output)) {
     emit tagSaveFinished(false, "The edited copy already exists. Rename or move it first.");
     return;
@@ -393,4 +407,23 @@ QVariantList PlaybackController::browseCoverImages(const QString &path) const {
     if (items.size() >= 500) break;
   }
   return items;
+}
+
+QVariantList PlaybackController::scanMusicLibrary(const QString &folder, const QString &filter) const {
+  QVariantList songs;
+  const QDir dir(folder);
+  if (!dir.exists() || !QFileInfo(dir.absolutePath()).isReadable()) return songs;
+  const QSet<QString> audioExt = {"mp3", "flac", "wav", "ogg", "opus", "m4a", "aac", "wma", "alac"};
+  QDirIterator files(dir.absolutePath(), QDir::Files | QDir::Readable | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+  int inspected = 0;
+  while (files.hasNext() && inspected < 5000 && songs.size() < 600) {
+    files.next();
+    ++inspected;
+    const QFileInfo info = files.fileInfo();
+    if (!audioExt.contains(info.suffix().toLower())) continue;
+    if (!filter.isEmpty() && !info.fileName().contains(filter, Qt::CaseInsensitive)) continue;
+    songs.append(QVariantMap{{"name", info.completeBaseName()}, {"path", info.absoluteFilePath()},
+                             {"folder", info.absolutePath()}});
+  }
+  return songs;
 }
