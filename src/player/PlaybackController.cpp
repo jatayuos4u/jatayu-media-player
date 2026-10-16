@@ -377,3 +377,20 @@ void PlaybackController::saveMusicTags(const QString &title, const QString &arti
   });
   proc->start();
 }
+
+QVariantList PlaybackController::browseCoverImages(const QString &path) const {
+  QVariantList items;
+  QDir dir(path);
+  if (!dir.exists() || !QFileInfo(dir.absolutePath()).isReadable()) return items;
+  static const QSet<QString> imageTypes = {"jpg", "jpeg", "png"};
+  const QFileInfoList entries = dir.entryInfoList(QDir::Dirs | QDir::Files |
+    QDir::NoDotAndDotDot | QDir::Readable, QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
+  for (const QFileInfo &entry : entries) {
+    const bool folder = entry.isDir();
+    if (!folder && !imageTypes.contains(entry.suffix().toLower())) continue;
+    items.append(QVariantMap{{"name", entry.fileName()}, {"path", entry.absoluteFilePath()},
+                             {"directory", folder}});
+    if (items.size() >= 500) break;
+  }
+  return items;
+}
