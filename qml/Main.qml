@@ -1050,6 +1050,34 @@ ApplicationWindow {
         }
     }
     Dialog {
+        id: mediaInfoDialog
+        title: "Media information"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 560)
+        height: Math.min(window.height - 24, 450)
+        standardButtons: Dialog.Close
+        onOpened: mediaInfoText.text = player.mediaInformation()
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 8
+            Label { text: "Local file and stream details"; color: "#B7C8D8" }
+            ScrollView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                TextArea {
+                    id: mediaInfoText
+                    readOnly: true
+                    selectByMouse: true
+                    wrapMode: TextEdit.WrapAnywhere
+                    color: "#E9F1F7"
+                    background: Rectangle { color: "#172532"; radius: 6 }
+                }
+            }
+            Button { text: "Refresh"; onClicked: mediaInfoText.text = player.mediaInformation() }
+        }
+    }
+    Dialog {
         id: playbackOptions
         title: "Playback options"
         modal: true
@@ -1323,6 +1351,7 @@ ApplicationWindow {
                     MenuItem { text: "Load subtitles"; onTriggered: subtitleDialog.open() }
                     MenuItem { text: "Subtitle settings"; onTriggered: captionTools.open() }
                     MenuItem { text: "Audio tracks and speed"; onTriggered: playbackOptions.open() }
+                    MenuItem { text: "Media information"; onTriggered: mediaInfoDialog.open() }
                     MenuItem { text: "Keyboard shortcuts"; onTriggered: shortcutsHelp.open() }
                     MenuItem { text: "Getting started"; onTriggered: gettingStartedDialog.open() }
                     MenuItem { text: "Troubleshooting"; onTriggered: troubleshootingDialog.open() }
