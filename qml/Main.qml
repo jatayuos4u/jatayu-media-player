@@ -15,6 +15,7 @@ ApplicationWindow {
     property color textColor: "#E9F1F7"
     property color muted: "#8496A8"
     property var mediaQueue: []
+    property bool restoredSettings: false
     property string repeatMode: "Off"
     property bool shuffleEnabled: false
     Settings {
@@ -32,10 +33,11 @@ ApplicationWindow {
         } catch (e) { mediaQueue = [] }
         repeatMode = ["Off", "All", "One"].includes(playlistSettings.storedRepeat) ? playlistSettings.storedRepeat : "Off"
         shuffleEnabled = playlistSettings.storedShuffle
+        restoredSettings = true
     }
-    onMediaQueueChanged: playlistSettings.storedQueue = JSON.stringify(mediaQueue)
-    onRepeatModeChanged: playlistSettings.storedRepeat = repeatMode
-    onShuffleEnabledChanged: playlistSettings.storedShuffle = shuffleEnabled
+    onMediaQueueChanged: if (restoredSettings) playlistSettings.storedQueue = JSON.stringify(mediaQueue)
+    onRepeatModeChanged: if (restoredSettings) playlistSettings.storedRepeat = repeatMode
+    onShuffleEnabledChanged: if (restoredSettings) playlistSettings.storedShuffle = shuffleEnabled
     function advanceQueue() {
         if (queueIndex < 0 || mediaQueue.length === 0) return
         if (repeatMode === "One") { playQueueIndex(queueIndex); return }
@@ -554,7 +556,32 @@ ApplicationWindow {
                     Layout.preferredHeight: 40
                     radius: 11
                     color: "#163F63"
-                    Label { anchors.centerIn: parent; text: "▶"; color: "#53B7FF"; font.pixelSize: 24 }
+                    Canvas {
+                        anchors.fill: parent
+                        onPaint: {
+                            const c = getContext("2d")
+                            c.clearRect(0, 0, width, height)
+                            c.fillStyle = "#39D9F2"
+                            c.beginPath()
+                            c.moveTo(11, 6)
+                            c.quadraticCurveTo(29, 13, 34, 22)
+                            c.quadraticCurveTo(25, 34, 12, 34)
+                            c.lineTo(19, 22)
+                            c.closePath()
+                            c.fill()
+                            c.fillStyle = "#1485E8"
+                            c.beginPath()
+                            c.moveTo(6, 9)
+                            c.quadraticCurveTo(8, 24, 19, 30)
+                            c.lineTo(11, 33)
+                            c.quadraticCurveTo(4, 21, 6, 9)
+                            c.fill()
+                            c.fillStyle = "#D8F9FF"
+                            c.beginPath()
+                            c.arc(27, 19, 1.5, 0, 6.283)
+                            c.fill()
+                        }
+                    }
                 }
                 ColumnLayout {
                     spacing: 2
