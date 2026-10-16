@@ -381,46 +381,95 @@ ApplicationWindow {
         title: "Music library"
         modal: true
         anchors.centerIn: Overlay.overlay
-        width: Math.min(window.width - 24, 820)
-        height: Math.min(window.height - 24, 570)
-        property string folder: player.locationPath("Music")
-        property var songs: []
-        function refresh() { songs = player.scanMusicLibrary(folder, librarySearch.text) }
-        onOpened: refresh()
+        width: Math.min(window.width - 24, 840)
+        height: Math.min(window.height - 24, 590)
         standardButtons: Dialog.Close
+        Settings {
+            id: libraryPreferences
+            category: "MusicLibrary"
+            property string savedFolder: ""
+        }
+        property string folder: libraryPreferences.savedFolder.length > 0 ? libraryPreferences.savedFolder : player.locationPath("Music")
+        property var songs: []
+        property string viewMode: "Songs"
+        property string selectedFolder: ""
+        property string sortMode: "Name"
+        function setFolder(path) {
+            folder = path
+            libraryPreferences.savedFolder = path
+            selectedFolder = ""
+            refresh()
+        }
+        function refresh() { songs = player.scanMusicLibrary(folder, librarySearch.text) }
+        readonly property var folderNames: {
+            let found = {}
+            for (const song of songs) found[song.folder] = true
+            return Object.keys(found).sort()
+        }
+        readonly property var visibleSongs: {
+            let list = songs.filter(song => viewMode !== "Folders" || selectedFolder === "" || song.folder === selectedFolder)
+            if (sortMode === "Name") return list.slice().sort((a,b) => a.name.localeCompare(b.name))
+            return list.slice().sort((a,b) => a.folder.localeCompare(b.folder) || a.name.localeCompare(b.name))
+        }
+        onOpened: refresh()
         ColumnLayout {
             anchors.fill: parent
-            spacing: 10
+            spacing: 8
             RowLayout {
                 Layout.fillWidth: true
-                Button { text: "Music"; onClicked: { libraryDialog.folder = player.locationPath("Music"); libraryDialog.refresh() } }
-                Button { text: "Downloads"; onClicked: { libraryDialog.folder = player.locationPath("Downloads"); libraryDialog.refresh() } }
-                Button { text: "Home"; onClicked: { libraryDialog.folder = player.locationPath("Home"); libraryDialog.refresh() } }
+                Button { text: "Music"; onClicked: libraryDialog.setFolder(player.locationPath("Music")) }
+                Button { text: "Downloads"; onClicked: libraryDialog.setFolder(player.locationPath("Downloads")) }
+                Button { text: "Home"; onClicked: libraryDialog.setFolder(player.locationPath("Home")) }
                 Button {
                     text: "Up"
                     enabled: libraryDialog.folder !== "/"
-                    onClicked: {
-                        libraryDialog.folder = libraryDialog.folder.substring(0, libraryDialog.folder.lastIndexOf("/")) || "/"
-                        libraryDialog.refresh()
-                    }
+                    onClicked: libraryDialog.setFolder(libraryDialog.folder.substring(0, libraryDialog.folder.lastIndexOf("/")) || "/")
                 }
                 Button { text: "Refresh"; onClicked: libraryDialog.refresh() }
             }
-            Label { Layout.fillWidth: true; text: libraryDialog.folder; color: "#B7C8D8"; elide: Text.ElideMiddle }
+            Label { Layout.fillWidth: true; text: "Library folder: " + libraryDialog.folder; color: "#B7C8D8"; elide: Text.ElideMiddle }
+            RowLayout {
+                Layout.fillWidth: true
+                Button { text: "Songs"; highlighted: libraryDialog.viewMode === "Songs"; onClicked: libraryDialog.viewMode = "Songs" }
+                Button { text: "Folders"; highlighted: libraryDialog.viewMode === "Folders"; onClicked: libraryDialog.viewMode = "Folders" }
+                Item { Layout.fillWidth: true }
+                Label { text: "Sort"; color: "#B7C8D8" }
+                ComboBox {
+                    model: ["Name", "Folder"]
+                    onActivated: libraryDialog.sortMode = currentText
+                }
+            }
             TextField {
                 id: librarySearch
                 Layout.fillWidth: true
-                placeholderText: "Search song filenames in selected folder…"
+                placeholderText: "Search songs in the selected folder…"
                 onTextChanged: libraryRefreshDelay.restart()
             }
-            Timer { id: libraryRefreshDelay; interval: 280; onTriggered: libraryDialog.refresh() }
-            Label { text: libraryDialog.songs.length + " songs found"; color: "#9AB6C9" }
+            Timer { id: libraryRefreshDelay; interval: 350; onTriggered: libraryDialog.refresh() }
+            Label {
+                color: "#9AB6C9"
+                text: libraryDialog.songs.length + " songs indexed in this folder (up to 600)"
+            }
+            ListView {
+                Layout.fillWidth: true
+                Layout.preferredHeight: libraryDialog.viewMode === "Folders" ? Math.min(110, libraryDialog.folderNames.length * 40) : 0
+                visible: libraryDialog.viewMode === "Folders"
+                clip: true
+                model: libraryDialog.folderNames
+                delegate: ItemDelegate {
+                    required property var modelData
+                    width: ListView.view.width
+                    text: modelData
+                    highlighted: libraryDialog.selectedFolder === modelData
+                    onClicked: libraryDialog.selectedFolder = libraryDialog.selectedFolder === modelData ? "" : modelData
+                }
+            }
             ListView {
                 id: songsList
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 clip: true
-                model: libraryDialog.songs
+                model: libraryDialog.visibleSongs
                 delegate: ItemDelegate {
                     required property var modelData
                     width: songsList.width
