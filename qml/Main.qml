@@ -14,6 +14,8 @@ ApplicationWindow {
     property color accent: "#1689E8"
     property color textColor: "#E9F1F7"
     property color muted: "#8496A8"
+    property bool errorBannerDismissed: false
+    Connections { target: player; function onErrorChanged() { window.errorBannerDismissed = false } }
     property bool forceMusicMode: false
     property bool forceVideoMode: false
     readonly property bool audioTrack: ["mp3", "flac", "wav", "ogg", "opus", "m4a", "aac", "wma", "alac"].includes(player.title.toLowerCase().split(".").pop())
@@ -961,6 +963,24 @@ ApplicationWindow {
         }
     }
     Dialog {
+        id: shortcutsHelp
+        title: "Keyboard shortcuts"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 510)
+        standardButtons: Dialog.Close
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 8
+            Label {
+                Layout.fillWidth: true
+                text: "Space — Play/Pause\nF — Fullscreen; Escape — Exit fullscreen\n← / → — Seek 5 seconds\nCtrl+← / Ctrl+→ — Seek 30 seconds\n↑ / ↓ — Volume ±5%\nCtrl+O — Browse media\nCtrl+L — Music library\nCtrl+P — My playlists\nCtrl+Shift+P — Playback options\nCtrl+0 — Normal speed\nCtrl++ / Ctrl+- — Speed ±0.25×"
+                color: "#E9F1F7"
+                wrapMode: Text.WordWrap
+            }
+        }
+    }
+    Dialog {
         id: playbackOptions
         title: "Playback options"
         modal: true
@@ -1133,6 +1153,16 @@ ApplicationWindow {
     Shortcut { sequence: "Left"; onActivated: player.seekRelative(-5) }
     Shortcut { sequence: "Right"; onActivated: player.seekRelative(5) }
     Shortcut { sequence: "Ctrl+O"; onActivated: mediaBrowser.open() }
+    Shortcut { sequence: "Ctrl+L"; onActivated: libraryDialog.open() }
+    Shortcut { sequence: "Ctrl+P"; onActivated: namedPlaylistsDialog.open() }
+    Shortcut { sequence: "Ctrl+Shift+P"; onActivated: playbackOptions.open() }
+    Shortcut { sequence: "Ctrl+Right"; onActivated: player.seekRelative(30) }
+    Shortcut { sequence: "Ctrl+Left"; onActivated: player.seekRelative(-30) }
+    Shortcut { sequence: "Up"; onActivated: player.setVolume(Math.min(100, player.volume + 5)) }
+    Shortcut { sequence: "Down"; onActivated: player.setVolume(Math.max(0, player.volume - 5)) }
+    Shortcut { sequence: "Ctrl+0"; onActivated: player.setPlaybackSpeed(1.0) }
+    Shortcut { sequence: "Ctrl+Plus"; onActivated: player.setPlaybackSpeed(Math.min(2, player.playbackSpeed + 0.25)) }
+    Shortcut { sequence: "Ctrl+Minus"; onActivated: player.setPlaybackSpeed(Math.max(0.5, player.playbackSpeed - 0.25)) }
     Shortcut { sequence: "F"; onActivated: window.toggleCinema() }
     Shortcut { sequence: "Escape"; onActivated: if (window.cinemaMode) window.showNormal() }
     ColumnLayout {
@@ -1213,6 +1243,7 @@ ApplicationWindow {
                     MenuItem { text: "Load subtitles"; onTriggered: subtitleDialog.open() }
                     MenuItem { text: "Subtitle settings"; onTriggered: captionTools.open() }
                     MenuItem { text: "Audio tracks and speed"; onTriggered: playbackOptions.open() }
+                    MenuItem { text: "Keyboard shortcuts"; onTriggered: shortcutsHelp.open() }
                     MenuSeparator {}
                     MenuItem { text: "Quality: Performance"; onTriggered: player.setQualityProfile("Performance") }
                     MenuItem { text: "Quality: Balanced"; onTriggered: player.setQualityProfile("Balanced") }
@@ -1400,9 +1431,22 @@ ApplicationWindow {
             }
         }
         Rectangle {
-            Layout.fillWidth: true; Layout.preferredHeight: player.error.length ? 26 : 0
-            color: "#6D2626"; visible: player.error.length > 0
-            Label { anchors.centerIn: parent; text: player.error; color: "white" }
+            Layout.fillWidth: true; Layout.preferredHeight: player.error.length && !window.errorBannerDismissed ? 34 : 0
+            color: "#6D2626"; visible: player.error.length > 0 && !window.errorBannerDismissed
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 12
+                anchors.rightMargin: 12
+                Label {
+                    Layout.fillWidth: true
+                    text: player.error
+                    color: "white"
+                    elide: Text.ElideRight
+                    ToolTip.visible: hovered
+                    ToolTip.text: player.error
+                }
+                Button { text: "Dismiss"; onClicked: errorBannerDismissed = true }
+            }
         }
         Rectangle {
             Layout.fillWidth: true; Layout.preferredHeight: window.cinemaMode ? 0 : 100
