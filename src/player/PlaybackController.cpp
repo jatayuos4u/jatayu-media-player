@@ -311,6 +311,27 @@ QVariantList PlaybackController::recentMedia() const {
   return items;
 }
 
+void PlaybackController::clearRecentMedia() {
+  QSettings settings;
+  settings.remove("recentMedia");
+  emit recentMediaChanged();
+}
+
+void PlaybackController::clearResumePositions() {
+  QSettings settings;
+  settings.remove("resume");
+}
+
+void PlaybackController::resetPlaybackPreferences() {
+  QSettings settings;
+  settings.remove("playbackVolume");
+  settings.remove("playbackSpeed");
+  settings.remove("videoQualityProfile");
+  setVolume(70);
+  setPlaybackSpeed(1.0);
+  setQualityProfile("Balanced");
+}
+
 void PlaybackController::setQualityProfile(const QString &requested) {
   if (!handle_) return;
   // High Quality is temporarily disabled: changing to EWA LanczosSharp while
