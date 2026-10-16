@@ -369,16 +369,14 @@ ApplicationWindow {
                         spacing: 3
                         model: mediaBrowser.entries
                         delegate: ItemDelegate {
+                            required property int index
                             required property var modelData
                             width: browserList.width
                             height: 46
                             highlighted: mediaBrowser.selectedPath === modelData.path
                             onClicked: {
+                                mediaBrowser.chooseIndex(index)
                                 browserList.forceActiveFocus()
-                                browserList.currentIndex = index
-                                mediaBrowser.selectedPath = modelData.path
-                                mediaBrowser.selectedName = modelData.name
-                                mediaBrowser.selectedFolder = modelData.directory
                             }
                             onDoubleClicked: {
                                 if (modelData.directory) mediaBrowser.navigate(modelData.path)
