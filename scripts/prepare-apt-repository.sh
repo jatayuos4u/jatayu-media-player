@@ -12,7 +12,7 @@ DEB=dist/jatayu-media-player_1.0.0_x86_64.deb
 [[ "$(dpkg-deb -f "$DEB" Architecture)" == amd64 ]] || exit 1
 KEY="$APT_SIGNING_FINGERPRINT"
 # Require a usable secret key, but never export it to the repository.
-gpg --batch --list-secret-keys "$KEY" | grep -q 'sec' || {
+gpg --batch --with-colons --list-secret-keys "$KEY" | grep -q "^sec:" || {
   echo "No matching secret key in local GPG keyring" >&2; exit 1;
 }
 REPO="$PWD/dist/apt-repo"
@@ -30,6 +30,6 @@ EOF
 reprepro -b "$REPO" includedeb stable "$DEB"
 [[ -s "$REPO/dists/stable/InRelease" ]] || { echo "Signed InRelease missing" >&2; exit 1; }
 gpg --batch --armor --export "$KEY" > "$REPO/jatayu-media-player-archive-key.asc"
-gpg --show-keys --with-fingerprint "$REPO/jatayu-media-player-archive-key.asc"
+gpg --batch --verify "$REPO/dists/stable/InRelease"\ngpg --show-keys --with-fingerprint "$REPO/jatayu-media-player-archive-key.asc"
 echo "Prepared signed APT repository in $REPO (LOCAL ONLY)."
 echo "Do not upload until fingerprint, repository layout and installation are verified."
