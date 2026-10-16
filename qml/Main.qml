@@ -574,7 +574,7 @@ ApplicationWindow {
             titleField.text = player.songTitle
             artistField.text = player.artist
             albumField.text = player.album
-            outputNameField.text = player.title.replace(/\\.[^.]+$/, "") + "-edited"
+            outputNameField.text = player.title.substring(0, player.title.lastIndexOf(".") >= 0 ? player.title.lastIndexOf(".") : player.title.length) + "-edited"
             feedback = ""
             coverPath = ""
             saving = false
