@@ -631,7 +631,7 @@ ApplicationWindow {
                     }
                     Label {
                         Layout.fillWidth: true
-                        text: player.title === "No media selected" ? "Your music, your way" : player.title
+                        text: player.title === "No media selected" ? "Your music, your way" : player.songTitle
                         font.pixelSize: 25
                         font.bold: true
                         color: "#F0F8FF"
@@ -640,7 +640,7 @@ ApplicationWindow {
                     }
                     Label {
                         Layout.fillWidth: true
-                        text: "Local music • No accounts • No tracking"
+                        text: (player.artist.length ? player.artist : "Unknown artist") + (player.album.length ? "  •  " + player.album : "")
                         font.pixelSize: 13
                         color: "#9AB6C9"
                         horizontalAlignment: Text.AlignHCenter
