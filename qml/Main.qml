@@ -391,6 +391,22 @@ ApplicationWindow {
         }
         property string folder: libraryPreferences.savedFolder.length > 0 ? libraryPreferences.savedFolder : player.locationPath("Music")
         property var songs: []
+        property string selectedArtist: ""
+        property string selectedAlbum: ""
+        Connections {
+            target: player
+            function onLibraryTagFound(path, artist, album, title) {
+                let updated = libraryDialog.songs.slice()
+                const i = updated.findIndex(song => song.path === path)
+                if (i < 0) return
+                updated[i] = Object.assign({}, updated[i], {
+                    artist: artist.length ? artist : "Unknown Artist",
+                    album: album.length ? album : "Unknown Album",
+                    displayTitle: title.length ? title : updated[i].name
+                })
+                libraryDialog.songs = updated
+            }
+        }
         property string viewMode: "Songs"
         property string selectedFolder: ""
         property string sortMode: "Name"
@@ -400,14 +416,24 @@ ApplicationWindow {
             selectedFolder = ""
             refresh()
         }
-        function refresh() { songs = player.scanMusicLibrary(folder, librarySearch.text) }
+        function refresh() {
+            songs = player.scanMusicLibrary(folder, librarySearch.text)
+            selectedArtist = ""
+            selectedAlbum = ""
+            player.inspectMusicTags(songs)
+        }
         readonly property var folderNames: {
             let found = {}
             for (const song of songs) found[song.folder] = true
             return Object.keys(found).sort()
         }
+        readonly property var artistNames: [...new Set(songs.map(s => s.artist || "Unknown Artist"))].sort()
+        readonly property var albumNames: [...new Set(songs.map(s => s.album || "Unknown Album"))].sort()
         readonly property var visibleSongs: {
-            let list = songs.filter(song => viewMode !== "Folders" || selectedFolder === "" || song.folder === selectedFolder)
+            let list = songs.filter(song =>
+                (viewMode !== "Folders" || selectedFolder === "" || song.folder === selectedFolder) &&
+                (viewMode !== "Artists" || selectedArtist === "" || (song.artist || "Unknown Artist") === selectedArtist) &&
+                (viewMode !== "Albums" || selectedAlbum === "" || (song.album || "Unknown Album") === selectedAlbum))
             if (sortMode === "Name") return list.slice().sort((a,b) => a.name.localeCompare(b.name))
             return list.slice().sort((a,b) => a.folder.localeCompare(b.folder) || a.name.localeCompare(b.name))
         }
@@ -432,6 +458,8 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 Button { text: "Songs"; highlighted: libraryDialog.viewMode === "Songs"; onClicked: libraryDialog.viewMode = "Songs" }
                 Button { text: "Folders"; highlighted: libraryDialog.viewMode === "Folders"; onClicked: libraryDialog.viewMode = "Folders" }
+                Button { text: "Artists"; highlighted: libraryDialog.viewMode === "Artists"; onClicked: libraryDialog.viewMode = "Artists" }
+                Button { text: "Albums"; highlighted: libraryDialog.viewMode === "Albums"; onClicked: libraryDialog.viewMode = "Albums" }
                 Item { Layout.fillWidth: true }
                 Label { text: "Sort"; color: "#B7C8D8" }
                 ComboBox {
@@ -465,6 +493,26 @@ ApplicationWindow {
                 }
             }
             ListView {
+                Layout.fillWidth: true
+                Layout.preferredHeight: libraryDialog.viewMode === "Artists" || libraryDialog.viewMode === "Albums" ? 112 : 0
+                visible: libraryDialog.viewMode === "Artists" || libraryDialog.viewMode === "Albums"
+                clip: true
+                model: libraryDialog.viewMode === "Artists" ? libraryDialog.artistNames : libraryDialog.albumNames
+                delegate: ItemDelegate {
+                    required property var modelData
+                    width: ListView.view.width
+                    text: modelData
+                    highlighted: libraryDialog.viewMode === "Artists" ?
+                                 libraryDialog.selectedArtist === modelData : libraryDialog.selectedAlbum === modelData
+                    onClicked: {
+                        if (libraryDialog.viewMode === "Artists")
+                            libraryDialog.selectedArtist = libraryDialog.selectedArtist === modelData ? "" : modelData
+                        else
+                            libraryDialog.selectedAlbum = libraryDialog.selectedAlbum === modelData ? "" : modelData
+                    }
+                }
+            }
+            ListView {
                 id: songsList
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -474,7 +522,7 @@ ApplicationWindow {
                     required property var modelData
                     width: songsList.width
                     contentItem: RowLayout {
-                        Label { Layout.fillWidth: true; text: modelData.name; color: "#E9F1F7"; elide: Text.ElideMiddle }
+                        Label { Layout.fillWidth: true; text: (modelData.displayTitle || modelData.name) + (modelData.artist ? "  ·  " + modelData.artist : ""); color: "#E9F1F7"; elide: Text.ElideMiddle }
                         Button { text: "Play"; onClicked: { window.enqueue(modelData.path, modelData.name, true); libraryDialog.close() } }
                         Button { text: "Add to queue"; onClicked: window.enqueue(modelData.path, modelData.name, false) }
                     }
