@@ -427,8 +427,8 @@ ApplicationWindow {
             for (const song of songs) found[song.folder] = true
             return Object.keys(found).sort()
         }
-        readonly property var artistNames: [...new Set(songs.map(s => s.artist || "Unknown Artist"))].sort()
-        readonly property var albumNames: [...new Set(songs.map(s => s.album || "Unknown Album"))].sort()
+        readonly property var artistNames: Object.keys(songs.reduce((out, song) => { out[song.artist || "Unknown Artist"] = true; return out }, {})).sort()
+        readonly property var albumNames: Object.keys(songs.reduce((out, song) => { out[song.album || "Unknown Album"] = true; return out }, {})).sort()
         readonly property var visibleSongs: {
             let list = songs.filter(song =>
                 (viewMode !== "Folders" || selectedFolder === "" || song.folder === selectedFolder) &&
