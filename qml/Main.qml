@@ -56,6 +56,10 @@ ApplicationWindow {
     }
     Connections {
         target: player
+        function onPlaybackFinished() {
+            if (window.queueIndex >= 0 && window.queueIndex + 1 < window.mediaQueue.length)
+                window.playQueueIndex(window.queueIndex + 1)
+        }
         function onPausedChanged() {
             if (player.paused) { window.showCinemaControls = true; hideControls.stop() }
             else if (window.cinemaMode) hideControls.restart()
