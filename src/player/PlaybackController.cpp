@@ -86,7 +86,7 @@ void PlaybackController::seek(double seconds) {
 void PlaybackController::seekRelative(double seconds) { seek(position_ + seconds); }
 void PlaybackController::setVolume(double value) { double v = std::clamp(value, 0.0, 100.0); mpv_set_property_async(handle_, 0, "volume", MPV_FORMAT_DOUBLE, &v); }
 void PlaybackController::setPlaybackSpeed(double speed) {
-  const double v = std::clamp(speed, 0.5, 2.0);
+  double v = std::clamp(speed, 0.5, 2.0);
   const int status = mpv_set_property(handle_, "speed", MPV_FORMAT_DOUBLE, &v);
   if (status < 0) setError(QString::fromUtf8(mpv_error_string(status)));
 }
