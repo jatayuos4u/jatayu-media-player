@@ -10,6 +10,9 @@ class PlaybackController : public QObject {
   Q_PROPERTY(double duration READ duration NOTIFY durationChanged)
   Q_PROPERTY(double volume READ volume WRITE setVolume NOTIFY volumeChanged)
   Q_PROPERTY(QString title READ title NOTIFY titleChanged)
+  Q_PROPERTY(QString songTitle READ songTitle NOTIFY metadataChanged)
+  Q_PROPERTY(QString artist READ artist NOTIFY metadataChanged)
+  Q_PROPERTY(QString album READ album NOTIFY metadataChanged)
   Q_PROPERTY(QString error READ error NOTIFY errorChanged)
   Q_PROPERTY(QString qualityProfile READ qualityProfile NOTIFY qualityProfileChanged)
 public:
@@ -21,6 +24,9 @@ public:
   double duration() const { return duration_; }
   double volume() const { return volume_; }
   QString title() const { return title_; }
+  QString songTitle() const { return songTitle_; }
+  QString artist() const { return artist_; }
+  QString album() const { return album_; }
   QString error() const { return error_; }
   QString qualityProfile() const { return qualityProfile_; }
   Q_INVOKABLE void setQualityProfile(const QString &profile);
@@ -47,6 +53,7 @@ signals:
   void durationChanged();
   void volumeChanged();
   void titleChanged();
+  void metadataChanged();
   void errorChanged();
   void engineEvent();
   void recentMediaChanged();
@@ -60,4 +67,5 @@ private:
   double position_ = 0, duration_ = 0, volume_ = 70;
   QString title_ = "No media selected", error_;
   QString qualityProfile_ = "Balanced";
+  QString songTitle_, artist_, album_;
 };
