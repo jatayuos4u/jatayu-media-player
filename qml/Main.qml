@@ -418,6 +418,44 @@ ApplicationWindow {
         }
     }
     Dialog {
+        id: editTags
+        title: "Edit music information"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 470)
+        standardButtons: Dialog.Cancel
+        property string feedback: ""
+        onOpened: {
+            titleField.text = player.songTitle
+            artistField.text = player.artist
+            albumField.text = player.album
+            feedback = ""
+        }
+        Connections {
+            target: player
+            function onTagSaveFinished(success, message) {
+                editTags.feedback = message
+            }
+        }
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+            Label { text: "Save a tagged copy; your original file stays unchanged."; color: "#B7C8D8"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+            Label { text: "Title"; color: "#E9F1F7" }
+            TextField { id: titleField; Layout.fillWidth: true; selectByMouse: true }
+            Label { text: "Artist"; color: "#E9F1F7" }
+            TextField { id: artistField; Layout.fillWidth: true; selectByMouse: true }
+            Label { text: "Album"; color: "#E9F1F7" }
+            TextField { id: albumField; Layout.fillWidth: true; selectByMouse: true }
+            Button {
+                text: "Save edited copy"
+                Layout.alignment: Qt.AlignRight
+                onClicked: player.saveMusicTags(titleField.text, artistField.text, albumField.text)
+            }
+            Label { text: editTags.feedback; color: "#B7C8D8"; wrapMode: Text.WrapAnywhere; Layout.fillWidth: true }
+        }
+    }
+    Dialog {
         id: captionTools
         title: "Subtitle controls"
         modal: true
@@ -614,6 +652,7 @@ ApplicationWindow {
                 Menu {
                     id: toolsMenu
                     MenuItem { text: "Recent files"; onTriggered: { mediaBrowser.open(); mediaBrowser.showRecent() } }
+                    MenuItem { text: "Edit music information"; enabled: window.audioTrack; onTriggered: editTags.open() }
                     MenuItem { text: "Load subtitles"; onTriggered: subtitleDialog.open() }
                     MenuItem { text: "Subtitle settings"; onTriggered: captionTools.open() }
                     MenuSeparator {}
