@@ -14,6 +14,26 @@ ApplicationWindow {
     property color accent: "#1689E8"
     property color textColor: "#E9F1F7"
     property color muted: "#8496A8"
+    readonly property bool cinemaMode: visibility === Window.FullScreen
+    property bool showCinemaControls: true
+    function toggleCinema() { if (cinemaMode) showNormal(); else showFullScreen() }
+    onCinemaModeChanged: {
+        showCinemaControls = true
+        if (cinemaMode && !player.paused) hideControls.restart()
+        else hideControls.stop()
+    }
+    Timer {
+        id: hideControls
+        interval: 3000
+        onTriggered: if (window.cinemaMode && !player.paused) window.showCinemaControls = false
+    }
+    Connections {
+        target: player
+        function onPausedChanged() {
+            if (player.paused) { window.showCinemaControls = true; hideControls.stop() }
+            else if (window.cinemaMode) hideControls.restart()
+        }
+    }
     Dialog {
         id: mediaBrowser
         title: "Open media"
@@ -292,14 +312,15 @@ ApplicationWindow {
     Shortcut { sequence: "Left"; onActivated: player.seekRelative(-5) }
     Shortcut { sequence: "Right"; onActivated: player.seekRelative(5) }
     Shortcut { sequence: "Ctrl+O"; onActivated: mediaBrowser.open() }
-    Shortcut { sequence: "F"; onActivated: window.visibility = window.visibility === Window.FullScreen ? Window.Windowed : Window.FullScreen }
-    Shortcut { sequence: "Escape"; onActivated: if (window.visibility === Window.FullScreen) window.visibility = Window.Windowed }
+    Shortcut { sequence: "F"; onActivated: window.toggleCinema() }
+    Shortcut { sequence: "Escape"; onActivated: if (window.cinemaMode) window.showNormal() }
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 72
+            Layout.preferredHeight: window.cinemaMode ? 0 : 72
+            visible: !window.cinemaMode
             color: "#172532"
             RowLayout {
                 anchors.fill: parent
@@ -328,6 +349,16 @@ ApplicationWindow {
             Layout.fillWidth: true; Layout.fillHeight: true
             color: "#070B0F"
             MpvVideoItem { id: video; anchors.fill: parent; controller: player }
+            MouseArea {
+                anchors.fill: parent
+                visible: window.cinemaMode
+                hoverEnabled: true
+                acceptedButtons: Qt.NoButton
+                onPositionChanged: {
+                    window.showCinemaControls = true
+                    if (!player.paused) hideControls.restart()
+                }
+            }
             Column {
                 anchors.centerIn: parent
                 visible: player.title === "No media selected"
@@ -376,7 +407,8 @@ ApplicationWindow {
             Label { anchors.centerIn: parent; text: player.error; color: "white" }
         }
         Rectangle {
-            Layout.fillWidth: true; Layout.preferredHeight: 100
+            Layout.fillWidth: true; Layout.preferredHeight: window.cinemaMode ? 0 : 100
+            visible: !window.cinemaMode
             color: "#1B2836"
             ColumnLayout {
                 anchors.fill: parent; anchors.margins: 12; spacing: 4
@@ -400,8 +432,45 @@ ApplicationWindow {
                     Item { Layout.fillWidth: true }
                     Label { text: "Volume"; color: window.muted }
                     Slider { Layout.preferredWidth: 120; from: 0; to: 100; value: player.volume; onMoved: player.setVolume(value) }
-                    Button { text: "⛶ Fullscreen"; onClicked: window.visibility = window.visibility === Window.FullScreen ? Window.Windowed : Window.FullScreen }
+                    Button { text: "⛶ Fullscreen"; onClicked: window.toggleCinema() }
                 }
+            }
+        }
+    }
+    Rectangle {
+        visible: window.cinemaMode && window.showCinemaControls
+        anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+        height: 112
+        z: 20
+        color: "#E6172532"
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 14
+            spacing: 3
+            Label {
+                text: player.title
+                color: "#E9F1F7"
+                Layout.fillWidth: true
+                elide: Text.ElideMiddle
+            }
+            Slider {
+                Layout.fillWidth: true
+                from: 0
+                to: Math.max(1, player.duration)
+                value: pressed ? value : player.position
+                enabled: player.duration > 0
+                onMoved: player.seek(value)
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Button { text: "↶ 10"; onClicked: player.seekRelative(-10) }
+                Button { text: player.paused ? "▶ Play" : "Ⅱ Pause"; onClicked: player.togglePause() }
+                Button { text: "10 ↷"; onClicked: player.seekRelative(10) }
+                Label { text: formatTime(player.position) + " / " + formatTime(player.duration); color: "#E9F1F7" }
+                Item { Layout.fillWidth: true }
+                Label { text: "Volume"; color: "#E9F1F7" }
+                Slider { Layout.preferredWidth: 125; from: 0; to: 100; value: player.volume; onMoved: player.setVolume(value) }
+                Button { text: "Exit fullscreen"; onClicked: window.showNormal() }
             }
         }
     }
