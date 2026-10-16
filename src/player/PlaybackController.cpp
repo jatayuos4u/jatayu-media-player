@@ -323,7 +323,7 @@ void PlaybackController::saveMusicTags(const QString &title, const QString &arti
   QString baseName = outputName.trimmed();
   if (baseName.isEmpty()) baseName = source.completeBaseName() + "-edited";
   // Save As accepts a filename only, never a path or traversal sequence.
-  if (baseName.contains('/') || baseName.contains('\\\\') || baseName == "." ||
+  if (baseName.contains('/') || baseName.contains(QChar(92)) || baseName == "." ||
       baseName == ".." || baseName.contains("..") || baseName.size() > 180) {
     emit tagSaveFinished(false, "Choose a filename without folders or '..'.");
     return;
