@@ -92,6 +92,7 @@ void PlaybackController::processEvents() {
     } else if (event->event_id == MPV_EVENT_END_FILE) {
       auto *end = static_cast<mpv_event_end_file *>(event->data);
       if (end && end->reason == MPV_END_FILE_REASON_ERROR) setError(QString::fromUtf8(mpv_error_string(end->error)));
+      else if (end && end->reason == MPV_END_FILE_REASON_EOF) emit playbackFinished();
     } else if (event->event_id == MPV_EVENT_FILE_LOADED) { setError({}); }
   }
 }
