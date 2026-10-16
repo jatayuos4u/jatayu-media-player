@@ -14,6 +14,9 @@
 #include <QImage>
 #include <QStandardPaths>
 #include <QCryptographicHash>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <algorithm>
 #include <stdexcept>
 PlaybackController::PlaybackController(QObject *parent) : QObject(parent) {
@@ -39,6 +42,7 @@ PlaybackController::PlaybackController(QObject *parent) : QObject(parent) {
 }
 PlaybackController::~PlaybackController() {
   if (artworkProcess_) { artworkProcess_->disconnect(this); artworkProcess_->kill(); artworkProcess_->waitForFinished(1000); }
+  if (libraryProbe_) { libraryProbe_->disconnect(this); libraryProbe_->kill(); libraryProbe_->waitForFinished(1000); }
   if (handle_) { mpv_set_wakeup_callback(handle_, nullptr, nullptr); mpv_terminate_destroy(handle_); }
 }
 void PlaybackController::wakeup(void *ctx) {
@@ -426,4 +430,54 @@ QVariantList PlaybackController::scanMusicLibrary(const QString &folder, const Q
                              {"folder", info.absolutePath()}});
   }
   return songs;
+}
+
+void PlaybackController::inspectMusicTags(const QVariantList &songs) {
+  pendingMusicFiles_.clear();
+  if (libraryProbe_) {
+    libraryProbe_->disconnect(this);
+    libraryProbe_->kill();
+    libraryProbe_->deleteLater();
+    libraryProbe_ = nullptr;
+  }
+  if (QStandardPaths::findExecutable("ffprobe").isEmpty()) return;
+  // Limit metadata reads to keep large libraries responsive.
+  for (const QVariant &item : songs) {
+    const QString path = item.toMap().value("path").toString();
+    if (QFileInfo(path).isFile() && pendingMusicFiles_.size() < 250)
+      pendingMusicFiles_.append(path);
+  }
+  inspectNextMusicTag();
+}
+void PlaybackController::inspectNextMusicTag() {
+  if (pendingMusicFiles_.isEmpty() || libraryProbe_) return;
+  const QString path = pendingMusicFiles_.takeFirst();
+  auto *probe = new QProcess(this);
+  libraryProbe_ = probe;
+  probe->setProgram("ffprobe");
+  probe->setArguments({"-v", "error", "-show_entries",
+                       "format_tags=title,artist,album", "-of", "json", path});
+  connect(probe, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+          this, [this, probe, path](int exitCode, QProcess::ExitStatus status) {
+    if (libraryProbe_ != probe) { probe->deleteLater(); return; }
+    libraryProbe_ = nullptr;
+    if (exitCode == 0 && status == QProcess::NormalExit) {
+      const QJsonObject tags = QJsonDocument::fromJson(probe->readAllStandardOutput())
+                                     .object().value("format").toObject().value("tags").toObject();
+      QString artist, album, title;
+      for (auto it = tags.begin(); it != tags.end(); ++it) {
+        const QString k = it.key().toLower();
+        if (k == "artist") artist = it.value().toString();
+        else if (k == "album") album = it.value().toString();
+        else if (k == "title") title = it.value().toString();
+      }
+      emit libraryTagFound(path, artist, album, title);
+    }
+    probe->deleteLater();
+    inspectNextMusicTag();
+  });
+  probe->start();
+  QTimer::singleShot(1200, this, [this, probe] {
+    if (libraryProbe_ == probe && probe->state() != QProcess::NotRunning) probe->kill();
+  });
 }
