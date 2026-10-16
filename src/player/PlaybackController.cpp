@@ -9,6 +9,11 @@
 #include <QFile>
 #include <QMetaObject>
 #include <QUrl>
+#include <QProcess>
+#include <QTimer>
+#include <QImage>
+#include <QStandardPaths>
+#include <QCryptographicHash>
 #include <algorithm>
 #include <stdexcept>
 PlaybackController::PlaybackController(QObject *parent) : QObject(parent) {
@@ -33,6 +38,7 @@ PlaybackController::PlaybackController(QObject *parent) : QObject(parent) {
   setQualityProfile(savedQuality);
 }
 PlaybackController::~PlaybackController() {
+  if (artworkProcess_) { artworkProcess_->disconnect(this); artworkProcess_->kill(); artworkProcess_->waitForFinished(1000); }
   if (handle_) { mpv_set_wakeup_callback(handle_, nullptr, nullptr); mpv_terminate_destroy(handle_); }
 }
 void PlaybackController::wakeup(void *ctx) {
@@ -47,7 +53,8 @@ void PlaybackController::openFile(const QString &path) {
   if (!info.isFile() || !info.isReadable()) { setError("File is unavailable or not readable"); return; }
   setError({});
   title_ = info.fileName(); emit titleChanged();
-  songTitle_ = info.completeBaseName(); artist_.clear(); album_.clear(); emit metadataChanged();
+  songTitle_ = info.completeBaseName(); artist_.clear(); album_.clear(); artworkUrl_.clear(); emit metadataChanged();
+  loadLocalArtwork(info.absoluteFilePath());
   QSettings settings;
   QStringList recent = settings.value("recentMedia").toStringList();
   recent.removeAll(info.absoluteFilePath());
@@ -257,4 +264,48 @@ void PlaybackController::cycleSubtitleTrack() {
   const char *args[] = {"cycle", "sid", nullptr};
   const int status = mpv_command_async(handle_, 0, args);
   if (status < 0) setError(QString::fromUtf8(mpv_error_string(status)));
+}
+
+void PlaybackController::loadLocalArtwork(const QString &path) {
+  if (artworkProcess_) {
+    artworkProcess_->disconnect(this);
+    artworkProcess_->kill();
+    artworkProcess_->deleteLater();
+    artworkProcess_ = nullptr;
+  }
+  const QString suffix = QFileInfo(path).suffix().toLower();
+  if (!QSet<QString>{"mp3","m4a","flac","ogg","opus","aac","wma","alac"}.contains(suffix))
+    return;
+  // Optional local FFmpeg utility, never a network request; failures retain the fallback icon.
+  const QString ffmpeg = QStandardPaths::findExecutable("ffmpeg");
+  if (ffmpeg.isEmpty()) return;
+  auto *process = new QProcess(this);
+  artworkProcess_ = process;
+  process->setProgram(ffmpeg);
+  process->setArguments({"-nostdin", "-hide_banner", "-loglevel", "error",
+                         "-i", path, "-map", "0:v:0", "-frames:v", "1",
+                         "-f", "image2pipe", "-vcodec", "mjpeg", "pipe:1"});
+  process->setProcessChannelMode(QProcess::SeparateChannels);
+  connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+          this, [this, process, path](int code, QProcess::ExitStatus status) {
+    if (artworkProcess_ != process) { process->deleteLater(); return; }
+    artworkProcess_ = nullptr;
+    const QByteArray output = process->readAllStandardOutput();
+    process->deleteLater();
+    if (status != QProcess::NormalExit || code != 0 || output.isEmpty() || output.size() > 5 * 1024 * 1024) return;
+    QImage image = QImage::fromData(output);
+    if (image.isNull()) return;
+    image = image.scaled(500, 500, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    const QString cacheDir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/artwork";
+    if (!QDir().mkpath(cacheDir)) return;
+    const QByteArray digest = QCryptographicHash::hash(QFile::encodeName(path), QCryptographicHash::Sha256).toHex();
+    const QString coverPath = cacheDir + "/" + QString::fromLatin1(digest) + ".png";
+    if (!image.save(coverPath, "PNG")) return;
+    artworkUrl_ = QUrl::fromLocalFile(coverPath).toString();
+    emit metadataChanged();
+  });
+  process->start();
+  QTimer::singleShot(3500, this, [this, process] {
+    if (artworkProcess_ == process && process->state() != QProcess::NotRunning) process->kill();
+  });
 }
