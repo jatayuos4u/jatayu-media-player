@@ -311,7 +311,7 @@ void PlaybackController::loadLocalArtwork(const QString &path) {
   });
 }
 
-void PlaybackController::saveMusicTags(const QString &title, const QString &artist, const QString &album) {
+void PlaybackController::saveMusicTags(const QString &title, const QString &artist, const QString &album, const QString &coverPath) {
   const QFileInfo source(currentFile_);
   if (!source.isFile() || !source.isReadable() ||
       !QSet<QString>{"mp3", "flac", "m4a", "ogg", "opus"}.contains(source.suffix().toLower())) {
@@ -325,12 +325,43 @@ void PlaybackController::saveMusicTags(const QString &title, const QString &arti
     emit tagSaveFinished(false, "The edited copy already exists. Rename or move it first.");
     return;
   }
+  const QString selectedCover = QUrl(coverPath).isLocalFile() ? QUrl(coverPath).toLocalFile() : coverPath;
+  const bool withCover = !selectedCover.trimmed().isEmpty();
+  if (withCover) {
+    const QFileInfo cover(selectedCover);
+    if (source.suffix().compare("mp3", Qt::CaseInsensitive) != 0) {
+      emit tagSaveFinished(false, "Adding artwork currently supports MP3 files only.");
+      return;
+    }
+    if (!cover.isFile() || !cover.isReadable() || cover.size() > 15 * 1024 * 1024 ||
+        !QSet<QString>{"jpg", "jpeg", "png"}.contains(cover.suffix().toLower())) {
+      emit tagSaveFinished(false, "Choose a readable JPG or PNG image smaller than 15 MB.");
+      return;
+    }
+    QImage testImage(selectedCover);
+    if (testImage.isNull()) {
+      emit tagSaveFinished(false, "The selected image could not be decoded.");
+      return;
+    }
+  }
   auto *proc = new QProcess(this);
   QStringList args = {"-nostdin", "-hide_banner", "-loglevel", "error",
                       "-n", "-i", source.absoluteFilePath(), "-map", "0",
                       "-c", "copy", "-metadata", "title=" + title.left(300),
                       "-metadata", "artist=" + artist.left(300),
                       "-metadata", "album=" + album.left(300), output};
+  if (withCover) {
+    // Preserve the audio stream and attach one image as ID3 cover art.
+    args = {"-nostdin", "-hide_banner", "-loglevel", "error", "-n",
+            "-i", source.absoluteFilePath(), "-i", selectedCover,
+            "-map", "0:a:0", "-map", "1:v:0", "-c:a", "copy",
+            "-c:v", "mjpeg", "-disposition:v:0", "attached_pic",
+            "-metadata:s:v:0", "title=Album cover",
+            "-metadata:s:v:0", "comment=Cover (front)",
+            "-metadata", "title=" + title.left(300),
+            "-metadata", "artist=" + artist.left(300),
+            "-metadata", "album=" + album.left(300), "-id3v2_version", "3", output};
+  }
   proc->setProgram(ffmpeg);
   proc->setArguments(args);
   connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
