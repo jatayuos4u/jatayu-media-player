@@ -149,6 +149,20 @@ ApplicationWindow {
         property bool selectedFolder: false
         property bool showingRecent: false
         property bool searchEverywhere: false
+        function chooseIndex(i) {
+            if (i < 0 || i >= entries.length) return
+            browserList.currentIndex = i
+            const item = entries[i]
+            selectedPath = item.path
+            selectedName = item.name
+            selectedFolder = item.directory
+            browserList.positionViewAtIndex(i, ListView.Contain)
+        }
+        function openSelected() {
+            if (!selectedPath) return
+            if (selectedFolder) navigate(selectedPath)
+            else { window.enqueue(selectedPath, selectedName, true); close() }
+        }
         Timer { id: searchDelay; interval: 350; onTriggered: mediaBrowser.refresh() }
         function showRecent() {
             showingRecent = true
@@ -181,6 +195,7 @@ ApplicationWindow {
         onOpened: {
             if (currentPath.length === 0) currentPath = player.locationPath("Home")
             refresh()
+            browserList.forceActiveFocus()
         }
         background: Rectangle { color: "#1B2836"; radius: 12; border.color: "#35475A" }
         header: Rectangle {
@@ -322,6 +337,15 @@ ApplicationWindow {
                     radius: 7
                     ListView {
                         id: browserList
+                        focus: true
+                        keyNavigationEnabled: false
+                        currentIndex: -1
+                        Keys.onDownPressed: function(event) { mediaBrowser.chooseIndex(Math.min(count - 1, currentIndex + 1)); event.accepted = true }
+                        Keys.onUpPressed: function(event) { mediaBrowser.chooseIndex(currentIndex < 0 ? 0 : Math.max(0, currentIndex - 1)); event.accepted = true }
+                        Keys.onReturnPressed: function(event) { mediaBrowser.openSelected(); event.accepted = true }
+                        Keys.onEnterPressed: function(event) { mediaBrowser.openSelected(); event.accepted = true }
+                        Keys.onHomePressed: function(event) { mediaBrowser.chooseIndex(0); event.accepted = true }
+                        Keys.onEndPressed: function(event) { mediaBrowser.chooseIndex(count - 1); event.accepted = true }
                         anchors.fill: parent
                         anchors.leftMargin: 6
                         anchors.topMargin: 6
@@ -329,7 +353,12 @@ ApplicationWindow {
                         anchors.rightMargin: 18
                         clip: true
                         boundsBehavior: Flickable.StopAtBounds
-                        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn; width: 9 }
+                        ScrollBar.vertical: ScrollBar {
+                            policy: ScrollBar.AlwaysOn
+                            width: 12
+                            contentItem: Rectangle { implicitWidth: 12; radius: 6; color: "#63B8E9" }
+                            background: Rectangle { color: "#263B4B"; radius: 6 }
+                        }
                         spacing: 3
                         model: mediaBrowser.entries
                         delegate: ItemDelegate {
@@ -338,6 +367,8 @@ ApplicationWindow {
                             height: 46
                             highlighted: mediaBrowser.selectedPath === modelData.path
                             onClicked: {
+                                browserList.forceActiveFocus()
+                                browserList.currentIndex = index
                                 mediaBrowser.selectedPath = modelData.path
                                 mediaBrowser.selectedName = modelData.name
                                 mediaBrowser.selectedFolder = modelData.directory
