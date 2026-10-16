@@ -15,8 +15,9 @@ ApplicationWindow {
     property color textColor: "#E9F1F7"
     property color muted: "#8496A8"
     property bool forceMusicMode: false
+    property bool forceVideoMode: false
     readonly property bool audioTrack: ["mp3", "flac", "wav", "ogg", "opus", "m4a", "aac", "wma", "alac"].includes(player.title.toLowerCase().split(".").pop())
-    readonly property bool musicMode: audioTrack || forceMusicMode
+    readonly property bool musicMode: !forceVideoMode && (audioTrack || forceMusicMode)
     property var mediaQueue: []
     property bool restoredSettings: false
     property string repeatMode: "Off"
@@ -594,11 +595,12 @@ ApplicationWindow {
                 Item { Layout.fillWidth: true }
                 Button { text: "Browse media"; onClicked: mediaBrowser.open() }
                 Button { text: "Queue (" + mediaQueue.length + ")"; onClicked: queueDialog.open() }
-                Button { text: window.musicMode ? "Video view" : "Music view"; onClicked: window.forceMusicMode = !window.forceMusicMode }
-                Button { text: "Recent"; onClicked: { mediaBrowser.open(); mediaBrowser.showRecent() } }
-                Label { text: "Quality"; color: "#9BB0C1" }
+                Button { text: window.musicMode ? "Video view" : "Music view"; onClicked: { window.forceVideoMode = window.musicMode; window.forceMusicMode = !window.forceVideoMode } }
+                Button { text: "Recent"; visible: window.width >= 1450; onClicked: { mediaBrowser.open(); mediaBrowser.showRecent() } }
+                Label { text: "Quality"; visible: window.width >= 1450; color: "#9BB0C1" }
                 ComboBox {
                     id: videoQualityPicker
+                    visible: window.width >= 1450
                     Layout.preferredWidth: 144
                     model: ["Performance", "Balanced"]
                     currentIndex: Math.max(0, model.indexOf(player.qualityProfile))
@@ -606,8 +608,18 @@ ApplicationWindow {
                     ToolTip.visible: hovered
                     ToolTip.text: "High Quality is temporarily disabled pending graphics stability testing."
                 }
-                Button { text: "Subtitles"; onClicked: subtitleDialog.open() }
-                Button { text: "Caption tools"; onClicked: captionTools.open() }
+                Button { text: "Subtitles"; visible: window.width >= 1450; onClicked: subtitleDialog.open() }
+                Button { text: "Caption tools"; visible: window.width >= 1450; onClicked: captionTools.open() }
+                Button { text: "More ▾"; onClicked: toolsMenu.popup() }
+                Menu {
+                    id: toolsMenu
+                    MenuItem { text: "Recent files"; onTriggered: { mediaBrowser.open(); mediaBrowser.showRecent() } }
+                    MenuItem { text: "Load subtitles"; onTriggered: subtitleDialog.open() }
+                    MenuItem { text: "Subtitle settings"; onTriggered: captionTools.open() }
+                    MenuSeparator {}
+                    MenuItem { text: "Quality: Performance"; onTriggered: player.setQualityProfile("Performance") }
+                    MenuItem { text: "Quality: Balanced"; onTriggered: player.setQualityProfile("Balanced") }
+                }
             }
         }
         Rectangle {
@@ -640,7 +652,7 @@ ApplicationWindow {
                     }
                     Label {
                         Layout.fillWidth: true
-                        text: (player.artist.length ? player.artist : "Unknown artist") + (player.album.length ? "  •  " + player.album : "")
+                        text: (player.artist.length ? player.artist : "Artist not tagged") + (player.album.length ? "  •  " + player.album : "")
                         font.pixelSize: 13
                         color: "#9AB6C9"
                         horizontalAlignment: Text.AlignHCenter
