@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
   QGuiApplication app(argc, argv);
   QGuiApplication::setApplicationName("Jatayu Media Player");
   QGuiApplication::setOrganizationName("Jatayu");
+  QGuiApplication::setDesktopFileName("jatayu-media-player");
   app.setWindowIcon(QIcon(":/icons/jatayu-media-player.svg"));
   // libmpv requires the C numeric locale for number parsing.
   // Keep the system language and other locale categories unchanged.
