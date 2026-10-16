@@ -1220,6 +1220,13 @@ ApplicationWindow {
                         onToggled: userPreferences.showHelpHints = checked
                     }
                     Label { text: "Private local playback without an account."; color: "#C0D3DF" }
+                    Button { text: "Restore playback and interface defaults"; onClicked: resetPreferencesConfirm.open() }
+                    Label {
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                        color: "#9CB1C4"
+                        text: "Resets volume, playback speed, video quality, resume and queue preferences, and interface hints. Your songs and saved playlists are not deleted."
+                    }
                     Item { Layout.fillHeight: true }
                 }
                 ColumnLayout {
@@ -1300,10 +1307,50 @@ ApplicationWindow {
                         text: "No built-in advertising or telemetry. Media history, playlists, and preferences remain on this computer."
                     }
                     Button { text: "View recent files"; onClicked: { preferencesDialog.close(); mediaBrowser.open(); mediaBrowser.showRecent() } }
+                    Button { text: "Clear recent-file history…"; onClicked: clearRecentConfirm.open() }
+                    Button { text: "Clear saved playback positions…"; onClicked: clearResumeConfirm.open() }
+                    Label {
+                        Layout.fillWidth: true
+                        color: "#9CB1C4"
+                        wrapMode: Text.WordWrap
+                        text: "These actions only remove Jatayu Media Player's stored history. Original media files, album artwork and named playlists are not deleted."
+                    }
                     Item { Layout.fillHeight: true }
                 }
             }
         }
+    }
+    Dialog {
+        id: clearRecentConfirm
+        title: "Clear recent files?"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        standardButtons: Dialog.Yes | Dialog.Cancel
+        onAccepted: player.clearRecentMedia()
+        Label { text: "Remove the locally stored recent-file list?\nYour media files will remain untouched."; color: "#E9F1F7"; wrapMode: Text.WordWrap; width: 330 }
+    }
+    Dialog {
+        id: clearResumeConfirm
+        title: "Clear resume positions?"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        standardButtons: Dialog.Yes | Dialog.Cancel
+        onAccepted: player.clearResumePositions()
+        Label { text: "Forget all saved playback positions?\nYour songs, videos and playlists remain untouched."; color: "#E9F1F7"; wrapMode: Text.WordWrap; width: 330 }
+    }
+    Dialog {
+        id: resetPreferencesConfirm
+        title: "Restore default preferences?"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        standardButtons: Dialog.Yes | Dialog.Cancel
+        onAccepted: {
+            userPreferences.resumeEnabled = true
+            userPreferences.rememberQueue = true
+            userPreferences.showHelpHints = true
+            player.resetPlaybackPreferences()
+        }
+        Label { text: "Restore default playback settings and interface hints?\nThis does not remove media or named playlists."; color: "#E9F1F7"; wrapMode: Text.WordWrap; width: 350 }
     }
     Dialog {
         id: playbackOptions
