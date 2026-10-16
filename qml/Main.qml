@@ -417,6 +417,12 @@ ApplicationWindow {
             }
         }
     }
+    FileDialog {
+        id: coverChooser
+        title: "Choose album artwork"
+        nameFilters: ["Cover images (*.jpg *.jpeg *.png)"]
+        onAccepted: editTags.coverPath = selectedFile.toString()
+    }
     Dialog {
         id: editTags
         title: "Edit music information"
@@ -425,16 +431,21 @@ ApplicationWindow {
         width: Math.min(window.width - 24, 470)
         standardButtons: Dialog.Cancel
         property string feedback: ""
+        property string coverPath: ""
+        property bool saving: false
         onOpened: {
             titleField.text = player.songTitle
             artistField.text = player.artist
             albumField.text = player.album
             feedback = ""
+            coverPath = ""
+            saving = false
         }
         Connections {
             target: player
             function onTagSaveFinished(success, message) {
                 editTags.feedback = message
+                editTags.saving = false
             }
         }
         ColumnLayout {
@@ -447,10 +458,26 @@ ApplicationWindow {
             TextField { id: artistField; Layout.fillWidth: true; selectByMouse: true }
             Label { text: "Album"; color: "#E9F1F7" }
             TextField { id: albumField; Layout.fillWidth: true; selectByMouse: true }
+            Label { text: "Album artwork (optional, MP3 only)"; color: "#E9F1F7" }
+            RowLayout {
+                Layout.fillWidth: true
+                Button { text: "Choose cover image"; onClicked: coverChooser.open() }
+                Button { text: "Clear"; enabled: editTags.coverPath.length > 0; onClicked: editTags.coverPath = "" }
+            }
+            Image {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 120
+                Layout.preferredHeight: 120
+                source: editTags.coverPath.length ? editTags.coverPath : player.artworkUrl
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
+                visible: source.toString().length > 0 && status === Image.Ready
+            }
             Button {
-                text: "Save edited copy"
+                text: editTags.saving ? "Saving…" : "Save edited copy"
+                enabled: !editTags.saving
                 Layout.alignment: Qt.AlignRight
-                onClicked: player.saveMusicTags(titleField.text, artistField.text, albumField.text)
+                onClicked: { editTags.saving = true; player.saveMusicTags(titleField.text, artistField.text, albumField.text, editTags.coverPath) }
             }
             Label { text: editTags.feedback; color: "#B7C8D8"; wrapMode: Text.WrapAnywhere; Layout.fillWidth: true }
         }
