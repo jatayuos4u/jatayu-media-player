@@ -34,6 +34,7 @@ public:
   QString qualityProfile() const { return qualityProfile_; }
   Q_INVOKABLE void setQualityProfile(const QString &profile);
   Q_INVOKABLE void openFile(const QString &path);
+  Q_INVOKABLE void saveMusicTags(const QString &title, const QString &artist, const QString &album);
   Q_INVOKABLE QString locationPath(const QString &name) const;
   Q_INVOKABLE QVariantList browseFolder(const QString &path, const QString &filter) const;
   Q_INVOKABLE QVariantList recentMedia() const;
@@ -57,6 +58,7 @@ signals:
   void volumeChanged();
   void titleChanged();
   void metadataChanged();
+  void tagSaveFinished(bool success, QString message);
   void errorChanged();
   void engineEvent();
   void recentMediaChanged();
@@ -71,6 +73,6 @@ private:
   double position_ = 0, duration_ = 0, volume_ = 70;
   QString title_ = "No media selected", error_;
   QString qualityProfile_ = "Balanced";
-  QString songTitle_, artist_, album_, artworkUrl_;
+  QString songTitle_, artist_, album_, artworkUrl_, currentFile_;
   QProcess *artworkProcess_ = nullptr;
 };
