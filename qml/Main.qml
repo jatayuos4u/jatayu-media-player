@@ -10,6 +10,7 @@ ApplicationWindow {
     width: 1100; height: 680
     minimumWidth: 650; minimumHeight: 430
     title: "Jatayu Media Player — " + player.title
+    icon.source: "qrc:/icons/jatayu-media-player.svg"
     color: "#101820"
     property color accent: "#1689E8"
     property color textColor: "#E9F1F7"
