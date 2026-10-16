@@ -1177,37 +1177,56 @@ ApplicationWindow {
         title: "Preferences"
         modal: true
         anchors.centerIn: Overlay.overlay
-        width: Math.min(window.width - 24, 570)
-        height: Math.min(window.height - 24, 500)
+        width: Math.min(window.width - 24, 800)
+        height: Math.min(window.height - 24, 545)
         standardButtons: Dialog.Close
-        ColumnLayout {
+        property int section: 0
+        readonly property var pages: ["General", "Playback", "Audio", "Video", "Subtitles", "Library", "Shortcuts", "Privacy"]
+        background: Rectangle { color: "#151F2B"; border.color: "#35475A"; radius: 10 }
+        RowLayout {
             anchors.fill: parent
             spacing: 12
-            TabBar {
-                id: preferencesTabs
-                Layout.fillWidth: true
-                TabButton { text: "General" }
-                TabButton { text: "Playback" }
-                TabButton { text: "Audio" }
-                TabButton { text: "Video" }
-                TabButton { text: "Privacy" }
+            Rectangle {
+                Layout.preferredWidth: Math.min(170, preferencesDialog.width * 0.28)
+                Layout.fillHeight: true
+                color: "#182A3C"
+                radius: 7
+                ListView {
+                    id: preferencesNavigation
+                    anchors.fill: parent
+                    anchors.margins: 6
+                    clip: true
+                    model: preferencesDialog.pages
+                    delegate: ItemDelegate {
+                        required property int index
+                        required property string modelData
+                        width: preferencesNavigation.width
+                        text: modelData
+                        highlighted: preferencesDialog.section === index
+                        onClicked: preferencesDialog.section = index
+                    }
+                }
             }
             StackLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                currentIndex: preferencesTabs.currentIndex
+                currentIndex: preferencesDialog.section
                 ColumnLayout {
+                    spacing: 12
+                    Label { text: "General"; font.pixelSize: 19; color: "#E9F1F7" }
                     CheckBox {
                         text: "Show helpful interface hints"
                         checked: userPreferences.showHelpHints
                         onToggled: userPreferences.showHelpHints = checked
                     }
-                    Label { text: "The player works locally without an account."; color: "#C0D3DF" }
+                    Label { text: "Private local playback without an account."; color: "#C0D3DF" }
                     Item { Layout.fillHeight: true }
                 }
                 ColumnLayout {
+                    spacing: 12
+                    Label { text: "Playback"; font.pixelSize: 19; color: "#E9F1F7" }
                     CheckBox {
-                        text: "Remember playback position for longer files"
+                        text: "Resume longer media files"
                         checked: userPreferences.resumeEnabled
                         onToggled: userPreferences.resumeEnabled = checked
                     }
@@ -1216,38 +1235,71 @@ ApplicationWindow {
                         checked: userPreferences.rememberQueue
                         onToggled: userPreferences.rememberQueue = checked
                     }
-                    Button { text: "Playback speed and audio tracks"; onClicked: playbackOptions.open() }
-                    Item { Layout.fillHeight: true }
-                }
-                ColumnLayout {
-                    Label { text: "Volume: " + Math.round(player.volume) + "%"; color: "#C0D3DF" }
-                    Slider {
+                    Label { text: "Speed: " + Number(player.playbackSpeed.toFixed(2)) + "×"; color: "#C0D3DF" }
+                    RowLayout {
                         Layout.fillWidth: true
-                        from: 0; to: 100
-                        value: player.volume
-                        onMoved: player.setVolume(value)
+                        Button { text: "0.75×"; onClicked: player.setPlaybackSpeed(0.75) }
+                        Button { text: "1×"; onClicked: player.setPlaybackSpeed(1) }
+                        Button { text: "1.25×"; onClicked: player.setPlaybackSpeed(1.25) }
+                        Button { text: "1.5×"; onClicked: player.setPlaybackSpeed(1.5) }
                     }
-                    Button { text: "Select audio track"; onClicked: playbackOptions.open() }
                     Item { Layout.fillHeight: true }
                 }
                 ColumnLayout {
-                    Label { text: "Rendering quality"; color: "#C0D3DF" }
+                    spacing: 12
+                    Label { text: "Audio"; font.pixelSize: 19; color: "#E9F1F7" }
+                    Label { text: "Volume: " + Math.round(player.volume) + "%"; color: "#C0D3DF" }
+                    Slider { Layout.fillWidth: true; from: 0; to: 100; value: player.volume; onMoved: player.setVolume(value) }
+                    Label { text: "Audio tracks: " + player.audioTracks.length; color: "#C0D3DF" }
+                    Button { text: "Open audio track selector"; onClicked: { preferencesDialog.close(); playbackOptions.open() } }
+                    Item { Layout.fillHeight: true }
+                }
+                ColumnLayout {
+                    spacing: 12
+                    Label { text: "Video"; font.pixelSize: 19; color: "#E9F1F7" }
+                    Label { text: "Video scaling quality"; color: "#C0D3DF" }
                     ComboBox {
+                        Layout.fillWidth: true
                         model: ["Performance", "Balanced"]
                         currentIndex: player.qualityProfile === "Performance" ? 0 : 1
                         onActivated: player.setQualityProfile(currentText)
                     }
-                    Label { text: "High Quality remains disabled until graphics stability tests pass."; wrapMode: Text.WordWrap; color: "#C0D3DF"; Layout.fillWidth: true }
+                    Label {
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                        text: "Advanced GPU profiles are unavailable until tested on more hardware."
+                        color: "#C0D3DF"
+                    }
                     Item { Layout.fillHeight: true }
                 }
                 ColumnLayout {
+                    spacing: 12
+                    Label { text: "Subtitles"; font.pixelSize: 19; color: "#E9F1F7" }
+                    Button { text: "Open subtitle appearance and delay"; onClicked: { preferencesDialog.close(); captionTools.open() } }
+                    Button { text: "Load subtitle file"; onClicked: { preferencesDialog.close(); subtitleDialog.open() } }
+                    Item { Layout.fillHeight: true }
+                }
+                ColumnLayout {
+                    spacing: 12
+                    Label { text: "Music library"; font.pixelSize: 19; color: "#E9F1F7" }
+                    Button { text: "Browse library and refresh songs"; onClicked: { preferencesDialog.close(); libraryDialog.open() } }
+                    Button { text: "Manage playlists"; onClicked: { preferencesDialog.close(); namedPlaylistsDialog.open() } }
+                    Item { Layout.fillHeight: true }
+                }
+                ColumnLayout {
+                    spacing: 12
+                    Label { text: "Keyboard shortcuts"; font.pixelSize: 19; color: "#E9F1F7" }
+                    Label { text: "Use Space for play/pause, F for fullscreen, and arrow keys to seek."; color: "#C0D3DF"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Button { text: "View all shortcuts"; onClicked: { preferencesDialog.close(); shortcutsHelp.open() } }
+                    Item { Layout.fillHeight: true }
+                }
+                ColumnLayout {
+                    spacing: 12
+                    Label { text: "Privacy"; font.pixelSize: 19; color: "#E9F1F7" }
                     Label {
-                        Layout.fillWidth: true
-                        wrapMode: Text.WordWrap
-                        text: "No account, advertisements, or built-in analytics. Playback history, saved playlists and preferences stay on this computer. Network media may access remote services if you open a network stream."
-                        color: "#C0D3DF"
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap; color: "#C0D3DF"
+                        text: "No built-in advertising or telemetry. Media history, playlists, and preferences remain on this computer."
                     }
-                    Button { text: "Show recent files"; onClicked: { preferencesDialog.close(); mediaBrowser.showRecent(); mediaBrowser.open() } }
+                    Button { text: "View recent files"; onClicked: { preferencesDialog.close(); mediaBrowser.open(); mediaBrowser.showRecent() } }
                     Item { Layout.fillHeight: true }
                 }
             }
