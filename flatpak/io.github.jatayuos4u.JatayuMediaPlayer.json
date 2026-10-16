@@ -32,7 +32,8 @@
       ],
       "post-install": [
         "sed -i 's/^Icon=jatayu-media-player$/Icon=io.github.jatayuos4u.JatayuMediaPlayer/' /app/share/applications/jatayu-media-player.desktop",
-        "install -Dm644 ../flatpak/io.github.jatayuos4u.JatayuMediaPlayer.metainfo.xml /app/share/metainfo/io.github.jatayuos4u.JatayuMediaPlayer.metainfo.xml"
+        "install -Dm644 ../flatpak/io.github.jatayuos4u.JatayuMediaPlayer.metainfo.xml /app/share/metainfo/io.github.jatayuos4u.JatayuMediaPlayer.metainfo.xml",
+        "rm -f /app/share/applications/mpv.desktop /app/share/metainfo/mpv.metainfo.xml /app/share/appdata/mpv.appdata.xml /app/share/icons/hicolor/scalable/apps/mpv.svg /app/share/icons/hicolor/symbolic/apps/mpv-symbolic.svg"
       ]
     }
   ],
