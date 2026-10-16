@@ -10,13 +10,13 @@ ApplicationWindow {
     width: 1100; height: 680
     minimumWidth: 650; minimumHeight: 430
     title: "Jatayu Media Player — " + player.title
-    icon.source: "qrc:/icons/jatayu-media-player.svg"
+    icon: "qrc:/icons/jatayu-media-player.svg"
     color: "#101820"
     property color accent: "#1689E8"
     property color textColor: "#E9F1F7"
     property color muted: "#8496A8"
     property bool forceMusicMode: false
-    readonly property bool audioTrack: /\\.(mp3|flac|wav|ogg|opus|m4a|aac|wma|alac)$/i.test(player.title)
+    readonly property bool audioTrack: ["mp3", "flac", "wav", "ogg", "opus", "m4a", "aac", "wma", "alac"].includes(player.title.toLowerCase().split(".").pop())
     readonly property bool musicMode: audioTrack || forceMusicMode
     property var mediaQueue: []
     property bool restoredSettings: false
