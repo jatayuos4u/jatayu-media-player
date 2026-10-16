@@ -2,6 +2,7 @@
 #include <QObject>
 #include <QString>
 #include <QVariantList>
+#include <QProcess>
 #include <mpv/client.h>
 class PlaybackController : public QObject {
   Q_OBJECT
@@ -13,6 +14,7 @@ class PlaybackController : public QObject {
   Q_PROPERTY(QString songTitle READ songTitle NOTIFY metadataChanged)
   Q_PROPERTY(QString artist READ artist NOTIFY metadataChanged)
   Q_PROPERTY(QString album READ album NOTIFY metadataChanged)
+  Q_PROPERTY(QString artworkUrl READ artworkUrl NOTIFY metadataChanged)
   Q_PROPERTY(QString error READ error NOTIFY errorChanged)
   Q_PROPERTY(QString qualityProfile READ qualityProfile NOTIFY qualityProfileChanged)
 public:
@@ -27,6 +29,7 @@ public:
   QString songTitle() const { return songTitle_; }
   QString artist() const { return artist_; }
   QString album() const { return album_; }
+  QString artworkUrl() const { return artworkUrl_; }
   QString error() const { return error_; }
   QString qualityProfile() const { return qualityProfile_; }
   Q_INVOKABLE void setQualityProfile(const QString &profile);
@@ -62,10 +65,12 @@ signals:
 private:
   static void wakeup(void *ctx);
   void setError(QString message);
+  void loadLocalArtwork(const QString &path);
   mpv_handle *handle_ = nullptr;
   bool paused_ = true;
   double position_ = 0, duration_ = 0, volume_ = 70;
   QString title_ = "No media selected", error_;
   QString qualityProfile_ = "Balanced";
-  QString songTitle_, artist_, album_;
+  QString songTitle_, artist_, album_, artworkUrl_;
+  QProcess *artworkProcess_ = nullptr;
 };
