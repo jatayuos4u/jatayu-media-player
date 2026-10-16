@@ -39,7 +39,8 @@ PlaybackController::PlaybackController(QObject *parent) : QObject(parent) {
   mpv_observe_property(handle_, 8, "aid", MPV_FORMAT_NODE);
   mpv_set_wakeup_callback(handle_, &PlaybackController::wakeup, this);
   connect(this, &PlaybackController::engineEvent, this, &PlaybackController::processEvents, Qt::QueuedConnection);
-  setVolume(70);
+  setVolume(std::clamp(QSettings().value("playbackVolume", 70.0).toDouble(), 0.0, 100.0));
+  setPlaybackSpeed(std::clamp(QSettings().value("playbackSpeed", 1.0).toDouble(), 0.5, 2.0));
   const QString savedQuality = QSettings().value("videoQualityProfile", "Balanced").toString();
   setQualityProfile(savedQuality);
 }
@@ -84,11 +85,12 @@ void PlaybackController::seek(double seconds) {
   const char *args[] = {"seek", t.constData(), "absolute+exact", nullptr}; mpv_command_async(handle_, 0, args);
 }
 void PlaybackController::seekRelative(double seconds) { seek(position_ + seconds); }
-void PlaybackController::setVolume(double value) { double v = std::clamp(value, 0.0, 100.0); mpv_set_property_async(handle_, 0, "volume", MPV_FORMAT_DOUBLE, &v); }
+void PlaybackController::setVolume(double value) { double v = std::clamp(value, 0.0, 100.0); mpv_set_property_async(handle_, 0, "volume", MPV_FORMAT_DOUBLE, &v); QSettings().setValue("playbackVolume", v); }
 void PlaybackController::setPlaybackSpeed(double speed) {
   double v = std::clamp(speed, 0.5, 2.0);
   const int status = mpv_set_property(handle_, "speed", MPV_FORMAT_DOUBLE, &v);
   if (status < 0) setError(QString::fromUtf8(mpv_error_string(status)));
+  else QSettings().setValue("playbackSpeed", v);
 }
 void PlaybackController::selectAudioTrack(int id) {
   if (id < 0) {
