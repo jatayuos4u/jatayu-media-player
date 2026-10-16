@@ -147,6 +147,41 @@ ApplicationWindow {
         property string selectedPath: ""
         property string selectedName: ""
         property bool selectedFolder: false
+        property var selectedFiles: ({})
+        property int selectionAnchor: -1
+        readonly property int selectedFileCount: Object.keys(selectedFiles).length
+        function selectFile(i, modifiers) {
+            if (i < 0 || i >= entries.length) return
+            const item = entries[i]
+            chooseIndex(i)
+            if (item.directory) {
+                if (!(modifiers & (Qt.ControlModifier | Qt.ShiftModifier))) selectedFiles = ({})
+                return
+            }
+            const selected = Object.assign({}, selectedFiles)
+            if ((modifiers & Qt.ShiftModifier) && selectionAnchor >= 0) {
+                for (let n = Math.min(i, selectionAnchor); n <= Math.max(i, selectionAnchor); n++) {
+                    const candidate = entries[n]
+                    if (!candidate.directory) selected[candidate.path] = {path:candidate.path, name:candidate.name}
+                }
+            } else if (modifiers & Qt.ControlModifier) {
+                if (selected[item.path]) delete selected[item.path]
+                else selected[item.path] = {path:item.path, name:item.name}
+                selectionAnchor = i
+            } else {
+                selectedFiles = ({[item.path]: {path:item.path, name:item.name}})
+                selectionAnchor = i
+                return
+            }
+            selectedFiles = selected
+        }
+        function addSelectedToQueue() {
+            const files = Object.values(selectedFiles)
+            if (files.length === 0 && selectedPath && !selectedFolder)
+                files.push({path:selectedPath, name:selectedName})
+            for (const file of files) window.enqueue(file.path, file.name, false)
+            if (files.length > 0) close()
+        }
         property bool showingRecent: false
         property bool searchEverywhere: false
         function chooseIndex(i) {
@@ -170,6 +205,8 @@ ApplicationWindow {
             currentPath = "Recent files"
             selectedPath = ""
             selectedName = ""
+            selectedFiles = ({})
+            selectionAnchor = -1
             browserSearch.text = ""
             entries = player.recentMedia()
         }
@@ -183,6 +220,8 @@ ApplicationWindow {
             refresh()
         }
         function refresh() {
+            selectedFiles = ({})
+            selectionAnchor = -1
             if (showingRecent) {
                 let search = browserSearch.text.toLowerCase()
                 entries = player.recentMedia().filter(item => item.name.toLowerCase().includes(search))
@@ -373,9 +412,9 @@ ApplicationWindow {
                             required property var modelData
                             width: browserList.width
                             height: 46
-                            highlighted: mediaBrowser.selectedPath === modelData.path
+                            highlighted: !!mediaBrowser.selectedFiles[modelData.path] || mediaBrowser.selectedPath === modelData.path
                             onClicked: {
-                                mediaBrowser.chooseIndex(index)
+                                mediaBrowser.selectFile(index, Qt.application.keyboardModifiers)
                                 browserList.forceActiveFocus()
                             }
                             onDoubleClicked: {
@@ -424,17 +463,14 @@ ApplicationWindow {
                 spacing: 10
                 Label {
                     Layout.fillWidth: true
-                    text: mediaBrowser.selectedName.length ? mediaBrowser.selectedName : "Select a media file or folder"
+                    text: mediaBrowser.selectedFileCount > 1 ? mediaBrowser.selectedFileCount + " files selected" : (mediaBrowser.selectedName.length ? mediaBrowser.selectedName : "Select a media file or folder")
                     color: "#E9F1F7"
                     elide: Text.ElideMiddle
                 }
                 Button {
-                    text: "Add to queue"
-                    enabled: mediaBrowser.selectedPath.length > 0 && !mediaBrowser.selectedFolder
-                    onClicked: {
-                        window.enqueue(mediaBrowser.selectedPath, mediaBrowser.selectedName, false)
-                        mediaBrowser.close()
-                    }
+                    text: mediaBrowser.selectedFileCount > 1 ? "Add " + mediaBrowser.selectedFileCount + " to queue" : "Add to queue"
+                    enabled: mediaBrowser.selectedFileCount > 0 || (mediaBrowser.selectedPath.length > 0 && !mediaBrowser.selectedFolder)
+                    onClicked: mediaBrowser.addSelectedToQueue()
                 }
                 Button {
                     text: mediaBrowser.selectedFolder ? "Open folder" : "Play selected"
