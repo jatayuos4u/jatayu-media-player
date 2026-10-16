@@ -40,6 +40,7 @@ public:
   QString qualityProfile() const { return qualityProfile_; }
   Q_INVOKABLE void setQualityProfile(const QString &profile);
   Q_INVOKABLE void openFile(const QString &path);
+  Q_INVOKABLE QString mediaInformation() const;
   Q_INVOKABLE void saveMusicTags(const QString &title, const QString &artist, const QString &album, const QString &coverPath = QString(), const QString &outputName = QString());
   Q_INVOKABLE QString locationPath(const QString &name) const;
   Q_INVOKABLE QVariantList browseFolder(const QString &path, const QString &filter) const;
@@ -94,4 +95,5 @@ private:
   QProcess *artworkProcess_ = nullptr;
   QProcess *libraryProbe_ = nullptr;
   QStringList pendingMusicFiles_;
+  double lastSavedPosition_ = -1;
 };
