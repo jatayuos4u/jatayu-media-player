@@ -414,7 +414,7 @@ ApplicationWindow {
                             height: 46
                             highlighted: !!mediaBrowser.selectedFiles[modelData.path] || mediaBrowser.selectedPath === modelData.path
                             onClicked: {
-                                mediaBrowser.selectFile(index, Qt.application.keyboardModifiers)
+                                mediaBrowser.selectFile(index, Qt.NoModifier)
                                 browserList.forceActiveFocus()
                             }
                             onDoubleClicked: {
@@ -431,6 +431,16 @@ ApplicationWindow {
                             }
                             contentItem: RowLayout {
                                 spacing: 10
+                                CheckBox {
+                                    visible: !modelData.directory
+                                    checked: !!mediaBrowser.selectedFiles[modelData.path]
+                                    onClicked: {
+                                        mediaBrowser.selectFile(index, Qt.ControlModifier)
+                                        browserList.forceActiveFocus()
+                                    }
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: "Select for bulk queue"
+                                }
                                 Label {
                                     text: modelData.directory ? "▸" : "▶"
                                     color: "#59B8FF"
