@@ -554,6 +554,14 @@ ApplicationWindow {
                         Label { Layout.fillWidth: true; text: (modelData.displayTitle || modelData.name) + (modelData.artist ? "  ·  " + modelData.artist : ""); color: "#E9F1F7"; elide: Text.ElideMiddle }
                         Button { text: "Play"; onClicked: { window.enqueue(modelData.path, modelData.name, true); libraryDialog.close() } }
                         Button { text: "Add to queue"; onClicked: window.enqueue(modelData.path, modelData.name, false) }
+                        Button {
+                            text: "Playlist +"
+                            onClicked: {
+                                window.pendingPlaylistEntry = {path: modelData.path, name: modelData.name}
+                                libraryDialog.close()
+                                namedPlaylistsDialog.open()
+                            }
+                        }
                     }
                 }
             }
@@ -567,6 +575,7 @@ ApplicationWindow {
         width: Math.min(window.width - 24, 650)
         height: Math.min(window.height - 24, 530)
         standardButtons: Dialog.Close
+        onClosed: window.pendingPlaylistEntry = null
         ColumnLayout {
             anchors.fill: parent
             spacing: 10
