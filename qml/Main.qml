@@ -286,6 +286,7 @@ ApplicationWindow {
                         anchors.margins: 7
                         clip: true
                         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                        ScrollBar.vertical.policy: ScrollBar.AlwaysOn
                         Column {
                             width: 145
                             spacing: 5
@@ -322,8 +323,13 @@ ApplicationWindow {
                     ListView {
                         id: browserList
                         anchors.fill: parent
-                        anchors.margins: 6
+                        anchors.leftMargin: 6
+                        anchors.topMargin: 6
+                        anchors.bottomMargin: 6
+                        anchors.rightMargin: 18
                         clip: true
+                        boundsBehavior: Flickable.StopAtBounds
+                        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn; width: 9 }
                         spacing: 3
                         model: mediaBrowser.entries
                         delegate: ItemDelegate {
