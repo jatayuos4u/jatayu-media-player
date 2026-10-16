@@ -124,7 +124,7 @@ void PlaybackController::processEvents() {
         case 2: {
           double x = *static_cast<double *>(prop->data);
           if (position_ != x) { position_ = x; emit positionChanged(); }
-          if (!currentFile_.isEmpty() && duration_ > 60 && x >= 10 &&
+          if (QSettings().value("UserPreferences/resumeEnabled", true).toBool() && !currentFile_.isEmpty() && duration_ > 60 && x >= 10 &&
               (lastSavedPosition_ < 0 || std::abs(x - lastSavedPosition_) >= 5)) {
             const QString key = "resume/" + QString::fromLatin1(QCryptographicHash::hash(
                  QFile::encodeName(currentFile_), QCryptographicHash::Sha256).toHex());
@@ -214,7 +214,7 @@ void PlaybackController::processEvents() {
         const QString key = "resume/" + QString::fromLatin1(QCryptographicHash::hash(
             QFile::encodeName(currentFile_), QCryptographicHash::Sha256).toHex());
         const double saved = QSettings().value(key, 0).toDouble();
-        if (saved >= 10 && (duration_ <= 0 || saved < duration_ - 15)) {
+        if (QSettings().value("UserPreferences/resumeEnabled", true).toBool() && saved >= 10 && (duration_ <= 0 || saved < duration_ - 15)) {
           const QByteArray t = QByteArray::number(saved, 'f', 2);
           const char *args[] = {"seek", t.constData(), "absolute", nullptr};
           mpv_command_async(handle_, 0, args);
