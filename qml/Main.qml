@@ -1302,7 +1302,7 @@ ApplicationWindow {
                 }
                 Button { text: "Subtitles"; visible: window.width >= 1450; onClicked: subtitleDialog.open() }
                 Button { text: "Caption tools"; visible: window.width >= 1450; onClicked: captionTools.open() }
-                Button { text: "Help ▾"; onClicked: helpMenu.popup() }
+                Button { text: "Help ▾"; visible: window.width >= 1350; onClicked: helpMenu.popup() }
                 Menu {
                     id: helpMenu
                     MenuItem { text: "Getting started"; onTriggered: gettingStartedDialog.open() }
@@ -1324,6 +1324,9 @@ ApplicationWindow {
                     MenuItem { text: "Subtitle settings"; onTriggered: captionTools.open() }
                     MenuItem { text: "Audio tracks and speed"; onTriggered: playbackOptions.open() }
                     MenuItem { text: "Keyboard shortcuts"; onTriggered: shortcutsHelp.open() }
+                    MenuItem { text: "Getting started"; onTriggered: gettingStartedDialog.open() }
+                    MenuItem { text: "Troubleshooting"; onTriggered: troubleshootingDialog.open() }
+                    MenuItem { text: "About Jatayu Media Player"; onTriggered: aboutPlayerDialog.open() }
                     MenuSeparator {}
                     MenuItem { text: "Quality: Performance"; onTriggered: player.setQualityProfile("Performance") }
                     MenuItem { text: "Quality: Balanced"; onTriggered: player.setQualityProfile("Balanced") }
