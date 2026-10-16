@@ -60,7 +60,7 @@ ApplicationWindow {
     Component.onCompleted: {
         try {
             const loaded = JSON.parse(playlistSettings.storedQueue)
-            if (Array.isArray(loaded))
+            if (Array.isArray(loaded) && playlistSettings.storedQueue !== "" && userPreferences.rememberQueue)
                 mediaQueue = loaded.filter(item => item && typeof item.path === "string" && typeof item.name === "string").slice(0, 500)
         } catch (e) { mediaQueue = [] }
         repeatMode = ["Off", "All", "One"].includes(playlistSettings.storedRepeat) ? playlistSettings.storedRepeat : "Off"
@@ -71,7 +71,7 @@ ApplicationWindow {
         } catch (e) { namedPlaylists = ({}) }
         restoredSettings = true
     }
-    onMediaQueueChanged: if (restoredSettings) playlistSettings.storedQueue = JSON.stringify(mediaQueue)
+    onMediaQueueChanged: if (restoredSettings && userPreferences.rememberQueue) playlistSettings.storedQueue = JSON.stringify(mediaQueue)
     onRepeatModeChanged: if (restoredSettings) playlistSettings.storedRepeat = repeatMode
     onShuffleEnabledChanged: if (restoredSettings) playlistSettings.storedShuffle = shuffleEnabled
     function advanceQueue() {
@@ -1121,6 +1121,94 @@ ApplicationWindow {
             Button { text: "Refresh"; onClicked: mediaInfoText.text = player.mediaInformation() }
         }
     }
+    Settings {
+        id: userPreferences
+        category: "UserPreferences"
+        property bool resumeEnabled: true
+        property bool rememberQueue: true
+        property bool showHelpHints: true
+    }
+    Dialog {
+        id: preferencesDialog
+        title: "Preferences"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(window.width - 24, 570)
+        height: Math.min(window.height - 24, 500)
+        standardButtons: Dialog.Close
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 12
+            TabBar {
+                id: preferencesTabs
+                Layout.fillWidth: true
+                TabButton { text: "General" }
+                TabButton { text: "Playback" }
+                TabButton { text: "Audio" }
+                TabButton { text: "Video" }
+                TabButton { text: "Privacy" }
+            }
+            StackLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                currentIndex: preferencesTabs.currentIndex
+                ColumnLayout {
+                    CheckBox {
+                        text: "Show helpful interface hints"
+                        checked: userPreferences.showHelpHints
+                        onToggled: userPreferences.showHelpHints = checked
+                    }
+                    Label { text: "The player works locally without an account."; color: "#C0D3DF" }
+                    Item { Layout.fillHeight: true }
+                }
+                ColumnLayout {
+                    CheckBox {
+                        text: "Remember playback position for longer files"
+                        checked: userPreferences.resumeEnabled
+                        onToggled: userPreferences.resumeEnabled = checked
+                    }
+                    CheckBox {
+                        text: "Remember playback queue"
+                        checked: userPreferences.rememberQueue
+                        onToggled: userPreferences.rememberQueue = checked
+                    }
+                    Button { text: "Playback speed and audio tracks"; onClicked: playbackOptions.open() }
+                    Item { Layout.fillHeight: true }
+                }
+                ColumnLayout {
+                    Label { text: "Volume: " + Math.round(player.volume) + "%"; color: "#C0D3DF" }
+                    Slider {
+                        Layout.fillWidth: true
+                        from: 0; to: 100
+                        value: player.volume
+                        onMoved: player.setVolume(value)
+                    }
+                    Button { text: "Select audio track"; onClicked: playbackOptions.open() }
+                    Item { Layout.fillHeight: true }
+                }
+                ColumnLayout {
+                    Label { text: "Rendering quality"; color: "#C0D3DF" }
+                    ComboBox {
+                        model: ["Performance", "Balanced"]
+                        currentIndex: player.qualityProfile === "Performance" ? 0 : 1
+                        onActivated: player.setQualityProfile(currentText)
+                    }
+                    Label { text: "High Quality remains disabled until graphics stability tests pass."; wrapMode: Text.WordWrap; color: "#C0D3DF"; Layout.fillWidth: true }
+                    Item { Layout.fillHeight: true }
+                }
+                ColumnLayout {
+                    Label {
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                        text: "No account, advertisements, or built-in analytics. Playback history, saved playlists and preferences stay on this computer. Network media may access remote services if you open a network stream."
+                        color: "#C0D3DF"
+                    }
+                    Button { text: "Show recent files"; onClicked: { preferencesDialog.close(); mediaBrowser.showRecent(); mediaBrowser.open() } }
+                    Item { Layout.fillHeight: true }
+                }
+            }
+        }
+    }
     Dialog {
         id: playbackOptions
         title: "Playback options"
@@ -1395,6 +1483,7 @@ ApplicationWindow {
                     MenuItem { text: "Load subtitles"; onTriggered: subtitleDialog.open() }
                     MenuItem { text: "Subtitle settings"; onTriggered: captionTools.open() }
                     MenuItem { text: "Audio tracks and speed"; onTriggered: playbackOptions.open() }
+                    MenuItem { text: "Preferences"; onTriggered: preferencesDialog.open() }
                     MenuItem { text: "Media information"; onTriggered: mediaInfoDialog.open() }
                     MenuItem { text: "Keyboard shortcuts"; onTriggered: shortcutsHelp.open() }
                     MenuItem { text: "Getting started"; onTriggered: gettingStartedDialog.open() }
