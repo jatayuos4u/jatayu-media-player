@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(JatayuMediaPlayer VERSION 0.3.0 LANGUAGES CXX)
+project(JatayuMediaPlayer VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
@@ -39,12 +39,12 @@ install(FILES assets/jatayu-media-player.svg DESTINATION share/icons/hicolor/sca
 # Preserve the application license alongside the installed package.
 install(FILES LICENSE DESTINATION share/doc/jatayu-media-player RENAME copyright)
 
-# Opt-in local Debian beta packaging. No package or release is produced by default.
+# Opt-in local Debian packaging. No package or release is produced by default.
 set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_NAME "jatayu-media-player")
 set(CPACK_PACKAGE_VENDOR "Jatayu Media Player Project")
 set(CPACK_PACKAGE_CONTACT "https://github.com/jatayuos4u/jatayu-media-player/issues")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Privacy-focused Qt/libmpv player for Linux (development beta)")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Privacy-focused Qt/libmpv media player for Linux")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_DEBIAN_PACKAGE_SECTION "video")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
