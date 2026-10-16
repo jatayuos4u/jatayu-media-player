@@ -31,11 +31,11 @@
         }
       ],
       "post-install": [
-        "mv /app/share/applications/jatayu-media-player.desktop /app/share/applications/io.github.jatayuos4u.JatayuMediaPlayer.desktop",
-        "sed -i 's/^Icon=jatayu-media-player$/Icon=io.github.jatayuos4u.JatayuMediaPlayer/' /app/share/applications/io.github.jatayuos4u.JatayuMediaPlayer.desktop",
-        "mv /app/share/icons/hicolor/scalable/apps/jatayu-media-player.svg /app/share/icons/hicolor/scalable/apps/io.github.jatayuos4u.JatayuMediaPlayer.svg",
+        "sed -i 's/^Icon=jatayu-media-player$/Icon=io.github.jatayuos4u.JatayuMediaPlayer/' /app/share/applications/jatayu-media-player.desktop",
         "install -Dm644 ../flatpak/io.github.jatayuos4u.JatayuMediaPlayer.metainfo.xml /app/share/metainfo/io.github.jatayuos4u.JatayuMediaPlayer.metainfo.xml"
       ]
     }
-  ]
+  ],
+  "rename-desktop-file": "jatayu-media-player.desktop",
+  "rename-icon": "jatayu-media-player"
 }
