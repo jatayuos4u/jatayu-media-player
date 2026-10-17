@@ -76,3 +76,10 @@ The report is only *head -n 35* of each file. No full review of its terms, excep
 - Bundled in `flatpak-build/files/lib`: `libuchardet.so.0.0.7` and `libmpv.so.2.3.0`, plus separate debug binaries. This demonstrates redistribution of both libraries, requiring applicable notices and corresponding source handling.
 - No `libavcodec.so*` found in the searched build paths. This does **not** prove FFmpeg is absent: KDE Platform runtime and extension libraries remain to inspect.
 - The current search did not find a preserved mpv Meson build log. The manifest lacks `-Dgpl=false`; identify exact runtime-linked dependencies and ensure GPL compliance or obtain definitive config evidence.
+
+## ELF linkage / uchardet core source evidence — maintainer report 17 October 2026
+
+- Actual `readelf -d flatpak-build/files/lib/libmpv.so.2.3.0` lists `libass.so.9`, `libavcodec.so.61`, `libavfilter.so.10`, `libavformat.so.61`, `libavutil.so.59`, `libplacebo.so.349`, `libswresample.so.5`, `libswscale.so.8`, `libavdevice.so.61`, `libluajit-5.1.so.2`, `libuchardet.so.0` and other shared libraries. This proves direct dependencies, not whether FFmpeg lives in the application or KDE runtime.
+- `readelf` on `libuchardet.so.0.0.7` showed system C++ runtime dependencies only in supplied output.
+- The actual `src/uchardet.cpp` license header states MPL-1.1 / GPL-2.0-or-later / LGPL-2.1-or-later with an explicit alternative-license grant. This demonstrates alternatives for this file, **not** exhaustive proof for all compiled objects.
+- Do not claim FFmpeg license compliance or complete source clearance until actual shared-object origin, build options, applicable notices and source-offer method are verified.
