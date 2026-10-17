@@ -47,3 +47,17 @@ These are pointers for source inspection, **not findings of legal compatibility 
 - **libass / libplacebo / FFmpeg / Qt:** exact pinned file licenses, linked dependency configurations and bundled-runtime boundary remain unverified.
 
 **Important distinction:** public upstream licensing descriptions are informative but do not replace a report of actual binary configuration or complete corresponding-source availability. The application source tarball created from `git archive` is not a source bundle for all external Flatpak modules.
+
+## Direct examination of maintainer-provided license text excerpts (17 October 2026)
+
+The maintainer supplied the first 35 lines of each extracted document (not full texts), after `scripts/extract-v1-upstream-licenses.py` completed. Based on those excerpts:
+
+| Component | Evidence from supplied exact-source excerpt | Remaining check |
+| --- | --- | --- |
+| libass 0.16.0 | `COPYING` identifies ISC license and libass contributor copyright | Retain full ISC attribution with distributed Flatpak component; inspect file-level exceptions |
+| LuaJIT pinned commit | `COPYRIGHT` gives MIT grant and embedded Lua 5.1/5.2 notices | Preserve full `COPYRIGHT`, including additional downstream notices beyond displayed excerpt |
+| libplacebo pinned commit | Root `LICENSE` starts with LGPL-2.1 text; `demos/LICENSE` identifies CC0-1.0 | Confirm effective library license/version and any exceptions in relevant source files |
+| mpv 0.39.0 | `Copyright` says GPL-2.0-or-later by default; LGPL-2.1-or-later with `-Dgpl=false`; both license texts included | Flatpak manifest doesn't pass `-Dgpl=false`, so don't claim LGPL-only; check actual meson configuration and linked libraries |
+| uchardet 0.0.7 | `COPYING` begins with Mozilla Public License 1.1 | Verify per-file multi-license notices and exact compatibility path. MPL-1.1-only code may be incompatible with GPL when combined in some ways |
+
+The report is only *head -n 35* of each file. No full review of its terms, exceptions, embedded license sections, or notices is established by this evidence. Confirm dependency composition using runtime/build introspection, and collect complete notices and corresponding source before publication.
