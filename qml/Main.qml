@@ -1068,10 +1068,10 @@ ApplicationWindow {
                 fillMode: Image.PreserveAspectFit
             }
             Label { text: "Jatayu Media Player"; font.pixelSize: 23; font.bold: true; color: "#E9F1F7"; Layout.alignment: Qt.AlignHCenter }
-            Label { text: "Version 0.3.0 — Development Preview"; color: "#9FC1D7"; Layout.alignment: Qt.AlignHCenter }
+            Label { text: "Version 1.0.0"; color: "#9FC1D7"; Layout.alignment: Qt.AlignHCenter }
             Label {
                 Layout.fillWidth: true
-                text: "Every Beat. Every Frame.\n\nIndependent, open-source media player for Linux, built using Qt 6 and libmpv. No advertising or built-in telemetry.\n\nApplication source: GPL-3.0-or-later. Third-party components retain their own licenses.\n\nThis development build is not a stable release."
+                text: "Every Beat. Every Frame.\n\nIndependent, open-source media player for Linux, built using Qt 6 and libmpv. No advertising or built-in telemetry.\n\nApplication source: GPL-3.0-or-later. Third-party components retain their own licenses."
                 color: "#D3E2EF"
                 wrapMode: Text.WordWrap
             }
