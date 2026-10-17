@@ -27,7 +27,18 @@ Components: main
 Description: Jatayu Media Player signed Debian packages
 SignWith: $KEY
 EOF
+# Reprepro skips a package with an existing name/version. When rebuilding
+# 1.0.0-1 during local release preparation, replace an older package so
+# repository metadata never silently points at stale program bytes.
+POOL="$REPO/pool/main/j/jatayu-media-player/jatayu-media-player_1.0.0-1_amd64.deb"
+if [[ -f "$POOL" ]] && ! cmp -s "$DEB" "$POOL"; then
+  echo "Local repository has an older build with the same version."
+  echo "Replacing it in LOCAL staging; publish only after a clean install test."
+  reprepro -b "$REPO" remove stable jatayu-media-player
+fi
 reprepro -b "$REPO" includedeb stable "$DEB"
+[[ -s "$POOL" ]] || { echo "Expected APT pool package not found: $POOL" >&2; exit 1; }
+cmp -s "$DEB" "$POOL" || { echo "APT pool package differs from freshly built .deb" >&2; exit 1; }
 [[ -s "$REPO/dists/stable/InRelease" ]] || { echo "Signed InRelease missing" >&2; exit 1; }
 gpg --batch --armor --export "$KEY" > "$REPO/jatayu-media-player-archive-key.asc"
 gpg --batch --verify "$REPO/dists/stable/InRelease"
