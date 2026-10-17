@@ -28,9 +28,10 @@ Description: Jatayu Media Player signed Debian packages
 SignWith: $KEY
 EOF
 # Reprepro skips a package with an existing name/version. When rebuilding
-# 1.0.0-1 during local release preparation, replace an older package so
+# during local release preparation, replace an older package so
 # repository metadata never silently points at stale program bytes.
-POOL="$REPO/pool/main/j/jatayu-media-player/jatayu-media-player_1.0.0-1_amd64.deb"
+PKG_VERSION=$(dpkg-deb -f "$DEB" Version)
+POOL="$REPO/pool/main/j/jatayu-media-player/jatayu-media-player_${PKG_VERSION}_amd64.deb"
 if [[ -f "$POOL" ]] && ! cmp -s "$DEB" "$POOL"; then
   echo "Local repository has an older build with the same version."
   echo "Replacing it in LOCAL staging; publish only after a clean install test."
