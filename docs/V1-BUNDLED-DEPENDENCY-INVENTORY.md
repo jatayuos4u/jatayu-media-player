@@ -26,3 +26,15 @@ The Flatpak manifest `flatpak/io.github.jatayuos4u.JatayuMediaPlayer.json` inclu
 ## Observed tests, separate from license clearance
 
 Maintainer demonstrated signed Flatpak installation from GitHub Pages and update to commit `ce739b38472e4abce195c972db2ddee038fef6432ce991e7eddbc8d604be626d`. Debian `1.0.0-2` installed through GitHub Pages and played MP3/MP4. These tests establish functionality, not redistribution clearance.
+
+## Authoritative upstream source and license review locations
+
+- mpv: https://github.com/mpv-player/mpv — review COPYING, build features and LGPL/GPL configuration for the exact pinned v0.39.0 build.
+- LuaJIT: https://github.com/LuaJIT/LuaJIT — inspect COPYRIGHT and the exact pinned revision.
+- libass: https://github.com/libass/libass — inspect COPYING in the pinned 0.16.0 source.
+- uchardet: https://gitlab.freedesktop.org/uchardet/uchardet — inspect license notices of pinned v0.0.7 source.
+- libplacebo: https://github.com/haasn/libplacebo — inspect COPYING/LICENSE and the exact pinned v7.349.0 tree and project patches.
+- Qt/KDE runtime: https://www.qt.io/licensing/ and https://invent.kde.org/packaging/flatpak-kde-runtime — review distributed runtime components and Qt plugin terms.
+- FFmpeg: https://ffmpeg.org/legal.html — check actual enabled libraries, nonfree/GPL flags and dependencies; do not assume the runtime's license configuration.
+
+These are pointers for source inspection, **not findings of legal compatibility or proof that corresponding source is bundled**. Archive the relevant notices and source packages before a general public release.
