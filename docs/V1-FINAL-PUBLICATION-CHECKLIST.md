@@ -24,7 +24,7 @@ These hashes were reported by maintainer after local verification. Recheck exact
 - [ ] Confirm original graphics, README attribution and rights for all distributed files.
 - [ ] Review and approve source availability, release notes and optional complete notices bundle.
 - [ ] Confirm user-side VM removal/desktop associations if those are release requirements.
-- [ ] Review security of broad Flatpak home-directory permission and document honestly.
+- [x] Reviewed and documented broad Flatpak home-directory permission in dependency inventory; `--filesystem=home`, `/media`, and `/run/media` give extensive local file access required for media browsing. Narrowing would change tested release behavior; consider separate post-release permissions design after testing.
 
 ## Prepared assets and website review
 
@@ -69,3 +69,12 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Maintainer ran `scripts/inventory-v1-upstream-licenses.py` successfully; **11 file occurrences** identified (some repeated between source archives and checked-out trees), including mpv `Copyright`, `LICENSE.GPL`, `LICENSE.LGPL`; LuaJIT `COPYRIGHT`; libass `COPYING`; uchardet `COPYING`; libplacebo `LICENSE` and `demos/LICENSE`.
 - [x] Added `scripts/extract-v1-upstream-licenses.py`; maintainer ran it successfully on 17 October 2026 and reported 11 license/notice file occurrences extracted to `dist/v1-upstream-source-review/license-review/`.
 - [ ] Read actual license text, inspect files with nonstandard names, establish licensing and attribution of each built component, confirm binary-specific build configuration, and assess corresponding sources and patches.
+
+## Licensing source-package work — 17 October 2026
+
+- [x] Confirmed via maintainer ELF resolution that libmpv links FFmpeg libraries from separately mounted `codecs-extra` rather than from the application tree. Runtime licensing still applies to runtime distributor; avoid claiming bundled FFmpeg.
+- [x] Confirmed uchardet main source `uchardet.cpp` explicitly allows GPL-2.0-or-later or LGPL-2.1-or-later as alternatives to MPL-1.1. Other compiled files still require review.
+- [x] Created `scripts/package-v1-corresponding-sources.py` to assemble verified pinned sources, full extracted license texts, manifests, patches and application source into an **offline review archive**. Script has not yet run on maintainer's machine.
+- [ ] Check actual resulting review tarball and determine if it covers *all* bundled code and notices; do not label it legally complete merely because packaging succeeds.
+- [ ] Confirm icon/branding rights from asset creator and package distributor.
+- [ ] Maintainer sign-off on compliance before public release.
