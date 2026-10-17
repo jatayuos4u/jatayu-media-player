@@ -1055,30 +1055,32 @@ ApplicationWindow {
         title: "About Jatayu Media Player"
         modal: true
         anchors.centerIn: Overlay.overlay
-        width: Math.min(window.width - 24, 510)
+        width: Math.min(window.width - 24, 600)
+        height: Math.min(window.height - 24, 590)
         standardButtons: Dialog.Close
         ColumnLayout {
             anchors.fill: parent
-            spacing: 10
-            Image {
-                source: "qrc:/icons/jatayu-media-player.svg"
-                Layout.preferredWidth: 76
-                Layout.preferredHeight: 76
-                Layout.alignment: Qt.AlignHCenter
-                fillMode: Image.PreserveAspectFit
-            }
+            spacing: 12
+            Image { source: "qrc:/icons/jatayu-media-player.svg"; Layout.preferredWidth: 68; Layout.preferredHeight: 68; Layout.alignment: Qt.AlignHCenter; fillMode: Image.PreserveAspectFit }
             Label { text: "Jatayu Media Player"; font.pixelSize: 23; font.bold: true; color: "#E9F1F7"; Layout.alignment: Qt.AlignHCenter }
-            Label { text: "Version 1.0.0"; color: "#9FC1D7"; Layout.alignment: Qt.AlignHCenter }
-            Label {
-                Layout.fillWidth: true
-                text: "Every Beat. Every Frame.\n\nIndependent, open-source media player for Linux, built using Qt 6 and libmpv. No advertising or built-in telemetry.\n\nApplication source: GPL-3.0-or-later. Third-party components retain their own licenses."
-                color: "#D3E2EF"
-                wrapMode: Text.WordWrap
+            Label { text: "Version 1.0.0  •  Your Media. Your World."; color: "#9FC1D7"; Layout.alignment: Qt.AlignHCenter }
+            ScrollView {
+                Layout.fillWidth: true; Layout.fillHeight: true; clip: true
+                ColumnLayout {
+                    width: aboutPlayerDialog.availableWidth - 16
+                    spacing: 10
+                    Label { Layout.fillWidth: true; text: "A modern, privacy-focused Linux music and video player powered by Qt 6 and libmpv. Enjoy local playback without ads, built-in telemetry or mandatory accounts."; color: "#D3E2EF"; wrapMode: Text.WordWrap }
+                    Label { Layout.fillWidth: true; text: "PROJECT INFORMATION"; font.bold: true; color: "#58CBEF" }
+                    Label { Layout.fillWidth: true; text: "Creator: Anup Yadav\nPlatform: Linux (Debian package and Flatpak)\nLicense: GPL-3.0-or-later\nWebsite: jatayuos.in\nRepository: github.com/jatayuos4u/jatayu-media-player"; color: "#D3E2EF"; wrapMode: Text.WrapAnywhere }
+                    Label { Layout.fillWidth: true; text: "OPEN SOURCE AND PRIVACY"; font.bold: true; color: "#58CBEF" }
+                    Label { Layout.fillWidth: true; text: "Jatayu Media Player is an independent open-source project. Qt, libmpv and other third-party components retain their respective licenses. Files are played locally; the application does not include advertising or built-in telemetry."; color: "#D3E2EF"; wrapMode: Text.WordWrap }
+                }
             }
-            Button {
-                text: "Source code and license"
-                Layout.alignment: Qt.AlignHCenter
-                onClicked: Qt.openUrlExternally("https://github.com/jatayuos4u/jatayu-media-player")
+            Flow {
+                Layout.fillWidth: true; spacing: 8
+                Button { text: "Website"; onClicked: Qt.openUrlExternally("https://jatayuos.in") }
+                Button { text: "Source and license"; onClicked: Qt.openUrlExternally("https://github.com/jatayuos4u/jatayu-media-player") }
+                Button { text: "Report an issue"; onClicked: Qt.openUrlExternally("https://github.com/jatayuos4u/jatayu-media-player/issues") }
             }
         }
     }
@@ -1087,35 +1089,70 @@ ApplicationWindow {
         title: "Getting started"
         modal: true
         anchors.centerIn: Overlay.overlay
-        width: Math.min(window.width - 24, 530)
+        width: Math.min(window.width - 24, 610)
+        height: Math.min(window.height - 24, 540)
         standardButtons: Dialog.Close
-        Label {
-            width: parent.width
-            color: "#D3E2EF"
-            wrapMode: Text.WordWrap
-            text: "Open songs or videos using Browse media (Ctrl+O).\n\nUse Space to play or pause, Left/Right to seek, and F for fullscreen.\n\nOpen More > Music library to browse songs, build queues and manage named playlists.\n\nUse Playback options for speed and audio tracks. Load local subtitle files with Subtitles.\n\nEdit song tags and album covers with More > Edit music information; edits are saved to a new copy."
+        ColumnLayout {
+            anchors.fill: parent; spacing: 10
+            Label { text: "Make the most of your music and videos"; font.pixelSize: 16; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+            ScrollView {
+                Layout.fillWidth: true; Layout.fillHeight: true; clip: true
+                ColumnLayout {
+                    width: gettingStartedDialog.availableWidth - 16; spacing: 12
+                    Label { text: "1. Open and play"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Choose Browse media (Ctrl+O) to find your local video or audio files. Space pauses playback, arrow keys seek and F switches fullscreen."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "2. Organize your music"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Open More > Music library to browse tracks. Use Queue to manage upcoming songs and My playlists to save collections."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "3. Fine-tune playback"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Open More > Audio tracks and speed for track selection and playback speed. For slower computers, choose Quality: Performance."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "4. Subtitles and video"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Use More > Load subtitles for local subtitle files and Subtitle settings for caption controls."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "5. Edit music information"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Choose More > Edit music information for supported audio files. Save edits as a new copy so the original stays unchanged."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "6. Personalize and get help"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Open More > Preferences for playback and privacy settings. Use Help for keyboard shortcuts, troubleshooting and support."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                }
+            }
+            Flow { Layout.fillWidth: true; spacing: 8
+                Button { text: "Browse media"; onClicked: { gettingStartedDialog.close(); mediaBrowser.open() } }
+                Button { text: "Music library"; onClicked: { gettingStartedDialog.close(); libraryDialog.open() } }
+                Button { text: "Shortcuts"; onClicked: { gettingStartedDialog.close(); shortcutsHelp.open() } }
+            }
         }
     }
     Dialog {
         id: troubleshootingDialog
-        title: "Troubleshooting"
+        title: "Troubleshooting and support"
         modal: true
         anchors.centerIn: Overlay.overlay
-        width: Math.min(window.width - 24, 530)
+        width: Math.min(window.width - 24, 650)
+        height: Math.min(window.height - 24, 560)
         standardButtons: Dialog.Close
         ColumnLayout {
-            anchors.fill: parent
-            spacing: 10
-            Label {
-                Layout.fillWidth: true
-                color: "#D3E2EF"
-                wrapMode: Text.WordWrap
-                text: "No audio? Check mute, system output, volume and the selected audio track.\n\nVideo stuttering? Choose Quality: Performance under More.\n\nSubtitle missing? Load the correct file and inspect subtitle timing or track selection.\n\nAlbum image missing? Not all audio files contain embedded artwork.\n\nIf a problem persists, start the player from a terminal and include the error output in a GitHub issue."
+            anchors.fill: parent; spacing: 10
+            Label { text: "Practical fixes for common playback problems"; color: "#9FC1D7"; Layout.fillWidth: true; wrapMode: Text.WordWrap }
+            ScrollView {
+                Layout.fillWidth: true; Layout.fillHeight: true; clip: true
+                ColumnLayout {
+                    width: troubleshootingDialog.availableWidth - 16; spacing: 12
+                    Label { text: "Playback and sound"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "No sound: check the player mute and volume controls, then your system output device. Confirm that the correct audio track is selected in Audio tracks and speed. Try a second file to rule out damaged media."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "Black video or stuttering"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Try Performance quality under More, close demanding applications and play a file stored locally. Check whether the same file works with another player. On older graphics hardware, high-resolution or high-bitrate video may be too demanding."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "Files do not open"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Confirm the file exists and that you have permission to read it. Use Browse media rather than manually entering a path. In Flatpak, files outside the permitted home, /media and /run/media locations may not be accessible."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "Subtitles are missing"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Use More > Load subtitles and choose a matching .srt, .ass, .ssa or .vtt file. Check subtitle track selection, visibility and timing; the chosen subtitle may not match the video release."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "Library, playlists or cover art"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Refresh or revisit the music library and check your folder selection and search filters. Artwork is not embedded in every file. When editing music information, Jatayu Media Player writes a new copy to protect the original; reopen the edited copy to verify changes."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "Reporting an issue"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Include your Linux distribution, whether you installed the Debian package or Flatpak, the media format and the exact steps to reproduce. Launch the app from a terminal, capture relevant errors and remove personal paths or private data before sharing logs."; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                }
             }
-            Button {
-                text: "Report an issue"
-                Layout.alignment: Qt.AlignRight
-                onClicked: Qt.openUrlExternally("https://github.com/jatayuos4u/jatayu-media-player/issues")
+            Flow { Layout.fillWidth: true; spacing: 8
+                Button { text: "Report an issue"; onClicked: Qt.openUrlExternally("https://github.com/jatayuos4u/jatayu-media-player/issues/new") }
+                Button { text: "Documentation"; onClicked: Qt.openUrlExternally("https://github.com/jatayuos4u/jatayu-media-player#readme") }
+                Button { text: "Website"; onClicked: Qt.openUrlExternally("https://jatayuos.in") }
             }
         }
     }
@@ -1124,17 +1161,25 @@ ApplicationWindow {
         title: "Keyboard shortcuts"
         modal: true
         anchors.centerIn: Overlay.overlay
-        width: Math.min(window.width - 24, 510)
+        width: Math.min(window.width - 24, 580)
+        height: Math.min(window.height - 24, 500)
         standardButtons: Dialog.Close
         ColumnLayout {
-            anchors.fill: parent
-            spacing: 8
-            Label {
-                Layout.fillWidth: true
-                text: "Space — Play/Pause\nF — Fullscreen; Escape — Exit fullscreen\n← / → — Seek 5 seconds\nCtrl+← / Ctrl+→ — Seek 30 seconds\n↑ / ↓ — Volume ±5%\nCtrl+O — Browse media\nCtrl+L — Music library\nCtrl+P — My playlists\nCtrl+Shift+P — Playback options\nCtrl+0 — Normal speed\nCtrl++ / Ctrl+- — Speed ±0.25×"
-                color: "#E9F1F7"
-                wrapMode: Text.WordWrap
+            anchors.fill: parent; spacing: 10
+            Label { text: "Quick controls for playback and navigation"; color: "#9FC1D7"; Layout.fillWidth: true }
+            ScrollView {
+                Layout.fillWidth: true; Layout.fillHeight: true; clip: true
+                ColumnLayout {
+                    width: shortcutsHelp.availableWidth - 16; spacing: 12
+                    Label { text: "PLAYBACK"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Space  Play / pause\\n← / →  Seek back / forward 5 seconds\\nCtrl+← / Ctrl+→  Seek 30 seconds\\n↑ / ↓  Adjust volume by 5%\\nCtrl+0  Reset speed\\nCtrl+Plus / Ctrl+Minus  Adjust speed"; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "MEDIA AND LIBRARY"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "Ctrl+O  Browse media\\nCtrl+F  Search media in the browser\\nCtrl+L  Music library\\nCtrl+P  My playlists\\nCtrl+Shift+P  Playback options"; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                    Label { text: "DISPLAY"; font.bold: true; color: "#E9F1F7"; Layout.fillWidth: true }
+                    Label { text: "F  Toggle fullscreen\\nEscape  Exit fullscreen"; color: "#C1D3E2"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                }
             }
+            Button { text: "Getting started"; Layout.alignment: Qt.AlignRight; onClicked: { shortcutsHelp.close(); gettingStartedDialog.open() } }
         }
     }
     Dialog {
@@ -1585,7 +1630,7 @@ ApplicationWindow {
                 ColumnLayout {
                     spacing: 2
                     Label { text: "Jatayu Media Player"; color: "#E9F1F7"; font.bold: true; font.pixelSize: 19 }
-                    Label { text: player.title === "No media selected" ? "Every Beat. Every Frame." : player.title; color: "#97ADBF"; font.pixelSize: 11; elide: Text.ElideMiddle; Layout.maximumWidth: 350 }
+                    Label { text: player.title === "No media selected" ? "Your Media. Your World." : player.title; color: "#97ADBF"; font.pixelSize: 11; elide: Text.ElideMiddle; Layout.maximumWidth: 350 }
                 }
                 Item { Layout.fillWidth: true }
                 Button { text: "Browse media"; onClicked: mediaBrowser.open() }
@@ -1628,11 +1673,6 @@ ApplicationWindow {
                     MenuItem { text: "Audio tracks and speed"; onTriggered: playbackOptions.open() }
                     MenuItem { text: "Preferences"; onTriggered: preferencesDialog.open() }
                     MenuItem { text: "Media information"; onTriggered: mediaInfoDialog.open() }
-                    MenuItem { text: "Keyboard shortcuts"; onTriggered: shortcutsHelp.open() }
-                    MenuItem { text: "Getting started"; onTriggered: gettingStartedDialog.open() }
-                    MenuItem { text: "Troubleshooting"; onTriggered: troubleshootingDialog.open() }
-                    MenuItem { text: "About Jatayu Media Player"; onTriggered: aboutPlayerDialog.open() }
-                    MenuSeparator {}
                     MenuItem { text: "Quality: Performance"; onTriggered: player.setQualityProfile("Performance") }
                     MenuItem { text: "Quality: Balanced"; onTriggered: player.setQualityProfile("Balanced") }
                 }
