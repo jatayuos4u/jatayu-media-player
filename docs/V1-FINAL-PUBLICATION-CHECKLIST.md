@@ -55,6 +55,11 @@ No tag, release publication, website merge, or rebuild is authorized by this che
 ## Upstream source collection prepared — 17 October 2026
 
 - [x] `scripts/collect-v1-upstream-sources.py` added for locally fetching pinned Flatpak libmpv dependency sources and project patches with commit/SHA256 verification. It **has not yet been run**; downloading may use substantial disk space and network traffic. It does not rebuild or publish binaries.
-- [ ] Run `python3 scripts/collect-v1-upstream-sources.py` on a connected system with sufficient free disk space; inspect downloaded `COPYING`/`LICENSE`/`Copyright` files and exact patched build configuration.
+- [x] Maintainer ran `python3 scripts/collect-v1-upstream-sources.py` successfully on 17 October 2026. Script completed fetching pinned mpv, LuaJIT, libass, uchardet, and libplacebo sources and recorded their hashes/revisions locally (based on reported terminal output).
+- [ ] Extract and inspect exact `COPYING`/`LICENSE`/`Copyright` files and check patched build configuration from locally downloaded sources.
 - [ ] Evaluate mpv GPL mode (manifest does not pass `-Dgpl=false`), linked FFmpeg license/build options, possible runtime dependencies, and license compatibility before external distribution.
 - [ ] Review complete corresponding-source and attribution bundle; no legal clearance implied by this script.
+
+## Pinned upstream collection evidence (17 October 2026)
+
+Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT `f73e649a...`, libass 0.16.0, uchardet 0.0.7 and libplacebo `1fd3c7bd...`, including scripts' built-in SHA256 and pinned git revision checks. No licensing conclusion follows from downloading or verifying source files. Review exact source notices and any extra transitive dependencies before clearing the release.
