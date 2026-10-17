@@ -69,3 +69,10 @@ The report is only *head -n 35* of each file. No full review of its terms, excep
 - `COPYING` contains MPL 1.1 plus later GPL/LGPL license texts; the combined license text does not alone establish the effective license of each source file.
 - Flatpak build directory and files show libass and libplacebo config headers; no mpv Meson buildoptions or log identified in the supplied search result. These headers do not establish mpv build licensing.
 - Outstanding: inspect all uchardet compiled-file headers and exact Flatpak bundled shared objects/build options, not test-only files.
+
+## Actual Flatpak library evidence — maintainer terminal report
+
+- Source search returned dozens of uchardet `src/` files with GPL/LGPL/MPL-related license wording; **not yet exhaustive** for every compiled translation unit.
+- Bundled in `flatpak-build/files/lib`: `libuchardet.so.0.0.7` and `libmpv.so.2.3.0`, plus separate debug binaries. This demonstrates redistribution of both libraries, requiring applicable notices and corresponding source handling.
+- No `libavcodec.so*` found in the searched build paths. This does **not** prove FFmpeg is absent: KDE Platform runtime and extension libraries remain to inspect.
+- The current search did not find a preserved mpv Meson build log. The manifest lacks `-Dgpl=false`; identify exact runtime-linked dependencies and ensure GPL compliance or obtain definitive config evidence.
