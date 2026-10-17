@@ -61,3 +61,11 @@ The maintainer supplied the first 35 lines of each extracted document (not full 
 | uchardet 0.0.7 | `COPYING` begins with Mozilla Public License 1.1 | Verify per-file multi-license notices and exact compatibility path. MPL-1.1-only code may be incompatible with GPL when combined in some ways |
 
 The report is only *head -n 35* of each file. No full review of its terms, exceptions, embedded license sections, or notices is established by this evidence. Confirm dependency composition using runtime/build introspection, and collect complete notices and corresponding source before publication.
+
+## uchardet file-level evidence and build-directory findings (maintainer report)
+
+- The pinned uchardet 0.0.7 source archive was extracted under `dist/uchardet-license-check/uchardet-v0.0.7`.
+- `test/uchardet-tests.c` declares a tri-license option MPL 1.1 / GPL 2.0-or-later / LGPL 2.1-or-later. **This proves the option for that file only, not all compiled library sources.**
+- `COPYING` contains MPL 1.1 plus later GPL/LGPL license texts; the combined license text does not alone establish the effective license of each source file.
+- Flatpak build directory and files show libass and libplacebo config headers; no mpv Meson buildoptions or log identified in the supplied search result. These headers do not establish mpv build licensing.
+- Outstanding: inspect all uchardet compiled-file headers and exact Flatpak bundled shared objects/build options, not test-only files.
