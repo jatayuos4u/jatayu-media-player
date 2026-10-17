@@ -30,7 +30,8 @@ These hashes were reported by maintainer after local verification. Recheck exact
 
 - [x] Offline final-assets staging script added at `scripts/stage-v1-release-assets.sh`. It enforces both tested binary hashes, retains source-build commit `cdccb895...`, generates a source archive and places draft notices in `dist/release-candidate-1.0.0/`. **Not yet executed on maintainer's machine.**
 - [x] Website content including installation guidance prepared in draft `jatayuos4u/jatayuos-website` PR #4. **Not merged and not live.**
-- [ ] Execute staging script locally and verify source-archive contents; test download hashes again.
+- [x] Maintainer executed local staging and confirmed both binaries pass `sha256sum -c SHA256SUMS`; source archive and SOURCE-COMMIT.txt present (17 October 2026).
+- [ ] Inspect application source archive contents and verify complete third-party corresponding-source availability; test hashes again after final upload.
 - [ ] Test a clean build of the website preview and approve the site changes.
 - [ ] Obtain documented third-party license and corresponding-source evidence. This cannot be certified from manifest names alone.
 
@@ -42,3 +43,11 @@ These hashes were reported by maintainer after local verification. Recheck exact
 5. Test external URLs, package hashes and installation instructions, and publicly announce through `jatayuos.in`.
 
 No tag, release publication, website merge, or rebuild is authorized by this checklist.
+
+## Local staging output received (17 October 2026)
+
+- Local folder `dist/release-candidate-1.0.0/`: Debian binary (~205 KB), Flatpak bundle (~2.1 MB), application source archive (~58 KB), LICENSE, notes, SHA256SUMS, SOURCE-COMMIT.txt.
+- SOURCE-COMMIT: `cdccb895c3b80f9ecac8827cb115adc43bdaa731`.
+- `sha256sum -c SHA256SUMS` reported `OK` for both release binary files.
+- Evidence folder `dist/v1-compliance-evidence/` generated; its local Flatpak info/permissions files are 88 bytes and require inspection (may be error output, **not** confirmed Flatpak installed metadata).
+- Third-party license and complete corresponding-source obligations **remain unverified**. No publication authorized.
