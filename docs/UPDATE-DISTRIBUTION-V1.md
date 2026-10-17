@@ -39,6 +39,24 @@ These commands stage repositories under `dist/apt-repo` and `dist/flatpak-repo`.
 
 **Important:** Host names mentioned in this document are illustrative and are not live endpoints. The APT repo requires a stable HTTPS static host that serves the full `dists/` and `pool/` tree. The Flatpak repo must expose the entire OSTree repository with suitable MIME types and HTTPS. Do not provide update installation instructions pointing to URLs until remote installation and the update path have been tested.
 
+## Hosting decision: GitHub + jatayuos.in (17 October 2026)
+
+**Approved structure**: GitHub is the source of truth for Jatayu Media Player source, tagged releases and binary artifacts. The existing Astro website at `https://jatayuos.in` remains the public website, hosted through its existing GitHub and Cloudflare Pages integration. Do **not** replace the current website or its hosting.
+
+- Application source: `https://github.com/jatayuos4u/jatayu-media-player`
+- Final release assets: GitHub Releases for **both** versioned `.deb` and `.flatpak` bundles, `SHA256SUMS`, source revision, notices.
+- Public landing/download page: add a Jatayu Media Player page to `jatayuos.in` using its website repository, linking to the verified GitHub release assets. Do not expose preview builds or placeholder URLs as downloadable 1.0.
+- Updates: A `.deb` or `.flatpak` file downloaded from GitHub Releases is **not** an APT/Flatpak update repository. APT and Flatpak remotes require repository indexes and signatures, hosted with stable HTTPS URLs and tested independently.
+
+**GitHub-only repo-hosting feasibility**: GitHub Pages can serve static files but has repository/site size and bandwidth limits; a complete OSTree Flatpak repo may exceed those limits and generate many objects. Do not add repo blobs to the existing website source repo or publish them via Cloudflare Pages without measuring repository size and limits. The user's preference is to host on GitHub; **first measure**:
+```bash
+du -sh dist/apt-repo dist/flatpak-repo
+find dist/flatpak-repo/objects -type f | wc -l
+```
+If the full repositories fit a suitable dedicated GitHub Pages repo and access/upgrade tests pass, they can be served there using a separately configured GitHub Pages hostname and linked from `jatayuos.in`. If they do not fit, preserve GitHub Releases as primary downloads and defer automatic repository updates until suitable static hosting is approved; do not pretend a GitHub Releases download is a Flatpak remote.
+
+**Release-day policy**: Do not tag, make private repositories public, deploy DNS, alter website production, or publish artifacts without the maintainer's separate approval and verified release gate. Never commit any signing private key; only approved public key and fingerprint may be published.
+
 ## Privacy
 No silent download/overwrite of the running executable and no update telemetry. Use APT and Flatpak's signed distribution mechanisms, letting users manage upgrades using their system tools.
 
