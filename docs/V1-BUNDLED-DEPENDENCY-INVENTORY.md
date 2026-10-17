@@ -83,3 +83,9 @@ The report is only *head -n 35* of each file. No full review of its terms, excep
 - `readelf` on `libuchardet.so.0.0.7` showed system C++ runtime dependencies only in supplied output.
 - The actual `src/uchardet.cpp` license header states MPL-1.1 / GPL-2.0-or-later / LGPL-2.1-or-later with an explicit alternative-license grant. This demonstrates alternatives for this file, **not** exhaustive proof for all compiled objects.
 - Do not claim FFmpeg license compliance or complete source clearance until actual shared-object origin, build options, applicable notices and source-offer method are verified.
+
+## Runtime inventory and FFmpeg location check — maintainer report
+
+- `find flatpak-build/files` produced no `libavcodec.so*`, `libavformat.so*`, or `libavfilter.so*` matches. This is evidence they are not present under those filenames in the built app tree, **not** identification of the runtime provider.
+- Installed system Flatpak components include `org.kde.Platform//6.10`, `org.kde.Sdk//6.10`, `org.freedesktop.Platform.codecs-extra//25.08-extra`, GL and VAAPI extensions.
+- Next verify actual runtime ownership of FFmpeg ELF libraries; installed runtimes do not alone prove which ones are in the app's runtime namespace or the effective FFmpeg configuration.
