@@ -26,6 +26,14 @@ These hashes were reported by maintainer after local verification. Recheck exact
 - [ ] Confirm user-side VM removal/desktop associations if those are release requirements.
 - [ ] Review security of broad Flatpak home-directory permission and document honestly.
 
+## Prepared assets and website review
+
+- [x] Offline final-assets staging script added at `scripts/stage-v1-release-assets.sh`. It enforces both tested binary hashes, retains source-build commit `cdccb895...`, generates a source archive and places draft notices in `dist/release-candidate-1.0.0/`. **Not yet executed on maintainer's machine.**
+- [x] Website content including installation guidance prepared in draft `jatayuos4u/jatayuos-website` PR #4. **Not merged and not live.**
+- [ ] Execute staging script locally and verify source-archive contents; test download hashes again.
+- [ ] Test a clean build of the website preview and approve the site changes.
+- [ ] Obtain documented third-party license and corresponding-source evidence. This cannot be certified from manifest names alone.
+
 ## Only after gates pass
 1. Confirm final binaries remain byte-for-byte identical to checked hashes.
 2. Approve GitHub normal **v1.0.0** release and attach `.deb`, `.flatpak`, `SHA256SUMS`, `SOURCE-COMMIT.txt`, rights/third-party notices, plus source links.
