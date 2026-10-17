@@ -89,3 +89,11 @@ The report is only *head -n 35* of each file. No full review of its terms, excep
 - `find flatpak-build/files` produced no `libavcodec.so*`, `libavformat.so*`, or `libavfilter.so*` matches. This is evidence they are not present under those filenames in the built app tree, **not** identification of the runtime provider.
 - Installed system Flatpak components include `org.kde.Platform//6.10`, `org.kde.Sdk//6.10`, `org.freedesktop.Platform.codecs-extra//25.08-extra`, GL and VAAPI extensions.
 - Next verify actual runtime ownership of FFmpeg ELF libraries; installed runtimes do not alone prove which ones are in the app's runtime namespace or the effective FFmpeg configuration.
+
+## KDE runtime FFmpeg location — maintainer evidence (17 October 2026)
+
+- `flatpak info -l org.kde.Platform//6.10` resolves to deployment commit `31742ff0f905913c512ea732960bbdeffa8306dcbebca45eeee62bfed0ca03a3`.
+- `libavcodec.so.61`, `libavformat.so.61`, and `libavfilter.so.10` are present under the KDE Platform 6.10 runtime `files/lib/x86_64-linux-gnu/` path.
+- Files with the same SONAMEs also exist in installed freedesktop codecs-extra and KDE SDK trees. This `find` output does **not** establish which instance libmpv loads at runtime; the app Flatpak's declared runtime namespace needs confirmation.
+- Earlier app-tree search found none of those three FFmpeg libraries under `flatpak-build/files`. They are therefore not evidenced as directly included in the staged app filesystem, while bundled libmpv still links to their ABI.
+- Remaining: verify effective runtime library resolution and FFmpeg license/configuration from the runtime's build provenance, not simply installed paths.
