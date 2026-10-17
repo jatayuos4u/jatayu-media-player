@@ -75,6 +75,14 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Confirmed via maintainer ELF resolution that libmpv links FFmpeg libraries from separately mounted `codecs-extra` rather than from the application tree. Runtime licensing still applies to runtime distributor; avoid claiming bundled FFmpeg.
 - [x] Confirmed uchardet main source `uchardet.cpp` explicitly allows GPL-2.0-or-later or LGPL-2.1-or-later as alternatives to MPL-1.1. Other compiled files still require review.
 - [x] Created `scripts/package-v1-corresponding-sources.py` to assemble verified pinned sources, full extracted license texts, manifests, patches and application source into an **offline review archive**. Script has not yet run on maintainer's machine.
-- [ ] Check actual resulting review tarball and determine if it covers *all* bundled code and notices; do not label it legally complete merely because packaging succeeds.
+- [x] Maintainer executed corresponding-source review bundler successfully: archive generated with 23 top-level entries, reported SHA256 `cc7efee35ed7f201fc8a0a06a9d29c48cde4dd928617cee818b65f4964d0720f`.
+- [ ] Inspect generated archive contents and nested sources, confirm all actual bundled code and notices are covered; generation success alone is not legal completeness.
 - [ ] Confirm icon/branding rights from asset creator and package distributor.
 - [ ] Maintainer sign-off on compliance before public release.
+
+## Corresponding-source archive collection report (17 October 2026)
+
+- File: `dist/release-candidate-1.0.0/jatayu-media-player-1.0.0-corresponding-sources-REVIEW.tar.gz` (local; not published).
+- Maintainer-provided SHA256: `cc7efee35ed7f201fc8a0a06a9d29c48cde4dd928617cee818b65f4964d0720f`.
+- Packaging script reported 23 top-level source, manifest, patch and notice entries; nested upstream tarballs contain more files. No archive inspection or independent checksum verification has occurred in this assistant session.
+- Keep the `-REVIEW` suffix until component and transitive-dependency source compliance is verified and release owner signs off.
