@@ -16,7 +16,7 @@ echo '== Package metadata =='
 dpkg-deb -f "$DEB" Package Version Architecture Depends
 echo '== Local checksums =='
 sha256sum "$DEB" "$FLATPAK"
-if [[ -f dist/SHA256SUMS ]]; then (cd dist && sha256sum -c SHA256SUMS); fi
+if [[ -f dist/SHA256SUMS ]]; then sha256sum -c dist/SHA256SUMS; fi
 echo '== APT installed and candidate =='
 apt-cache policy jatayu-media-player
 echo '== Flatpak public remote =='
