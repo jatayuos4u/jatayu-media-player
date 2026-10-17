@@ -51,3 +51,10 @@ No tag, release publication, website merge, or rebuild is authorized by this che
 - `sha256sum -c SHA256SUMS` reported `OK` for both release binary files.
 - Evidence folder `dist/v1-compliance-evidence/` generated; its local Flatpak info/permissions files are 88 bytes and require inspection (may be error output, **not** confirmed Flatpak installed metadata).
 - Third-party license and complete corresponding-source obligations **remain unverified**. No publication authorized.
+
+## Upstream source collection prepared — 17 October 2026
+
+- [x] `scripts/collect-v1-upstream-sources.py` added for locally fetching pinned Flatpak libmpv dependency sources and project patches with commit/SHA256 verification. It **has not yet been run**; downloading may use substantial disk space and network traffic. It does not rebuild or publish binaries.
+- [ ] Run `python3 scripts/collect-v1-upstream-sources.py` on a connected system with sufficient free disk space; inspect downloaded `COPYING`/`LICENSE`/`Copyright` files and exact patched build configuration.
+- [ ] Evaluate mpv GPL mode (manifest does not pass `-Dgpl=false`), linked FFmpeg license/build options, possible runtime dependencies, and license compatibility before external distribution.
+- [ ] Review complete corresponding-source and attribution bundle; no legal clearance implied by this script.
