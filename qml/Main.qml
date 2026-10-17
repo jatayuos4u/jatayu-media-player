@@ -1650,7 +1650,7 @@ ApplicationWindow {
                 }
                 Button { text: "Subtitles"; visible: window.width >= 1450; onClicked: subtitleDialog.open() }
                 Button { text: "Caption tools"; visible: window.width >= 1450; onClicked: captionTools.open() }
-                Button { text: "Help ▾"; visible: window.width >= 1350; onClicked: helpMenu.popup() }
+                Button { text: "Help ▾"; onClicked: helpMenu.popup() }
                 Menu {
                     id: helpMenu
                     MenuItem { text: "Getting started"; onTriggered: gettingStartedDialog.open() }
