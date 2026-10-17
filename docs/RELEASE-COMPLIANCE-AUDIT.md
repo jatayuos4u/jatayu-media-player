@@ -61,7 +61,11 @@ APT remove does not necessarily purge personal settings (QSettings under user ho
 - [ ] Debian APT upgrade from an older installed revision to a newer one explicitly verified (APT source and installation were verified, but upgrade transaction history was not captured).
 - [ ] Independent clean-machine and non-Debian-distribution compatibility verified.
 - [ ] Complete review of bundled Flatpak source components, license configurations, branding and corresponding source for GPL obligations.
-- [ ] Application file associations, uninstall and reinstall on a clean system verified.
+- [x] Application uninstall and reinstall on the existing Debian 13 test laptop confirmed by maintainer (not an independent clean OS test). Desktop-file association test remains pending.
 - [ ] Final release notes and source archive reconciled against the exact published binaries.
+
+- [x] On the existing development laptop, maintainer uninstalled Debian and Flatpak application installations, backed up player settings, confirmed no installed package/executable and no duplicate media-player desktop entries, then reinstalled the Debian package from the signed APT repository and confirmed launch and playback. This is a **fresh-application-state test**, not an independent clean Debian system test.
+- [ ] Independently verify a fresh Debian 13 OS installation in a disposable VM or separate computer; verify supported desktop launch associations.
+- [ ] Inspect full runtime/bundled-license notices before redistribution.
 
 **Important:** The checks above reflect maintainer-supplied terminal output and screenshots. They are not a substitute for a legal review or reproducible third-party independent testing.
