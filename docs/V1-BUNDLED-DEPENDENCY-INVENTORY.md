@@ -38,3 +38,12 @@ Maintainer demonstrated signed Flatpak installation from GitHub Pages and update
 - FFmpeg: https://ffmpeg.org/legal.html — check actual enabled libraries, nonfree/GPL flags and dependencies; do not assume the runtime's license configuration.
 
 These are pointers for source inspection, **not findings of legal compatibility or proof that corresponding source is bundled**. Archive the relevant notices and source packages before a general public release.
+
+## External licensing research — 17 October 2026 (not binary-specific clearance)
+
+- **mpv v0.39.0:** upstream Copyright describes GPL-2.0-or-later default, with LGPL-2.1-or-later possible if built using `-Dgpl=false` and relevant sources omitted. Current local `flatpak/libmpv.json` passes only `-Dbuild-date=false` and `-Dlibmpv=true`; **it does not explicitly set `-Dgpl=false`**. Treat built libmpv as possibly GPL, subject to actual configuration; inspect linked FFmpeg as well. Upstream: https://github.com/mpv-player/mpv/blob/v0.39.0/Copyright
+- **LuaJIT:** upstream COPYRIGHT documents MIT licensing and embedded portions; full notices should accompany redistribution. https://github.com/LuaJIT/LuaJIT/blob/v2.1/COPYRIGHT
+- **uchardet:** upstream advertises MPL-1.1, GPL-2.0-or-later, LGPL-2.1-or-later for different contents. Do not label entire build under a single license until exact COPYING and source files inspected. https://gitlab.freedesktop.org/uchardet/uchardet
+- **libass / libplacebo / FFmpeg / Qt:** exact pinned file licenses, linked dependency configurations and bundled-runtime boundary remain unverified.
+
+**Important distinction:** public upstream licensing descriptions are informative but do not replace a report of actual binary configuration or complete corresponding-source availability. The application source tarball created from `git archive` is not a source bundle for all external Flatpak modules.
