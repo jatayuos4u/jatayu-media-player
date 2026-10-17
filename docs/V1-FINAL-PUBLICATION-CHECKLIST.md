@@ -67,5 +67,5 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 ## Exact upstream license file inventory — maintainer report 17 October 2026
 
 - [x] Maintainer ran `scripts/inventory-v1-upstream-licenses.py` successfully; **11 file occurrences** identified (some repeated between source archives and checked-out trees), including mpv `Copyright`, `LICENSE.GPL`, `LICENSE.LGPL`; LuaJIT `COPYRIGHT`; libass `COPYING`; uchardet `COPYING`; libplacebo `LICENSE` and `demos/LICENSE`.
-- [x] Added `scripts/extract-v1-upstream-licenses.py` to copy those inventoried exact license files to a review directory without changing release binaries; **not yet executed**.
+- [x] Added `scripts/extract-v1-upstream-licenses.py`; maintainer ran it successfully on 17 October 2026 and reported 11 license/notice file occurrences extracted to `dist/v1-upstream-source-review/license-review/`.
 - [ ] Read actual license text, inspect files with nonstandard names, establish licensing and attribution of each built component, confirm binary-specific build configuration, and assess corresponding sources and patches.
