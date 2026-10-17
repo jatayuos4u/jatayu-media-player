@@ -29,7 +29,7 @@ The repository signing fingerprint must match the independently recorded release
 4. Check the simulated operation for unwanted package removals. Install:
    ```bash
    sudo apt install jatayu-media-player
-   dpkg-query -W -f='\${Status} \${Version}\\n' jatayu-media-player
+   dpkg-query -W -f='${Status} ${Version}\n' jatayu-media-player
    sudo dpkg -V jatayu-media-player
    /usr/bin/jatayu-media-player
    ```
