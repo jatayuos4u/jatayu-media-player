@@ -97,3 +97,10 @@ The report is only *head -n 35* of each file. No full review of its terms, excep
 - Files with the same SONAMEs also exist in installed freedesktop codecs-extra and KDE SDK trees. This `find` output does **not** establish which instance libmpv loads at runtime; the app Flatpak's declared runtime namespace needs confirmation.
 - Earlier app-tree search found none of those three FFmpeg libraries under `flatpak-build/files`. They are therefore not evidenced as directly included in the staged app filesystem, while bundled libmpv still links to their ABI.
 - Remaining: verify effective runtime library resolution and FFmpeg license/configuration from the runtime's build provenance, not simply installed paths.
+
+## Actual Flatpak runtime resolution — maintainer test
+
+- `flatpak build flatpak-build sh -c 'ldd /app/lib/libmpv.so.2.3.0 ...'` resolved `libavcodec.so.61`, `libavfilter.so.10`, `libavformat.so.61`, and `libavutil.so.59` from `/usr/lib/x86_64-linux-gnu/codecs-extra/lib/`.
+- Flatpak staging metadata declares runtime `org.kde.Platform/x86_64/6.10`, SDK `org.kde.Sdk/x86_64/6.10`, and `filesystems=home;/media;xdg-config/kdeglobals:ro;/run/media;`.
+- The app staging tree contains `files/lib/libmpv.so.2.3.0` (reported 2.6 MB). This confirms an application-bundled libmpv alongside an external runtime codec-extension dependency.
+- Caveat: `ldd` describes this tested staging runtime environment; different installations may mount other compatible codec extensions. Source/licensing requirements for the bundled mpv tree and runtime-provider provenance still require review.
