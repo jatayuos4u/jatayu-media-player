@@ -69,3 +69,9 @@ APT remove does not necessarily purge personal settings (QSettings under user ho
 - [ ] Inspect full runtime/bundled-license notices before redistribution.
 
 **Important:** The checks above reflect maintainer-supplied terminal output and screenshots. They are not a substitute for a legal review or reproducible third-party independent testing.
+
+## Additional maintainer report — 17 October 2026
+
+- [x] Maintainer reports successful installation and operation of Jatayu Media Player 1.0.0 from the .deb in a fresh Debian 13 virtual machine.
+- [ ] Detailed VM test log, machine specifications, full feature checklist and VM uninstall/reinstall not supplied; these remain unverified.
+- [ ] License provenance and complete corresponding-source distribution review remain open, independently of functional testing.
