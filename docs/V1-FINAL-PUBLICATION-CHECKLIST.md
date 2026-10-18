@@ -108,3 +108,11 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Maintainer-reported SHA256 of newly regenerated test package: `f6a763dcffac6376b47d8d69eefbfe319c35f91834843612284a1fd0ae6980ee`. This supersedes earlier **test** hash `c48d11dd...`, not the older release candidate's separate hash.
 - [ ] Install this exact package on affected VM and confirm title contrast, media browsing, and audio/video playback.
 - [ ] Rebuild and retest Flatpak from matching source revision before publishing corrected 1.0.0 artifacts.
+
+## Cross-distribution UI regression test sign-off — 18 October 2026
+
+- [x] Maintainer tested updated `1.0.0-3` Debian candidate on **Kubuntu, Lubuntu and Debian 13 KDE**; all functions reported working, including playback. JatayuOS had previously passed.
+- [x] Screenshots show repaired About dialog heading/readability and actual `video-testing.mp4` frames with active playback. Other functions and sound are maintainer-reported, not independently instrumented.
+- [x] Accepted updated Debian candidate for *release preparation* with maintainer SHA256 `f6a763dcffac6376b47d8d69eefbfe319c35f91834843612284a1fd0ae6980ee`.
+- [ ] Build and test matching Flatpak at **the exact current source revision**, then record both final asset hashes; previous Flatpak does not include the theme fix.
+- [ ] Finish outstanding third-party/source compliance and sign-off before publication. No release or website publication is authorized by this record.
