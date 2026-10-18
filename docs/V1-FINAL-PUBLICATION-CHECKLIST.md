@@ -101,3 +101,10 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Maintainer-reported SHA256: `c48d11ddbec8fd072aca86930b7353af7f1cf99d4fca523088181e173c339d74`.
 - [ ] Install new package in the affected test distro and check About, Troubleshooting, Queue, Media Browser and other dialogs for contrast; test basic playback.
 - [ ] If accepted, rebuild/retest Flatpak with same UI fix, update release package hashes, source build commit and corresponding-source archive. **Do not publish the earlier packages as if they contain this fix.**
+
+## Revised dialog-heading test package — 18 October 2026
+
+- [x] Maintainer compiled QML title-header fix at commit `3d6ba15be78e4555d5f81267c92a21fe62caf702`, linked executable successfully, and generated updated Debian package `dist/theme-fix-test/jatayu-media-player_1.0.0_x86_64.deb` (package revision 1.0.0-3).
+- [x] Maintainer-reported SHA256 of newly regenerated test package: `f6a763dcffac6376b47d8d69eefbfe319c35f91834843612284a1fd0ae6980ee`. This supersedes earlier **test** hash `c48d11dd...`, not the older release candidate's separate hash.
+- [ ] Install this exact package on affected VM and confirm title contrast, media browsing, and audio/video playback.
+- [ ] Rebuild and retest Flatpak from matching source revision before publishing corrected 1.0.0 artifacts.
