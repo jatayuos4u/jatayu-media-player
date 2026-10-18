@@ -116,3 +116,12 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Accepted updated Debian candidate for *release preparation* with maintainer SHA256 `f6a763dcffac6376b47d8d69eefbfe319c35f91834843612284a1fd0ae6980ee`.
 - [ ] Build and test matching Flatpak at **the exact current source revision**, then record both final asset hashes; previous Flatpak does not include the theme fix.
 - [ ] Finish outstanding third-party/source compliance and sign-off before publication. No release or website publication is authorized by this record.
+
+## Updated Flatpak local install and playback — 18 October 2026
+
+- [x] Maintainer built updated Flatpak staging, exported OSTree commit `acda0928c7ef6611c9f7b675e8787188a54886d55c0bc81da828167fc1e6e674`, and generated a 15 MB local `.flatpak` bundle.
+- [x] Updated bundle SHA256 reported as `42b5139bd5aeb3e6a0096b1d9f60f4233d1be534a5ce8078e36ec6acd142490b`. **Old signed Flatpak commit/hash belong to the earlier build and must not be presented as this corrected build.**
+- [x] Maintainer installed updated Flatpak with corrected file path and reports that functionality works. Screenshots show readable About dialog on dark theme, progress for WEBM media, and visible MP4 playback. Sound and full feature test are maintainer-reported.
+- [x] Maintainer authorized use of the three 18 Oct Flatpak screenshots for release and website. Images are from a user test desktop; use modest cropped/optimized versions without implying independent distro certification.
+- [ ] Final third-party license/corresponding-source review remains pending; previous corresponding-source archive points to an older application source commit and must be regenerated to match *corrected build source revision*.
+- [ ] Release upload, checksum re-verification, signing/repository update and public website merge remain pending.
