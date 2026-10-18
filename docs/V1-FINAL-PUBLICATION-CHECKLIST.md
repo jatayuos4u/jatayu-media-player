@@ -164,3 +164,12 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Source-commit identity matched `cdccb895c3b80f9ecac8827cb115adc43bdaa731`.
 - [ ] mpv build binary GPL configuration **unverified**; manifest has no explicit `-Dgpl` override. This alone does not prove actual binary option state.
 - [ ] Release remains blocked on complete third-party rights/source/notice validation and maintainer approval, not binary integrity.
+
+## Corrected 1.0.0 theme-fixed immutable asset audit — 18 October 2026
+
+- [x] Maintainer ran `scripts/check-v1-publish-assets.py` after updating branch to commit `4e0cf35`.
+- [x] Debian 1.0.0-3 candidate SHA256: `f6a763dcffac6376b47d8d69eefbfe319c35f91834843612284a1fd0ae6980ee` — PASS.
+- [x] Matching updated Flatpak SHA256: `42b5139bd5aeb3e6a0096b1d9f60f4233d1be534a5ce8078e36ec6acd142490b` — PASS.
+- [x] Matching corresponding-source REVIEW archive SHA256: `cd9aaca96d5d1af7aeb4cfcd4430ee35981dd282ca67d9e70865019bcf51c180` — PASS; 23 archive members.
+- [x] Built application source commit `3d6ba15be78e4555d5f81267c92a21fe62caf702` — PASS.
+- [ ] Complete source/rights audit and authorize release. Earlier `1.0.0-2` artifact verification should not be used as release sign-off for the corrected candidate.
