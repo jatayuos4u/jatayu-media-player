@@ -182,3 +182,11 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [ ] **Maintainer action:** run `bash scripts/stage-v1-theme-fixed-candidate.sh && python3 scripts/check-v1-publish-assets.py` after `git pull origin feature/playback-v0.3`. Staging does not rebuild binaries or publish files; review hash will change due to updated notices.
 - [ ] Human review of effective library licenses and exact copied corresponding sources remains required; no automatic scanner or source archive checksum is a legal clearance.
 - [ ] Confirm ownership/licenses of **all** shipped image assets, not just the main AI-generated icon. Obtain explicit maintainer final publication approval once all checks are resolved.
+
+## Final notices regeneration and verification — 18 October 2026
+
+- [x] Maintainer reran `bash scripts/stage-v1-theme-fixed-candidate.sh` and `python3 scripts/check-v1-publish-assets.py` after pulling source branch at `10e3740`.
+- [x] Source, binary, notices and license staging checks reported `OK`. Debian binary SHA256 `f6a763dcffac6376b47d8d69eefbfe319c35f91834843612284a1fd0ae6980ee`; Flatpak SHA256 `42b5139bd5aeb3e6a0096b1d9f60f4233d1be534a5ce8078e36ec6acd142490b`.
+- [x] Regenerated corresponding-source REVIEW archive SHA256 `020b7acdca7ef58680cf595357020bdd11680b36464e0410b8c83a6e155ddbbf`, structurally verified with 23 file entries; previous source archive checksums superseded.
+- [x] Source commit `3d6ba15be78e4555d5f81267c92a21fe62caf702` matched.
+- [ ] Outstanding: per-component exact license/source completeness review, binary-specific mpv config provenance, and final rights/maintainer compliance sign-off. No release or website publication made.
