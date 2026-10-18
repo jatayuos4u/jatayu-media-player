@@ -146,8 +146,6 @@ ApplicationWindow {
     }
     Dialog {
         id: mediaBrowser
-        // Do not inherit a light popup background from the host distribution.
-        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Open media"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -925,8 +923,6 @@ ApplicationWindow {
     }
     Dialog {
         id: coverChooser
-        // Do not inherit a light popup background from the host distribution.
-        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Choose album artwork"
         modal: true
         anchors.centerIn: Overlay.overlay
