@@ -6,11 +6,11 @@ import tarfile
 from pathlib import Path
 
 root=Path(__file__).resolve().parents[1]
-staged=root/"dist/release-candidate-1.0.0"
+staged=root/"dist/release-candidate-1.0.0-theme-fixed"
 expected={
- "jatayu-media-player_1.0.0_x86_64.deb":"0b40619a0ae1268dc18b6f35d961391d0bac8afe7eef47d776f9b51594d7d0dd",
- "io.github.jatayuos4u.JatayuMediaPlayer-1.0.0-x86_64.flatpak":"0979e87c1c52b6caa0bdd903c48f03f598dde61deb3220bb91e3dd16db70895c",
- "jatayu-media-player-1.0.0-corresponding-sources-REVIEW.tar.gz":"cc7efee35ed7f201fc8a0a06a9d29c48cde4dd928617cee818b65f4964d0720f"
+ "jatayu-media-player_1.0.0_x86_64.deb":"f6a763dcffac6376b47d8d69eefbfe319c35f91834843612284a1fd0ae6980ee",
+ "io.github.jatayuos4u.JatayuMediaPlayer-1.0.0-x86_64.flatpak":"42b5139bd5aeb3e6a0096b1d9f60f4233d1be534a5ce8078e36ec6acd142490b",
+ "jatayu-media-player-1.0.0-corresponding-sources-REVIEW.tar.gz":"cd9aaca96d5d1af7aeb4cfcd4430ee35981dd282ca67d9e70865019bcf51c180"
 }
 errors=[]
 for filename,digest in expected.items():
@@ -22,7 +22,7 @@ for filename,digest in expected.items():
  print(("PASS" if h==digest else "FAIL")+" SHA256 "+filename+" "+h)
  if h!=digest: errors.append("HASH MISMATCH "+filename)
 p=staged/"SOURCE-COMMIT.txt"
-if not p.is_file() or p.read_text().strip()!="cdccb895c3b80f9ecac8827cb115adc43bdaa731":
+if not p.is_file() or p.read_text().strip()!="3d6ba15be78e4555d5f81267c92a21fe62caf702":
  errors.append("Source-commit identifier mismatch")
 else: print("PASS source-commit identity")
 manifest=json.loads((root/"flatpak/libmpv.json").read_text())
