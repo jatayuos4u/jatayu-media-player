@@ -173,3 +173,12 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Matching corresponding-source REVIEW archive SHA256: `cd9aaca96d5d1af7aeb4cfcd4430ee35981dd282ca67d9e70865019bcf51c180` — PASS; 23 archive members.
 - [x] Built application source commit `3d6ba15be78e4555d5f81267c92a21fe62caf702` — PASS.
 - [ ] Complete source/rights audit and authorize release. Earlier `1.0.0-2` artifact verification should not be used as release sign-off for the corrected candidate.
+
+## Pending-work consolidation — 18 October 2026
+
+- [x] Corrected `docs/V1-RELEASE-NOTES-DRAFT.md` to describe the tested theme-fixed Debian package revision `1.0.0-3` and the Kubuntu/Lubuntu/Debian KDE test scope.
+- [x] Removed obsolete hard-coded source-review checksum from `THIRD_PARTY_NOTICES.md`; release artifacts must use newly generated `SOURCE-REVIEW-SHA256SUMS`.
+- [x] Updated `scripts/check-v1-publish-assets.py` to read the regenerated archive checksum from staging, and reject staging when its notice file differs from current `THIRD_PARTY_NOTICES.md`.
+- [ ] **Maintainer action:** run `bash scripts/stage-v1-theme-fixed-candidate.sh && python3 scripts/check-v1-publish-assets.py` after `git pull origin feature/playback-v0.3`. Staging does not rebuild binaries or publish files; review hash will change due to updated notices.
+- [ ] Human review of effective library licenses and exact copied corresponding sources remains required; no automatic scanner or source archive checksum is a legal clearance.
+- [ ] Confirm ownership/licenses of **all** shipped image assets, not just the main AI-generated icon. Obtain explicit maintainer final publication approval once all checks are resolved.
