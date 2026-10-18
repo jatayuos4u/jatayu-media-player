@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Publish the already-tested theme-fixed release from the maintainer's laptop.
 # Requires: gh CLI authenticated with repo release write access.
-# Requires explicit completed compliance sign-off and RUN_RELEASE=YES.
+# Requires explicit CREATE_DRAFT=YES; this does not authorize public release.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 [[ "${RUN_RELEASE:-}" == YES ]] || { echo "STOP: set RUN_RELEASE=YES only after final compliance sign-off." >&2; exit 2; }
@@ -29,10 +29,12 @@ gh release create v1.0.0 \
   "$STAGE/jatayu-media-player-1.0.0-source.tar.gz" \
   "$STAGE/LICENSE" \
   "$STAGE/THIRD_PARTY_NOTICES.md" \
+  "$STAGE/jatayu-media-player-1.0.0-corresponding-sources-REVIEW.tar.gz" \
+  "$STAGE/SOURCE-REVIEW-SHA256SUMS" \
   --repo jatayuos4u/jatayu-media-player \
   --target "$SOURCE" \
   --title "Jatayu Media Player 1.0.0" \
   --notes-file docs/V1-FINAL-RELEASE-NOTES.md \
   --draft
-echo "DRAFT created. Confirm required corresponding sources and all assets are attached and checked BEFORE publishing the draft."
+echo "DRAFT created. Confirm asset checksums and third-party compliance BEFORE publishing the draft."
 echo "Corresponding-source archive remains REVIEW; do not present it as legally complete without substantive clearance."
