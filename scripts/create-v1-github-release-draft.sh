@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Publish the already-tested theme-fixed release from the maintainer's laptop.
+# Create a GitHub RELEASE DRAFT for the verified build; do not publish.
 # Requires: gh CLI authenticated with repo release write access.
 # Requires explicit CREATE_DRAFT=YES; this does not authorize public release.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-[[ "${RUN_RELEASE:-}" == YES ]] || { echo "STOP: set RUN_RELEASE=YES only after final compliance sign-off." >&2; exit 2; }
+[[ "${CREATE_DRAFT:-}" == YES ]] || { echo "STOP: set CREATE_DRAFT=YES to permit an unpublished draft." >&2; exit 2; }
 command -v gh >/dev/null || { echo "Install/authenticate GitHub CLI (gh)" >&2; exit 2; }
 command -v sha256sum >/dev/null
 STAGE="dist/release-candidate-1.0.0-theme-fixed"
@@ -17,9 +17,7 @@ if gh release view v1.0.0 --repo jatayuos4u/jatayu-media-player >/dev/null 2>&1;
   echo "STOP: tag/release v1.0.0 already exists; do not overwrite" >&2
   exit 2
 fi
-[[ "${COMPLIANCE_SIGNED_OFF:-}" == YES ]] || {
-  echo "STOP: compliance approval not provided; record qualified review before publishing." >&2; exit 2;
-}
+echo "NOTICE: compliance remains open; keep this release DRAFT until review is complete."
 echo "Creating release v1.0.0 targeting tested source revision: $SOURCE"
 gh release create v1.0.0 \
   "$STAGE/jatayu-media-player_1.0.0_x86_64.deb" \
