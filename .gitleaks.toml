@@ -1,0 +1,5 @@
+[allowlist]
+description = "Public release signing-key fingerprint"
+regexes = [
+  '''FCAD173B005222F8DCB16C691002D7BA2CD8EB09'''
+]
