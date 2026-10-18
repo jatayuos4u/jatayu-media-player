@@ -148,3 +148,9 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Corresponding-source REVIEW archive re-generated with 23 entries; maintainer-reported SHA256 `cd9aaca96d5d1af7aeb4cfcd4430ee35981dd282ca67d9e70865019bcf51c180`, and `SOURCE-REVIEW-SHA256SUMS` reported `OK`. This supersedes `1d1c66ea...` and previous review digests.
 - [x] Tested application build source remains `3d6ba15be78e4555d5f81267c92a21fe62caf702`; no binary rebuild or publication occurred.
 - [ ] License compatibility and complete corresponding-source adequacy still require independent/full review and maintainer approval; `REVIEW` archive title must not imply clearance.
+
+## Final immutable artifact check — 18 October 2026
+
+- [x] Added `scripts/check-v1-publish-assets.py`: read-only SHA256 verification for the original .deb and Flatpak, archive hash and structural checks, source-commit identity, and explicit warning on missing recorded mpv GPL option.
+- [ ] Maintainer to run verification on the local final staged files; passing means artifact identity and source-review structure only, **not third-party legal clearance**.
+- [ ] Separately review resulting source notice archive for actual component licenses/source completeness and record release-owner compliance sign-off.
