@@ -17,7 +17,7 @@ Jatayu Media Player is a free, open-source music and video player for Linux crea
 - Independent Linux app; it is **not preinstalled in JatayuOS**
 
 ### Packages
-- Debian amd64 `.deb`, software version `1.0.0`, Debian revision `1.0.0-2`
+- Debian amd64 `.deb`, software version `1.0.0`, Debian revision `1.0.0-3`
 - Flatpak bundle `io.github.jatayuos4u.JatayuMediaPlayer`, runtime `org.kde.Platform//6.10`
 
 ### Update channels
@@ -28,12 +28,12 @@ Final release assets must include SHA256 checksums and a source commit identifie
 
 ### Known limitations
 - Hardware acceleration and codec support depend on available drivers and the respective dependency stack.
-- Initial verification performed primarily on Debian 13 and a separate Flatpak installation.
-- Fresh Debian 13 VM installation and operation confirmed by maintainer; broad distribution compatibility and VM uninstall testing remain unverified.
+- Maintainer tested corrected Debian package on Debian 13 KDE, Kubuntu and Lubuntu; corrected Flatpak also locally installed and tested.
+- Fresh Debian 13 VM installation and operation confirmed by maintainer; other Linux distributions and desktop environments remain unverified.
 
 ### Official links
 - Website: https://jatayuos.in
 - Project: https://github.com/jatayuos4u/jatayu-media-player
 - Bugs: https://github.com/jatayuos4u/jatayu-media-player/issues
 
-**Release gate:** Do not publish this draft, tag `v1.0.0` or claim automatic APT upgrades until remaining tests and license notices are reviewed.
+**Release gate:** Do not publish this draft, tag `v1.0.0` or claim automatic APT upgrades until remaining third-party licensing, corresponding-source review and package publication checks are approved.
