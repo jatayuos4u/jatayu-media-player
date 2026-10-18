@@ -19,7 +19,7 @@ unknown=[]
 tri=[]
 for p in files:
     head=p.read_text(encoding="utf-8",errors="replace")[:2800]
-    if re.search(r"MPL\\s*1\\.1\\s*/\\s*GPL|Alternatively, the contents of this file may be used",head,re.I):
+    if re.search(r"MPL\s*1\.1\s*/\s*GPL|Alternatively, the contents of this file may be used",head,re.I):
         tri.append(str(p.relative_to(src)))
     elif re.search(r"GPL|LGPL|MIT|ISC|BSD|public domain|copyright|mozilla public license",head,re.I):
         unknown.append((str(p.relative_to(src)),"license wording requires inspection"))
