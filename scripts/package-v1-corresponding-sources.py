@@ -4,13 +4,14 @@ No binary rebuild, tag, upload or legal certification.
 """
 from pathlib import Path
 import hashlib
+import os
 import json
 import shutil
 import tarfile
 
 root=Path(__file__).resolve().parents[1]
 source=root/"dist/v1-upstream-source-review"
-release=root/"dist/release-candidate-1.0.0"
+release=Path(os.environ.get("JATAYU_RELEASE_REVIEW_DIR",str(root/"dist/release-candidate-1.0.0"))).resolve()
 if not source.is_dir() or not release.is_dir():
     raise SystemExit("Missing upstream source review or staged release directory")
 manifest=json.loads((root/"flatpak/libmpv.json").read_text())
