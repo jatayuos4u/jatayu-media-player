@@ -1,6 +1,6 @@
 # Jatayu Media Player 1.0.0 — final publication checklist
 
-Status: **Prepared, not approved for publication**. Target 19 October 2026.
+Status: **Corrected candidate staged and tested; not approved for publication**. Requested release date 18 October 2026. The historic 1.0.0-2 entries below refer to a superseded build; final candidate is 1.0.0-3.
 
 ## Immutable tested build
 - Built from source commit: `cdccb895c3b80f9ecac8827cb115adc43bdaa731` (as recorded by local build verification).
@@ -135,3 +135,9 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [ ] Check package reproducibility/provenance of source revision, then upload and verify final assets after release authorization.
 - [ ] Update signed APT and Flatpak remotes only with intended approved artifacts; older remote packages do not include theme fix.
 - [ ] Merge website PR #4 only after real release links are available and approved.
+
+## Notices refresh — 18 October 2026
+
+- [x] Rewrote `THIRD_PARTY_NOTICES.md` to distinguish directly bundled components and external codec runtime, record pinned known license terms and broad sandbox permissions, and accurately preserve unresolved legal questions.
+- [ ] **Regenerate the corrected candidate corresponding-source review archive now that `THIRD_PARTY_NOTICES.md` has changed.** Its previous digest `1d1c66ea...` is superseded after regeneration. Run `bash scripts/stage-v1-theme-fixed-candidate.sh` again and record its new digest; existing `.deb` and Flatpak binary hashes must remain unchanged.
+- [ ] Have qualified reviewer/maintainer confirm complete corresponding sources and exact-file notices before removing `REVIEW` designation.
