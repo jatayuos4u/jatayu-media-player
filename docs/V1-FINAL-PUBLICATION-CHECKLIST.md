@@ -141,3 +141,10 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Rewrote `THIRD_PARTY_NOTICES.md` to distinguish directly bundled components and external codec runtime, record pinned known license terms and broad sandbox permissions, and accurately preserve unresolved legal questions.
 - [ ] **Regenerate the corrected candidate corresponding-source review archive now that `THIRD_PARTY_NOTICES.md` has changed.** Its previous digest `1d1c66ea...` is superseded after regeneration. Run `bash scripts/stage-v1-theme-fixed-candidate.sh` again and record its new digest; existing `.deb` and Flatpak binary hashes must remain unchanged.
 - [ ] Have qualified reviewer/maintainer confirm complete corresponding sources and exact-file notices before removing `REVIEW` designation.
+
+## Updated notices archive verified — 18 October 2026
+
+- [x] Maintainer reran `scripts/stage-v1-theme-fixed-candidate.sh` after updating third-party notices and fixing the stage validation check. Debian 1.0.0-3, corrected Flatpak, application source, LICENSE and THIRD_PARTY_NOTICES.md all reported `OK`.
+- [x] Corresponding-source REVIEW archive re-generated with 23 entries; maintainer-reported SHA256 `cd9aaca96d5d1af7aeb4cfcd4430ee35981dd282ca67d9e70865019bcf51c180`, and `SOURCE-REVIEW-SHA256SUMS` reported `OK`. This supersedes `1d1c66ea...` and previous review digests.
+- [x] Tested application build source remains `3d6ba15be78e4555d5f81267c92a21fe62caf702`; no binary rebuild or publication occurred.
+- [ ] License compatibility and complete corresponding-source adequacy still require independent/full review and maintainer approval; `REVIEW` archive title must not imply clearance.
