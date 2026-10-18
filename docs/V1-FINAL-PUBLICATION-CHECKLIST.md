@@ -154,3 +154,13 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Added `scripts/check-v1-publish-assets.py`: read-only SHA256 verification for the original .deb and Flatpak, archive hash and structural checks, source-commit identity, and explicit warning on missing recorded mpv GPL option.
 - [ ] Maintainer to run verification on the local final staged files; passing means artifact identity and source-review structure only, **not third-party legal clearance**.
 - [ ] Separately review resulting source notice archive for actual component licenses/source completeness and record release-owner compliance sign-off.
+
+## Immutable final asset audit — maintainer report 18 October 2026
+
+- [x] `python3 scripts/check-v1-publish-assets.py` run successfully after pulling commit `45014f1`.
+- [x] `.deb` SHA256 matched `0b40619a0ae1268dc18b6f35d961391d0bac8afe7eef47d776f9b51594d7d0dd`.
+- [x] Flatpak SHA256 matched `0979e87c1c52b6caa0bdd903c48f03f598dde61deb3220bb91e3dd16db70895c`.
+- [x] Corresponding-source REVIEW archive SHA256 matched `cc7efee35ed7f201fc8a0a06a9d29c48cde4dd928617cee818b65f4964d0720f`; 23 archive entries present.
+- [x] Source-commit identity matched `cdccb895c3b80f9ecac8827cb115adc43bdaa731`.
+- [ ] mpv build binary GPL configuration **unverified**; manifest has no explicit `-Dgpl` override. This alone does not prove actual binary option state.
+- [ ] Release remains blocked on complete third-party rights/source/notice validation and maintainer approval, not binary integrity.
