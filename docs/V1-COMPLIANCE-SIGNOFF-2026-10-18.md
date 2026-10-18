@@ -38,3 +38,11 @@ No version tag, public release, binary upload, website merge or remote package u
 - [x] Five pinned upstream source modules reported present: libmpv, LuaJIT, libass, libplacebo, uchardet.
 - [x] All 18 enumerated app-deployment library paths (`flatpak-build/files/lib`, including SONAME symlinks and debug companions) matched expected filename prefixes; **0 unmapped**.
 - [ ] Important limitation: this is a **filename-based** staging-tree scan, not a cryptographic comparison of the exported Flatpak nor an exhaustive inventory of executable/plugin/data dependencies; source/license completeness and effective build flags are still unverified.
+
+## GitHub release draft verified — 18 October 2026
+
+- [x] GitHub REST API returned release ID `416409763`, `draft=true`, tag_name `v1.0.0`, target_commitish `3d6ba15be78e4555d5f81267c92a21fe62caf702`.
+- [x] All nine expected assets are `uploaded` and have GitHub-reported SHA256 digests.
+- [x] GitHub digests of Debian (`f6a763dc...`), Flatpak (`42b5139b...`) and corresponding-source REVIEW (`020b7acd...`) match maintainer's staged artifact hashes.
+- [ ] **Do not publish** until remaining source/license sign-off. The draft release notes contain a pre-publication warning sentence that must be removed in final published notes.
+- [ ] Website PR #4 remains separate/unpublished.
