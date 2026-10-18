@@ -53,3 +53,9 @@ No version tag, public release, binary upload, website merge or remote package u
 - [ ] The *existing GitHub release draft body* was created before that edit and is **not automatically updated** by repository file changes. Replace release body with the revised notes before publishing.
 - [ ] No new direct evidence or qualified review resolving the remaining license/corresponding-source gaps was provided. **Publication sign-off remains open.**
 - [ ] Release should not be made public while bundled `corresponding-sources-REVIEW.tar.gz` remains uncertified as complete source. Verify notices and build-license conditions, then owner approves publication.
+
+## Nested source archive evidence check (prepared)
+
+- [x] Added `scripts/inspect-v1-nested-license-sources.py` to open the **actual archives inside the release source-review tarball**, check expected upstream license/copyright documents, and report nested archive counts. It does not alter release binaries.
+- [ ] Maintainer needs to run this script on the staged release directory and share results. This is a meaningful next step beyond the previous filename-based mapping scan, but it does not establish complete legal clearance.
+- [ ] Once reviewed and signed off, replace the GitHub release **draft body** with `docs/V1-FINAL-RELEASE-NOTES.md`; the uploaded draft's current body is older and still includes its internal publication warning.
