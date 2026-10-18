@@ -1,39 +1,60 @@
 # Jatayu Media Player
 
-**Every Beat. Every Frame.**
+**Your Media. Your World.**
 
-Early development proof of concept for an independent Linux media player, built using C++20, Qt 6/QML and libmpv. Not yet a stable release, not preinstalled in JatayuOS.
+Jatayu Media Player is a free and open-source Linux music and video player built using C++20, Qt 6/QML and libmpv. It is an independent application, **not bundled with the JatayuOS ISO**.
 
-## Current prototype
+## Version 1.0.0 — Released 18 October 2026
 
-- Playback of locally selected media through libmpv
-- Qt Quick video render surface using the OpenGL-based libmpv render API
-- Play/pause, stop, relative seeking, timeline, volume, fullscreen
-- External subtitle loading, keyboard shortcuts, opening a file via Ctrl+O
-- Dark interface; no advertisement, analytics or telemetry dependencies
+[**Download the official 1.0.0 release**](https://github.com/jatayuos4u/jatayu-media-player/releases/tag/v1.0.0) · [Jatayu Media Player website](https://jatayuos.in/apps/media-player/) · [Report an issue](https://github.com/jatayuos4u/jatayu-media-player/issues)
 
-**Not yet implemented:** playlists, media library, MPRIS, persistence, comprehensive settings, light theme, localization, portable packages, and the full tested codec/support matrix. Real playback has not yet been verified on hardware.
+### Features
 
-## Build locally (Debian 13 / Ubuntu derivatives)
+- Playback of common audio and video formats through libmpv
+- Local media browser, queue, named playlists and music library
+- Subtitles, audio-track selection, playback speed and fullscreen
+- Media metadata, song information and music-mode interface
+- Preferences, keyboard shortcuts, Help and troubleshooting
+- No advertisements, built-in telemetry or required account
+
+Support for particular formats and hardware acceleration varies with the installed codec, runtime and driver stack.
+
+## Install
+
+Choose the official download for your Linux setup:
+
+- [**Debian-compatible amd64 package (.deb)**](https://github.com/jatayuos4u/jatayu-media-player/releases/download/v1.0.0/jatayu-media-player_1.0.0_x86_64.deb) — Debian package revision 1.0.0-3.
+- [**Flatpak bundle (.flatpak)**](https://github.com/jatayuos4u/jatayu-media-player/releases/download/v1.0.0/io.github.jatayuos4u.JatayuMediaPlayer-1.0.0-x86_64.flatpak) — KDE Platform 6.10 runtime.
+- [**SHA256 checksums**](https://github.com/jatayuos4u/jatayu-media-player/releases/download/v1.0.0/SHA256SUMS).
+
+For a downloaded Debian package:
 
 ```bash
-./scripts/setup-linux.sh
-./scripts/build-local.sh
-./build/jatayu-media-player ~/Videos/sample.mp4
+sudo apt install ./jatayu-media-player_1.0.0_x86_64.deb
 ```
 
-Read [docs/BUILD.md](docs/BUILD.md) for environment requirements and diagnostics. The source archive is not a precompiled player. There are no GitHub Actions workflows or artifact uploads.
+For a downloaded Flatpak bundle:
 
-## Keyboard controls
+```bash
+flatpak install --user ./io.github.jatayuos4u.JatayuMediaPlayer-1.0.0-x86_64.flatpak
+```
 
-| Key | Action |
-|---|---|
-| Ctrl+O | Open media |
-| Space | Play / pause |
-| Left / Right | Seek back / forward 5 seconds |
-| F | Fullscreen toggle |
-| Escape | Exit fullscreen |
+Downloading a standalone package does not automatically configure the project's update repository.
 
-## Privacy and licensing
+## Screenshots
 
-Playback of local files does not require an account. The app contains no tracking SDKs or advertising code. libmpv and its dependencies may have their own behaviour; network traffic still needs verification in testing. Source code is provided under GPL-3.0-or-later, with third-party dependencies governed by their respective licenses. Complete redistribution compliance remains a release gate.
+Real application screenshots are available on the [website](https://jatayuos.in/apps/media-player/#screenshots). The website includes home, music, video playback and About screens.
+
+## Build from source
+
+See [docs/BUILD.md](docs/BUILD.md), the [release's matching source snapshot](https://github.com/jatayuos4u/jatayu-media-player/releases/tag/v1.0.0), and the Flatpak build manifests for development requirements. The tested version 1.0.0 was built from commit `3d6ba15be78e4555d5f81267c92a21fe62caf702`.
+
+## Privacy and permissions
+
+The player has no built-in advertising or telemetry and does not require an account for local playback. Its Flatpak requests access to home and removable-media directories so users can browse local media.
+
+## Licensing and source notices
+
+The original application code is licensed **GPL-3.0-or-later**. Third-party components retain their respective licenses. See [LICENSE](LICENSE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and the upstream source-review materials attached to the release. Corresponding-source and third-party compliance review limitations are documented in the project; publication alone does not establish independent legal certification.
+
+Created by **Anup Yadav**. [Project website](https://jatayuos.in/apps/media-player/).
