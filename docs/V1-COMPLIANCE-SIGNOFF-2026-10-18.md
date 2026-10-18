@@ -31,3 +31,10 @@ Applies to corrected theme-fixed candidate, Debian revision **1.0.0-3**, applica
 ## Publication boundary
 
 No version tag, public release, binary upload, website merge or remote package update is authorized by this record.
+
+## Flatpak application-library inventory result — 18 October 2026
+
+- [x] Maintainer executed `scripts/audit-v1-flatpak-bundled-libraries.py` after pulling commit `5856f14`.
+- [x] Five pinned upstream source modules reported present: libmpv, LuaJIT, libass, libplacebo, uchardet.
+- [x] All 18 enumerated app-deployment library paths (`flatpak-build/files/lib`, including SONAME symlinks and debug companions) matched expected filename prefixes; **0 unmapped**.
+- [ ] Important limitation: this is a **filename-based** staging-tree scan, not a cryptographic comparison of the exported Flatpak nor an exhaustive inventory of executable/plugin/data dependencies; source/license completeness and effective build flags are still unverified.
