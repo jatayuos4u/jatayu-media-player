@@ -24,9 +24,7 @@ The application uses a separately installed `org.kde.Platform//6.10` runtime and
 
 ## Corresponding source and build inputs
 
-The candidate review archive includes the application source snapshot, exact pinned upstream archives/commit exports, the original Flatpak manifests, project patches, source inventory and extracted full third-party license texts. Maintainer generated and SHA256-verified the corrected candidate archive with digest:
-
-`1d1c66ea9b8ffb179d58df6528aa1596c3d077bb9a953253be40a5531a2c98ed`.
+The candidate review archive includes the application source snapshot, exact pinned upstream archives/commit exports, the original Flatpak manifests, project patches, source inventory and extracted full third-party license texts. The verified staged archive's digest is recorded separately in `dist/release-candidate-1.0.0-theme-fixed/SOURCE-REVIEW-SHA256SUMS`. Re-run the staging process whenever this notices file changes, because the archive embeds a copy of it. The previous archive SHA256 `cd9aaca96d5d1af7aeb4cfcd4430ee35981dd282ca67d9e70865019bcf51c180` describes the version **before this notice update** and must not be reused after regeneration.
 
 The review archive is **not yet verified to be complete corresponding source for every binary component**; do not change its `REVIEW` label or advertise complete legal clearance until an appropriately qualified reviewer assesses the complete bundle.
 
