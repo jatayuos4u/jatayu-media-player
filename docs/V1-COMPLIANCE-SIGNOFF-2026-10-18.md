@@ -59,3 +59,10 @@ No version tag, public release, binary upload, website merge or remote package u
 - [x] Added `scripts/inspect-v1-nested-license-sources.py` to open the **actual archives inside the release source-review tarball**, check expected upstream license/copyright documents, and report nested archive counts. It does not alter release binaries.
 - [ ] Maintainer needs to run this script on the staged release directory and share results. This is a meaningful next step beyond the previous filename-based mapping scan, but it does not establish complete legal clearance.
 - [ ] Once reviewed and signed off, replace the GitHub release **draft body** with `docs/V1-FINAL-RELEASE-NOTES.md`; the uploaded draft's current body is older and still includes its internal publication warning.
+
+## Nested corresponding-source inspection — maintainer report 18 October 2026
+
+- [x] `scripts/inspect-v1-nested-license-sources.py` completed successfully after branch pull to `1d59559`.
+- [x] Nested archives inspected: mpv/libmpv (775 files, Copyright + LICENSE.GPL + LICENSE.LGPL), libass (95, COPYING), uchardet (303, COPYING), LuaJIT (232, COPYRIGHT), libplacebo (242, LICENSE).
+- [x] Outer REVIEW tarball contains 23 files; SHA256 `020b7acdca7ef58680cf595357020bdd11680b36464e0410b8c83a6e155ddbbf` matched.
+- [ ] This is structural presence evidence, not full license adjudication or build-config proof; reviewer signature still pending. Release remains draft.
