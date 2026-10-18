@@ -1,7 +1,7 @@
 # Jatayu Media Player 1.0.0 — release notes draft
 
 **Status:** Final release candidate. **Not a published release.**
-**Release target:** 19 October 2026, subject to compliance and clean-install sign-off.
+**Requested release date:** 18 October 2026 (advanced from 19 October at maintainer request), pending final compliance clearance and binary asset publication.
 
 ## Your Media. Your World.
 
@@ -29,7 +29,7 @@ Final release assets must include SHA256 checksums and a source commit identifie
 ### Known limitations
 - Hardware acceleration and codec support depend on available drivers and the respective dependency stack.
 - Initial verification performed primarily on Debian 13 and a separate Flatpak installation.
-- Distribution-wide clean-install and uninstall verification pending.
+- Fresh Debian 13 VM installation and operation confirmed by maintainer; broad distribution compatibility and VM uninstall testing remain unverified.
 
 ### Official links
 - Website: https://jatayuos.in
