@@ -93,3 +93,11 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] `scripts/audit-v1-source-review.py` ran successfully on maintainer system: 72 uchardet source/header files examined, 72 matched explicit tri-license patterns, zero unclassified by scanner. This is pattern recognition, **not** an exhaustive build-unit/license legal audit.
 - [x] Corresponding-source REVIEW archive structural check passed, 23 file entries, reported SHA256 `cc7efee35ed7f201fc8a0a06a9d29c48cde4dd928617cee818b65f4964d0720f`, matching previously reported digest.
 - [ ] Verify source archives/build configuration fully correspond to shipped binaries, third-party notices and asset rights; retain REVIEW status pending sign-off.
+
+## Cross-distribution UI theme test build — 18 October 2026
+
+- [x] Maintainer rebuilt the application after the Qt Quick dialog palette/background fix. CPack generated `dist/theme-fix-test/jatayu-media-player_1.0.0_x86_64.deb` successfully.
+- [x] Package metadata reports Debian revision `1.0.0-3` (prior tested candidate was `1.0.0-2`).
+- [x] Maintainer-reported SHA256: `c48d11ddbec8fd072aca86930b7353af7f1cf99d4fca523088181e173c339d74`.
+- [ ] Install new package in the affected test distro and check About, Troubleshooting, Queue, Media Browser and other dialogs for contrast; test basic playback.
+- [ ] If accepted, rebuild/retest Flatpak with same UI fix, update release package hashes, source build commit and corresponding-source archive. **Do not publish the earlier packages as if they contain this fix.**
