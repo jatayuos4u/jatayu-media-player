@@ -66,3 +66,11 @@ No version tag, public release, binary upload, website merge or remote package u
 - [x] Nested archives inspected: mpv/libmpv (775 files, Copyright + LICENSE.GPL + LICENSE.LGPL), libass (95, COPYING), uchardet (303, COPYING), LuaJIT (232, COPYRIGHT), libplacebo (242, LICENSE).
 - [x] Outer REVIEW tarball contains 23 files; SHA256 `020b7acdca7ef58680cf595357020bdd11680b36464e0410b8c83a6e155ddbbf` matched.
 - [ ] This is structural presence evidence, not full license adjudication or build-config proof; reviewer signature still pending. Release remains draft.
+
+## Actual GitHub publication — 18 October 2026
+
+- [x] Release `v1.0.0` is **published**, GitHub REST reports `draft=false` and `published_at=2026-10-18T11:40:02Z` (17:10:02 IST), release ID `416409763`.
+- [x] Release target remains exact build-source commit `3d6ba15be78e4555d5f81267c92a21fe62caf702`.
+- [x] Nine GitHub assets remain present with expected GitHub SHA256 digests, including Debian `f6a763dc...`, Flatpak `42b5139b...`, and REVIEW archive `020b7acd...`.
+- [ ] This confirms **publication**, not external legal clearance; the unresolved review qualifications in this document remain relevant and must not be retroactively marked complete.
+- [ ] Website PR #4 still open, not merged; its mergeability was not confirmed. Update and review public links before deploying.
