@@ -46,3 +46,10 @@ No version tag, public release, binary upload, website merge or remote package u
 - [x] GitHub digests of Debian (`f6a763dc...`), Flatpak (`42b5139b...`) and corresponding-source REVIEW (`020b7acd...`) match maintainer's staged artifact hashes.
 - [ ] **Do not publish** until remaining source/license sign-off. The draft release notes contain a pre-publication warning sentence that must be removed in final published notes.
 - [ ] Website PR #4 remains separate/unpublished.
+
+## Follow-up on release publication request — 18 October 2026
+
+- [x] Removed internal draft-only warning from repository file `docs/V1-FINAL-RELEASE-NOTES.md` for use when publication is authorized.
+- [ ] The *existing GitHub release draft body* was created before that edit and is **not automatically updated** by repository file changes. Replace release body with the revised notes before publishing.
+- [ ] No new direct evidence or qualified review resolving the remaining license/corresponding-source gaps was provided. **Publication sign-off remains open.**
+- [ ] Release should not be made public while bundled `corresponding-sources-REVIEW.tar.gz` remains uncertified as complete source. Verify notices and build-license conditions, then owner approves publication.
