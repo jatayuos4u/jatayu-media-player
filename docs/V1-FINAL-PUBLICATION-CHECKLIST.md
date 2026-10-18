@@ -125,3 +125,13 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Maintainer authorized use of the three 18 Oct Flatpak screenshots for release and website. Images are from a user test desktop; use modest cropped/optimized versions without implying independent distro certification.
 - [ ] Final third-party license/corresponding-source review remains pending; previous corresponding-source archive points to an older application source commit and must be regenerated to match *corrected build source revision*.
 - [ ] Release upload, checksum re-verification, signing/repository update and public website merge remain pending.
+
+## Final theme-fixed candidate assembled — 18 October 2026
+
+- [x] Maintainer ran `bash scripts/stage-v1-theme-fixed-candidate.sh` successfully; checked fixed Debian, Flatpak, matching application-source archive, LICENSE and THIRD_PARTY_NOTICES.md — all `OK` per local hash verification.
+- [x] Local staging folder: `dist/release-candidate-1.0.0-theme-fixed/`; tested app source revision `3d6ba15be78e4555d5f81267c92a21fe62caf702` (not later documentation changes).
+- [x] Corresponding-source REVIEW archive regenerated for this candidate with 23 entries; local reported SHA256 `1d1c66ea9b8ffb179d58df6528aa1596c3d077bb9a953253be40a5531a2c98ed`; review checksum verified `OK`.
+- [ ] Inspect and approve entire source/notices bundle and license compatibility; structural archive success is not legal redistribution clearance.
+- [ ] Check package reproducibility/provenance of source revision, then upload and verify final assets after release authorization.
+- [ ] Update signed APT and Flatpak remotes only with intended approved artifacts; older remote packages do not include theme fix.
+- [ ] Merge website PR #4 only after real release links are available and approved.
