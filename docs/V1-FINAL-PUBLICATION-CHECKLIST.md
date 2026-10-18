@@ -77,7 +77,8 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - [x] Created `scripts/package-v1-corresponding-sources.py` to assemble verified pinned sources, full extracted license texts, manifests, patches and application source into an **offline review archive**. Script has not yet run on maintainer's machine.
 - [x] Maintainer executed corresponding-source review bundler successfully: archive generated with 23 top-level entries, reported SHA256 `cc7efee35ed7f201fc8a0a06a9d29c48cde4dd928617cee818b65f4964d0720f`.
 - [ ] Inspect generated archive contents and nested sources, confirm all actual bundled code and notices are covered; generation success alone is not legal completeness.
-- [ ] Confirm icon/branding rights from asset creator and package distributor.
+- [x] Maintainer reports the Jatayu Media Player logo/icon was generated specifically for the project using ChatGPT image generation. No external commissioned designer or stock asset was identified for that logo/icon; record as AI-assisted original project branding, **not a guarantee of uniqueness, trademark clearance, or rights for every other included asset**.
+- [ ] Check logo/icon distinctiveness against existing marks if intending trademark use; review any additional bundled artwork and third-party source assets.
 - [ ] Maintainer sign-off on compliance before public release.
 
 ## Corresponding-source archive collection report (17 October 2026)
