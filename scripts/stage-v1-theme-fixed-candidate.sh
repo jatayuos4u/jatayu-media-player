@@ -5,6 +5,7 @@ cd "$(dirname "$0")/.."
 DEB="dist/theme-fix-test/jatayu-media-player_1.0.0_x86_64.deb"
 FLATPAK="dist/theme-fix-test/io.github.jatayuos4u.JatayuMediaPlayer-1.0.0-x86_64.flatpak"
 OUT="$PWD/dist/release-candidate-1.0.0-theme-fixed"
+BUILD_SOURCE="3d6ba15be78e4555d5f81267c92a21fe62caf702"
 DEB_SHA="f6a763dcffac6376b47d8d69eefbfe319c35f91834843612284a1fd0ae6980ee"
 FLATPAK_SHA="42b5139bd5aeb3e6a0096b1d9f60f4233d1be534a5ce8078e36ec6acd142490b"
 for tool in git sha256sum dpkg-deb python3 tar; do command -v "$tool" >/dev/null || { echo "Missing $tool" >&2; exit 1; }; done
@@ -17,12 +18,13 @@ if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
   exit 1
 fi
 # Application sources are required to contain both the theme fix and the tested DEB packaging revision.
-git show HEAD:qml/Main.qml | grep -Fq 'Explicit title color: some Qt themes' || { echo "Missing dialog title fix" >&2; exit 1; }
-git show HEAD:CMakeLists.txt | grep -Fq 'set(CPACK_DEBIAN_PACKAGE_RELEASE "3")' || { echo "Missing 1.0.0-3 package revision" >&2; exit 1; }
+git cat-file -e "$BUILD_SOURCE^{commit}"
+git show "$BUILD_SOURCE":qml/Main.qml | grep -Fq 'Explicit title color: some Qt themes' || { echo "Missing dialog title fix" >&2; exit 1; }
+git show "$BUILD_SOURCE":CMakeLists.txt | grep -Fq 'set(CPACK_DEBIAN_PACKAGE_RELEASE "3")' || { echo "Missing 1.0.0-3 package revision" >&2; exit 1; }
 mkdir -p "$OUT"
 cp "$DEB" "$FLATPAK" "$OUT/"
-git rev-parse HEAD > "$OUT/SOURCE-COMMIT.txt"
-git archive --format=tar.gz --prefix=jatayu-media-player-1.0.0/ -o "$OUT/jatayu-media-player-1.0.0-source.tar.gz" HEAD
+printf "%s\n" "$BUILD_SOURCE" > "$OUT/SOURCE-COMMIT.txt"
+git archive --format=tar.gz --prefix=jatayu-media-player-1.0.0/ -o "$OUT/jatayu-media-player-1.0.0-source.tar.gz" "$BUILD_SOURCE"
 cp LICENSE THIRD_PARTY_NOTICES.md docs/V1-RELEASE-NOTES-DRAFT.md "$OUT/"
 (cd "$OUT" && sha256sum "$(basename "$DEB")" "$(basename "$FLATPAK")" jatayu-media-player-1.0.0-source.tar.gz LICENSE THIRD_PARTY_NOTICES.md > SHA256SUMS && sha256sum -c SHA256SUMS)
 JATAYU_RELEASE_REVIEW_DIR="$OUT" python3 scripts/package-v1-corresponding-sources.py
