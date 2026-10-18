@@ -19,8 +19,8 @@ if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
 fi
 # Application sources are required to contain both the theme fix and the tested DEB packaging revision.
 git cat-file -e "$BUILD_SOURCE^{commit}"
-git show "$BUILD_SOURCE":qml/Main.qml | grep -Fq 'Explicit title color: some Qt themes' || { echo "Missing dialog title fix" >&2; exit 1; }
-git show "$BUILD_SOURCE":CMakeLists.txt | grep -Fq 'set(CPACK_DEBIAN_PACKAGE_RELEASE "3")' || { echo "Missing 1.0.0-3 package revision" >&2; exit 1; }
+git grep -Fq 'Explicit title color: some Qt themes' "$BUILD_SOURCE" -- qml/Main.qml || { echo "Missing dialog title fix" >&2; exit 1; }
+git grep -Fq 'set(CPACK_DEBIAN_PACKAGE_RELEASE "3")' "$BUILD_SOURCE" -- CMakeLists.txt || { echo "Missing 1.0.0-3 package revision" >&2; exit 1; }
 mkdir -p "$OUT"
 cp "$DEB" "$FLATPAK" "$OUT/"
 printf "%s\n" "$BUILD_SOURCE" > "$OUT/SOURCE-COMMIT.txt"
