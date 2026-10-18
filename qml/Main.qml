@@ -509,6 +509,18 @@ ApplicationWindow {
     }
     Dialog {
         id: libraryDialog
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: libraryDialog.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Music library"
@@ -737,6 +749,18 @@ ApplicationWindow {
     }
     Dialog {
         id: namedPlaylistsDialog
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: namedPlaylistsDialog.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "My playlists"
@@ -826,6 +850,18 @@ ApplicationWindow {
     }
     Dialog {
         id: playlistEditor
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: playlistEditor.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Edit playlist: " + window.activePlaylist
@@ -880,6 +916,18 @@ ApplicationWindow {
     }
     Dialog {
         id: queueDialog
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: queueDialog.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Up next"
@@ -923,6 +971,18 @@ ApplicationWindow {
     }
     Dialog {
         id: coverChooser
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: coverChooser.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         title: "Choose album artwork"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1009,6 +1069,18 @@ ApplicationWindow {
     }
     Dialog {
         id: editTags
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: editTags.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Edit music information"
@@ -1073,6 +1145,18 @@ ApplicationWindow {
     }
     Dialog {
         id: aboutPlayerDialog
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: aboutPlayerDialog.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "About Jatayu Media Player"
@@ -1109,6 +1193,18 @@ ApplicationWindow {
     }
     Dialog {
         id: gettingStartedDialog
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: gettingStartedDialog.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Getting started"
@@ -1147,6 +1243,18 @@ ApplicationWindow {
     }
     Dialog {
         id: troubleshootingDialog
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: troubleshootingDialog.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Troubleshooting and support"
@@ -1185,6 +1293,18 @@ ApplicationWindow {
     }
     Dialog {
         id: shortcutsHelp
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: shortcutsHelp.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Keyboard shortcuts"
@@ -1213,6 +1333,18 @@ ApplicationWindow {
     }
     Dialog {
         id: mediaInfoDialog
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: mediaInfoDialog.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Media information"
@@ -1250,6 +1382,18 @@ ApplicationWindow {
     }
     Dialog {
         id: preferencesDialog
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: preferencesDialog.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         title: "Preferences"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1398,6 +1542,18 @@ ApplicationWindow {
     }
     Dialog {
         id: clearRecentConfirm
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: clearRecentConfirm.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Clear recent files?"
@@ -1409,6 +1565,18 @@ ApplicationWindow {
     }
     Dialog {
         id: clearResumeConfirm
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: clearResumeConfirm.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Clear resume positions?"
@@ -1420,6 +1588,18 @@ ApplicationWindow {
     }
     Dialog {
         id: resetPreferencesConfirm
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: resetPreferencesConfirm.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Restore default preferences?"
@@ -1436,6 +1616,18 @@ ApplicationWindow {
     }
     Dialog {
         id: playbackOptions
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: playbackOptions.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Playback options"
@@ -1488,6 +1680,18 @@ ApplicationWindow {
     }
     Dialog {
         id: captionTools
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: captionTools.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Subtitle controls"
@@ -1519,6 +1723,18 @@ ApplicationWindow {
     }
     Dialog {
         id: subtitleDialog
+        // Explicit title color: some Qt themes otherwise draw dark text on dark dialogs.
+        header: Label {
+            text: subtitleDialog.title
+            color: "#E9F1F7"
+            font.bold: true
+            font.pixelSize: 16
+            leftPadding: 16
+            rightPadding: 16
+            topPadding: 12
+            bottomPadding: 8
+            background: Rectangle { color: "transparent" }
+        }
         // Do not inherit a light popup background from the host distribution.
         background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Open subtitles"
