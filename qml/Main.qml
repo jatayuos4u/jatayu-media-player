@@ -11,6 +11,17 @@ ApplicationWindow {
     minimumWidth: 650; minimumHeight: 430
     title: "Jatayu Media Player — " + player.title
     color: "#101820"
+    // Keep dialog text, controls and backgrounds readable across distro Qt themes.
+    palette.window: "#152330"
+    palette.windowText: "#E9F1F7"
+    palette.base: "#101820"
+    palette.alternateBase: "#1B2836"
+    palette.text: "#E9F1F7"
+    palette.button: "#263B4B"
+    palette.buttonText: "#E9F1F7"
+    palette.highlight: "#1689E8"
+    palette.highlightedText: "#FFFFFF"
+    palette.placeholderText: "#9FC1D7"
     property color accent: "#1689E8"
     property color textColor: "#E9F1F7"
     property color muted: "#8496A8"
@@ -135,6 +146,8 @@ ApplicationWindow {
     }
     Dialog {
         id: mediaBrowser
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Open media"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -498,6 +511,8 @@ ApplicationWindow {
     }
     Dialog {
         id: libraryDialog
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Music library"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -724,6 +739,8 @@ ApplicationWindow {
     }
     Dialog {
         id: namedPlaylistsDialog
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "My playlists"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -811,6 +828,8 @@ ApplicationWindow {
     }
     Dialog {
         id: playlistEditor
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Edit playlist: " + window.activePlaylist
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -863,6 +882,8 @@ ApplicationWindow {
     }
     Dialog {
         id: queueDialog
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Up next"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -904,6 +925,8 @@ ApplicationWindow {
     }
     Dialog {
         id: coverChooser
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Choose album artwork"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -990,6 +1013,8 @@ ApplicationWindow {
     }
     Dialog {
         id: editTags
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Edit music information"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1052,6 +1077,8 @@ ApplicationWindow {
     }
     Dialog {
         id: aboutPlayerDialog
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "About Jatayu Media Player"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1086,6 +1113,8 @@ ApplicationWindow {
     }
     Dialog {
         id: gettingStartedDialog
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Getting started"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1122,6 +1151,8 @@ ApplicationWindow {
     }
     Dialog {
         id: troubleshootingDialog
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Troubleshooting and support"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1158,6 +1189,8 @@ ApplicationWindow {
     }
     Dialog {
         id: shortcutsHelp
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Keyboard shortcuts"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1184,6 +1217,8 @@ ApplicationWindow {
     }
     Dialog {
         id: mediaInfoDialog
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Media information"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1367,6 +1402,8 @@ ApplicationWindow {
     }
     Dialog {
         id: clearRecentConfirm
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Clear recent files?"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1376,6 +1413,8 @@ ApplicationWindow {
     }
     Dialog {
         id: clearResumeConfirm
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Clear resume positions?"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1385,6 +1424,8 @@ ApplicationWindow {
     }
     Dialog {
         id: resetPreferencesConfirm
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Restore default preferences?"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1399,6 +1440,8 @@ ApplicationWindow {
     }
     Dialog {
         id: playbackOptions
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Playback options"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1449,6 +1492,8 @@ ApplicationWindow {
     }
     Dialog {
         id: captionTools
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Subtitle controls"
         modal: true
         anchors.centerIn: Overlay.overlay
@@ -1478,6 +1523,8 @@ ApplicationWindow {
     }
     Dialog {
         id: subtitleDialog
+        // Do not inherit a light popup background from the host distribution.
+        background: Rectangle { color: "#152330"; border.color: "#35475A"; radius: 10 }
         title: "Open subtitles"
         modal: true
         anchors.centerIn: Overlay.overlay
