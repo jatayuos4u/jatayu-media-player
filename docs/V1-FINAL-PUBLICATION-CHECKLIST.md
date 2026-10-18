@@ -87,3 +87,9 @@ Maintainer terminal output reports successful collection of mpv v0.39.0, LuaJIT 
 - Maintainer-provided SHA256: `cc7efee35ed7f201fc8a0a06a9d29c48cde4dd928617cee818b65f4964d0720f`.
 - Packaging script reported 23 top-level source, manifest, patch and notice entries; nested upstream tarballs contain more files. No archive inspection or independent checksum verification has occurred in this assistant session.
 - Keep the `-REVIEW` suffix until component and transitive-dependency source compliance is verified and release owner signs off.
+
+## Maintainer source review scanner result — 18 October 2026
+
+- [x] `scripts/audit-v1-source-review.py` ran successfully on maintainer system: 72 uchardet source/header files examined, 72 matched explicit tri-license patterns, zero unclassified by scanner. This is pattern recognition, **not** an exhaustive build-unit/license legal audit.
+- [x] Corresponding-source REVIEW archive structural check passed, 23 file entries, reported SHA256 `cc7efee35ed7f201fc8a0a06a9d29c48cde4dd928617cee818b65f4964d0720f`, matching previously reported digest.
+- [ ] Verify source archives/build configuration fully correspond to shipped binaries, third-party notices and asset rights; retain REVIEW status pending sign-off.
