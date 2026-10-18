@@ -10,9 +10,24 @@ staged=root/"dist/release-candidate-1.0.0-theme-fixed"
 expected={
  "jatayu-media-player_1.0.0_x86_64.deb":"f6a763dcffac6376b47d8d69eefbfe319c35f91834843612284a1fd0ae6980ee",
  "io.github.jatayuos4u.JatayuMediaPlayer-1.0.0-x86_64.flatpak":"42b5139bd5aeb3e6a0096b1d9f60f4233d1be534a5ce8078e36ec6acd142490b",
- "jatayu-media-player-1.0.0-corresponding-sources-REVIEW.tar.gz":"cd9aaca96d5d1af7aeb4cfcd4430ee35981dd282ca67d9e70865019bcf51c180"
+
 }
 errors=[]
+review_name="jatayu-media-player-1.0.0-corresponding-sources-REVIEW.tar.gz"
+checksum_file=staged/"SOURCE-REVIEW-SHA256SUMS"
+if checksum_file.is_file():
+    rows=[line.split() for line in checksum_file.read_text().splitlines() if line.strip()]
+    matches=[r[0] for r in rows if len(r)==2 and r[1].lstrip("*")==review_name]
+    if len(matches)==1 and len(matches[0])==64:
+        expected[review_name]=matches[0]
+    else:
+        errors.append("Invalid REVIEW source checksum list")
+else:
+    errors.append("Missing source archive checksum list")
+notice=staged/"THIRD_PARTY_NOTICES.md"
+if not notice.is_file() or notice.read_bytes()!=(root/"THIRD_PARTY_NOTICES.md").read_bytes():
+    errors.append("Staged notices outdated or missing; regenerate staging before release")
+
 for filename,digest in expected.items():
  p=staged/filename
  if not p.is_file():
