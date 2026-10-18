@@ -34,4 +34,3 @@ Jatayu Media Player application code is GPL-3.0-or-later. Bundled third-party li
 - https://github.com/jatayuos4u/jatayu-media-player
 - https://jatayuos.in
 
-This is release-note copy for publication **only after** the documented source/license sign-off and uploaded asset verification. It is not a claim that publication has occurred.
