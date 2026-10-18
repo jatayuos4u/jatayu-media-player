@@ -2,3 +2,7 @@ build/
 .cache/
 *.user
 *.swp
+
+# Local build output
+.flatpak-builder/
+dist/

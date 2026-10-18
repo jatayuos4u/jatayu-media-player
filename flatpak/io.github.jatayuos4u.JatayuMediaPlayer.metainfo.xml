@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.jatayuos4u.JatayuMediaPlayer</id>
+  <name>Jatayu Media Player</name>
+  <summary>Private local music and video playback</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <description>
+    <p>Jatayu Media Player is a standalone Linux music and video player built with Qt and libmpv. Play local media, manage playlists, browse music, and control subtitles without an account or built-in telemetry.</p>
+  </description>
+  <launchable type="desktop-id">io.github.jatayuos4u.JatayuMediaPlayer.desktop</launchable>
+  <url type="homepage">https://github.com/jatayuos4u/jatayu-media-player</url>
+  <url type="bugtracker">https://github.com/jatayuos4u/jatayu-media-player/issues</url>
+  <categories><category>AudioVideo</category><category>Player</category></categories>
+  <releases><release version="1.0.0" date="2026-10-19"><description><p>Planned first stable release, subject to verification.</p></description></release></releases>
+</component>
